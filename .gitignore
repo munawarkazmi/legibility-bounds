@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Scratch output from probes. Anything a result rests on is committed
+# deliberately, under results/, and never left here.
+scratch/

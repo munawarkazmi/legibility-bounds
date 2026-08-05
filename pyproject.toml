@@ -1,0 +1,17 @@
+[project]
+name = "legibility-bounds"
+version = "0.0.1"
+description = "Two-sided bounds on achievable legibility under a path cost budget, in a polygonal world with a finite goal set"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.26"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+# Named explicitly rather than discovered. vendor/ holds the submodule, which
+# is a checkout of another project and not a package of this one.
+[tool.setuptools]
+packages = ["legibility_bounds"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

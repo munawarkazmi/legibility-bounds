@@ -1,0 +1,3 @@
+[submodule "vendor/legible-motion-bench"]
+	path = vendor/legible-motion-bench
+	url = https://github.com/munawarkazmi/legible-motion-bench.git
