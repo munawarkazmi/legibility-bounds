@@ -37,9 +37,13 @@ more cells. On `open_pair` at cost ceiling 1.25, under the geodesic observer,
 against `legible-motion-bench` at `a376ab2`:
 
     achieved   0.8374   optimiser, 12 free waypoints tried, 4000 evaluations
-    bound      0.8470   reachability, lattice 0.01
-    gap        0.0096
+    bound      0.8449   reachability, lattice 0.01
+    gap        0.0075
     crude      1.0000   the bound that ignores reachability
+
+Those two bound figures are as they stand today. When this was first run the
+bound was 0.8470 and the gap 0.0096; the belief bound has been sharpened since
+and the numbers below move with it.
 
 The crude bound is the one the plan expected to be useless and it is: the
 largest belief anywhere in the admissible ellipse is the belief at the goal
@@ -52,13 +56,13 @@ grow with `L`, so evaluating at the largest admissible length covers every
 shorter one in a single pass and the bound does not have to range over path
 lengths at all.
 
-The gap of 0.0096 is small enough to be suspicious, so the result was
-attacked rather than reported.
+The gap is small enough to be suspicious, so the result was attacked rather
+than reported.
 
 - At a ceiling of exactly one the true optimum is known without searching: in
   a world with no obstacles the only path no longer than the optimal path is
   the straight line. Its legibility is exactly 0.6968 and the bound there is
-  0.7279, so the bound is above the exact answer by 0.0311 in the one place
+  0.7219, so the bound is above the exact answer by 0.0251 in the one place
   the exact answer exists.
 - Four optimiser configurations at 3, 5, 8 and 12 free waypoints, 4000
   evaluations each, reached 0.8353, 0.8372, 0.8374 and 0.8340. All four sit
@@ -70,7 +74,7 @@ attacked rather than reported.
 Nothing exceeded it.
 
 The bound is not converged. Refining the lattice tightens it monotonically in
-what has been run, 0.8576 at grid 0.04, 0.8507 at 0.02, and 0.8470 at 0.01,
+what has been run, 0.8503 at grid 0.04, 0.8468 at 0.02, and 0.8449 at 0.01,
 which is the tool's default and the figure quoted above. The remaining
 looseness is therefore partly the lattice and partly the relaxation, and the
 two have not been separated.
@@ -84,31 +88,62 @@ nothing here says how much. One world, one ceiling, one observer.
 
 ## The whole suite, 6 August 2026
 
-`tools/suite_bounds.py` at lattice 0.05, geodesic observer, search budget 500,
-written to `results/suite_bounds.json`. Eight worlds at four cost ceilings,
-32 pairs, and in every one of them the bound sits above what the search
-reached. Nothing here is a trend: it is one lattice, one observer and one
-search budget.
+`tools/suite_bounds.py` at lattice 0.0125, geodesic observer, search budget
+500, written to `results/suite_bounds.json`. Eight worlds at four cost
+ceilings, 32 pairs, and in every one of them the bound sits above what the
+search reached. Nothing here is a trend: it is one lattice, one observer and
+one search budget.
 
     world                obstacles   worst gap   best gap   worst band
-    door_pair            yes            0.0717     0.0654         0.23
-    fan_middle           no             0.0717     0.0290         0.00
-    fan_outer            no             0.0470     0.0374         0.00
-    keep_out_shortcut    no             0.0377     0.0213         0.00
-    narrow_gap           yes            0.1527     0.1256         0.51
-    open_pair            no             0.0377     0.0213         0.00
-    pillar_aisle         yes            0.0493     0.0282         0.28
-    wall_choice          yes            0.1804     0.1331         0.46
+    door_pair            yes            0.0556     0.0325         0.18
+    fan_middle           no             0.0567     0.0144         0.00
+    fan_outer            no             0.0282     0.0210         0.00
+    keep_out_shortcut    no             0.0198     0.0075         0.00
+    narrow_gap           yes            0.1061     0.0399         0.37
+    open_pair            no             0.0198     0.0075         0.00
+    pillar_aisle         yes            0.0184     0.0072         0.00
+    wall_choice          yes            0.1554     0.0226         0.35
 
-Over the four worlds with obstacles the gap runs 0.0282 to 0.1804, and over
-the four without it runs 0.0213 to 0.0717.
+Over the four worlds with obstacles the gap runs 0.0072 to 0.1554, and over
+the four without it runs 0.0075 to 0.0567.
 
 What this buys is the statement the sibling benchmark could not make about
 its own worlds. In `wall_choice` at a 25 per cent cost budget the bound is
-0.7559, so no trajectory within that budget reaches legibility 0.76, whatever
+0.6314, so no trajectory within that budget reaches legibility 0.64, whatever
 search anyone runs. The local optimiser reached 0.6084 there, so the property
-is not vacuous either: the true optimum lies somewhere in between, and both
-ends of that interval are now stated rather than one.
+is not vacuous either: the true optimum lies in an interval of width 0.0231,
+and both of its ends are now stated rather than one.
+
+## At loose ceilings the weak end is the search, not the bound
+
+Two rows do not fit the pattern and they say something worth acting on.
+`wall_choice` at ceiling 1.50 has a gap of 0.1554 where the same world at 1.25
+has 0.0231, and `narrow_gap` at 1.50 has 0.1061 against 0.0689 at 1.25.
+
+The upper bound rises with the ceiling because it must: a looser budget admits
+more trajectories. What fails to rise with it is the achieved value. In
+`wall_choice` the search gains only 0.0435 between ceilings 1.25 and 1.50
+while the bound gains 0.1759. The interval widens at the bottom.
+
+So at tight ceilings the certificate is what limits the result and at loose
+ones the search is. That is an argument for the certified lower bound, a
+construction that achieves what it claims rather than a search that reports
+what it found, and it is now visible in the table rather than suspected.
+
+## Where the tool spends its time, and the flag that fixes it
+
+Almost all of it goes on 32 searches at 500 evaluations, not on bounds. The
+optimiser never sees the lattice, so re-running at a new lattice cannot change
+a single achieved value, and repeating those searches to confirm that took
+half an hour of the day.
+
+`--reuse` takes achieved values from a previous results file, which brings a
+re-run down to about three minutes. It refuses unless the geometry commit,
+observer, search budget and waypoint count all match, re-checks every reused
+row against a freshly computed shortest path in that world, and records
+`achieved_source` on each row with `reused_from` and `reused_rows` on the
+file. The committed record above was produced without it, so it stands alone;
+the flag exists for the iteration in between.
 
 ## The lattice is 450 times faster, 6 August 2026
 
@@ -144,29 +179,104 @@ outside the polygon, and in `narrow_gap` a corner of one obstacle is exactly
 collinear with an edge of the other. The argument needs the node on the
 boundary itself.
 
-## Refining the lattice does not fix the band, 6 August 2026
+## The band, bounded properly, 6 August 2026
 
-`tools/refinement.py`, written to `results/refinement.json`. This was run
-expecting the band to narrow with the lattice, since its width is half a cell
-diagonal. That expectation was wrong and the tool records it.
+The cells too close to an obstacle to cover with the straight-line argument
+were capped at a belief of one. That cap was the dominant looseness in every
+world with obstacles, and refining the lattice did not touch it: an earlier
+run of `tools/refinement.py` moved the bound in `wall_choice` by 0.0127 across
+an eightfold refinement while the band's share stayed at 0.37. The reason was
+structural. A slice is decided by the band whenever its reachable set touches
+an obstacle at all, and a thinner band is still touched, so more cells could
+never help while each band cell was worth nothing.
+
+The cap was standing in for the wrong quantity. Written as odds against the
+true goal,
+
+    b = 1 / (1 + sum over the other goals of
+                  (p_G / p_A) exp(beta[(C_G - g_G) - (C_A - g_A)]))
+
+bounding the belief from above needs a lower bound on the difference between
+two cost-to-go values, not an upper bound on either. That matters because an
+obstacle makes the second impossible and leaves the first available. Every
+cost-to-go is 1-Lipschitz in the geodesic metric, so moving a distance D
+inside a cell shifts the difference by at most 2D, and
+
+    b(x) <= 1 / (1 + odds(p) exp(-2 beta D))
+
+holds over the whole cell. The obstacle problem is then one scalar per cell:
+the largest geodesic distance between two of its points.
+
+**No universal D exists, and none is claimed.** A wall thinner than a cell
+puts two neighbouring points a wall's length apart geodesically. What exists
+is a bound under a precondition that can be checked: if no obstacle is thinner
+than a cell and no two obstacles are closer together than a cell, then a
+cell's free part is in one piece and meets at most one obstacle. Under that,
+a path between two free points of a cell runs inside the cell, going straight
+where it can and following the obstacle boundary where it cannot, which costs
+at most 2r of straight travel plus a convex arc inside a disc of radius r, so
+
+    D <= 2 (1 + pi) r
+
+`minimum_width` and `minimum_separation` compute the precondition per
+scenario, and it is reported as `detour_certified` rather than assumed. Where
+it fails the detour is infinite and everything falls back to what holds
+unconditionally, which is the cap of one.
+
+The geometric claim is not left as an argument.
+`test_the_detour_bound_holds_against_real_geodesics` samples point pairs
+inside real band cells and measures the true geodesic with the vendored
+implementation, and `test_the_precondition_is_reported_and_can_fail` builds a
+deliberately too-coarse lattice and checks that it refuses to certify.
+
+Same tool, same three worlds, after the change:
 
     world           grid 0.05 to 0.00625      bound moved   band moved
-    wall_choice     0.7559 to 0.7432               0.0127       0.0079
-    narrow_gap      0.8258 to 0.8147               0.0111       0.0069
-    pillar_aisle    0.8781 to 0.8680               0.0101      -0.0927
+    wall_choice     0.6998 to 0.6226               0.0771       0.0610
+    narrow_gap      0.7920 to 0.7511               0.0409      -0.0131
+    pillar_aisle    0.8614 to 0.8540               0.0074       0.0000
 
-The Lipschitz slack behaves as expected, falling from 0.0177 to 0.0022 across
-that refinement. The band does not. Its share is flat in two worlds and rises
-in the third, and the reason is structural rather than numerical: a slice is
-decided by the band whenever its reachable set touches an obstacle at all, and
-a thinner band is still touched. Eight times the resolution and 3 million
-cells buy about 0.011 of bound.
+Two things changed together. The bounds are much lower: `wall_choice` at grid
+0.05 falls from 0.7559 to 0.6998, and at the finest lattice to 0.6226 against
+an achieved 0.6084, so a gap of 0.1475 becomes 0.0142. And refinement now
+works, moving the bound six times as far as it did before, because D scales
+with the lattice. In `pillar_aisle` the band no longer decides a single slice.
 
-Two consequences. The committed suite at grid 0.05 was already close to
-whatever a finer lattice would give, so those numbers stand. And the next
-improvement has to be a real bound on the belief over a cell that straddles an
-obstacle, in place of the cap of one, rather than more cells. Refinement is
-not the route and now there is a committed tool saying so.
+The earlier conclusion, that refining cannot fix the band, was true of the cap
+and is not true of the bound that replaced it. It is recorded here rather than
+removed, because the reasoning that led to it is what produced this.
+
+## The constant in that bound was wrong once, 6 August 2026
+
+The first version said `D <= 2(1 + pi) r`, having counted one diameter of
+straight travel where the construction needs two: reaching the free part's
+boundary costs up to `2r` from each of the two points, not `2r` between them.
+The correct constant is `(4 + 2 pi) r`, twenty-four per cent larger, and the
+smaller one would have meant the bound was not a bound.
+
+It was found by rereading the derivation rather than by a failing test, which
+is the part worth recording. The test that should have caught it sampled point
+pairs in one world with one seed and asserted only that nothing exceeded the
+claim. It passed on a constant that was too small, because random pairs inside
+a cell are almost never separated by an obstacle.
+
+That test now runs over four worlds and counts the pairs the obstacle actually
+separated, failing if there are none, and it samples cells beside obstacle
+corners deliberately. The precondition guarantees obstacles are wider than a
+cell, so two points of one cell can only be separated where the segment
+between them clips a corner, and uniform sampling almost never lands there.
+Across `wall_choice`, `narrow_gap`, `pillar_aisle` and `door_pair` it now
+measures 5, 16, 11 and 21 separated pairs.
+
+The correction cost very little: `wall_choice` at grid 0.05 moved from 0.6877
+to 0.6998.
+
+What the same measurements say about the constant is that it is loose. The
+worst detour observed anywhere is about 2.2 cell radii against a claimed
+10.28. The constant is not tuned to that and must not be, since a bound fitted
+to samples is not a bound. But a sharper argument, bounding the detour round a
+single clipped corner rather than round the whole free part of the cell, would
+tighten every number in the suite and is worth doing.
 
 ## Where the bound is weak, stated in its own column
 

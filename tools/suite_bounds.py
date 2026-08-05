@@ -46,6 +46,40 @@ DEFAULT_CEILINGS = (1.05, 1.1, 1.25, 1.5)
 DEFAULT_OUTPUT = Path(__file__).resolve().parents[1] / "results" / "suite_bounds.json"
 
 
+def _load_reusable(args, observer) -> dict:
+    """Achieved values from a previous run, if they describe the same search.
+
+    The optimiser knows nothing about the lattice, so a value it produced is
+    still the value it would produce at a different one. Everything else it
+    does depend on has to match exactly, and a mismatch is refused rather than
+    worked around: a table whose rows came from different search settings
+    would be a table of two different experiments.
+    """
+    path = Path(args.reuse)
+    if not path.is_file():
+        raise SystemExit(f"--reuse names no file: {path}")
+    previous = json.loads(path.read_text(encoding="utf-8"))
+
+    for field, mine in (
+        ("geometry_commit", vendored.PINNED_COMMIT),
+        ("observer", observer.name),
+        ("search_budget", args.budget),
+        ("waypoints", args.waypoints),
+    ):
+        theirs = previous.get(field)
+        if theirs != mine:
+            raise SystemExit(
+                f"refusing to reuse {path.name}: its {field} is {theirs!r} and "
+                f"this run's is {mine!r}. Achieved values are only "
+                f"transferable between runs that searched the same way."
+            )
+
+    return {
+        (row["scenario"], float(row["ceiling"])): row
+        for row in previous.get("rows", [])
+    }
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--grid", type=float, default=0.05)
@@ -57,6 +91,19 @@ def main(argv=None) -> int:
     )
     parser.add_argument("--scenarios", default="")
     parser.add_argument("--output", default=str(DEFAULT_OUTPUT))
+    parser.add_argument(
+        "--reuse",
+        default="",
+        help=(
+            "a previous results file whose achieved values may be taken "
+            "rather than searched for again. The search knows nothing about "
+            "the lattice, so re-running at a new lattice cannot change them, "
+            "and repeating 32 searches to confirm that is most of the cost of "
+            "this tool. Reuse is refused unless the geometry, observer and "
+            "search settings match exactly, and every reused row is checked "
+            "against a freshly computed shortest path."
+        ),
+    )
     args = parser.parse_args(argv)
 
     ceilings = [float(c) for c in args.ceilings.split(",")]
@@ -66,10 +113,15 @@ def main(argv=None) -> int:
         or sorted(p.stem for p in vendored.SCENARIO_DIR.glob("*.json"))
     )
 
+    reused = _load_reusable(args, observer) if args.reuse else {}
+
     print(f"geometry:  legible-motion-bench at {vendored.PINNED_COMMIT[:7]}")
     print(f"observer:  {observer.name}")
     print(f"lattice:   {args.grid}")
-    print(f"search:    {args.budget} evaluations, {args.waypoints} waypoints\n")
+    print(f"search:    {args.budget} evaluations, {args.waypoints} waypoints")
+    if args.reuse:
+        print(f"reusing:   {len(reused)} achieved values from {args.reuse}")
+    print()
 
     header = (
         f"{'world':<20}{'ceiling':>9}{'achieved':>10}{'bound':>9}"
@@ -92,26 +144,48 @@ def main(argv=None) -> int:
             result = reachability_bound(
                 scenario, observer, ceiling, grid=args.grid, built=built
             )
-            plan = LegiblePlanner(
-                waypoints=args.waypoints,
-                budget=args.budget,
-                restarts=3,
-                cost_budget=ceiling,
-            ).plan(scenario)
-            scored = vendored.metrics.evaluate(scenario, observer, plan.points)
-            achieved = max(scored.legibility, baseline.legibility)
+            previous = reused.get((scenario.id, ceiling))
+            if previous is None:
+                plan = LegiblePlanner(
+                    waypoints=args.waypoints,
+                    budget=args.budget,
+                    restarts=3,
+                    cost_budget=ceiling,
+                ).plan(scenario)
+                scored = vendored.metrics.evaluate(scenario, observer, plan.points)
+                achieved = max(scored.legibility, baseline.legibility)
+                achieved_ratio = scored.cost_ratio
+                source = "searched"
+            else:
+                # The stored shortest path legibility is recomputed above and
+                # has to agree, which is a check that the reused row describes
+                # this world rather than merely carrying its name.
+                stored = previous["shortest_path_legibility"]
+                if abs(stored - baseline.legibility) > 1e-12:
+                    raise SystemExit(
+                        f"refusing to reuse {scenario.id} at ceiling {ceiling}: "
+                        f"the stored shortest path legibility is {stored!r} but "
+                        f"this world scores {baseline.legibility!r}"
+                    )
+                achieved = previous["achieved"]
+                achieved_ratio = previous["achieved_cost_ratio"]
+                source = f"reused from {Path(args.reuse).name}"
 
             row = {
                 "scenario": scenario.id,
                 "ceiling": ceiling,
                 "achieved": achieved,
-                "achieved_cost_ratio": scored.cost_ratio,
+                "achieved_cost_ratio": achieved_ratio,
+                "achieved_source": source,
                 "shortest_path_legibility": baseline.legibility,
                 "bound": result.bound,
                 "gap": result.bound - achieved,
                 "weight_from_band": result.weight_from_band,
                 "band_cells": result.band_cells,
+                "uncertified_cells": result.uncertified_cells,
                 "unusable_cells": result.unusable_cells,
+                "detour_certified": result.detour_certified,
+                "band_detour": result.band_detour,
                 "has_obstacles": bool(scenario.obstacles),
                 "lattice_build_seconds": build_seconds,
             }
@@ -135,6 +209,8 @@ def main(argv=None) -> int:
         "geometry_commit": vendored.PINNED_COMMIT,
         "observer": observer.name,
         "grid": args.grid,
+        "reused_from": args.reuse or None,
+        "reused_rows": sum(1 for r in rows if r["achieved_source"] != "searched"),
         "search_budget": args.budget,
         "waypoints": args.waypoints,
         "rows": rows,

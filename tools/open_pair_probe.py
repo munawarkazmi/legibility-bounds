@@ -128,7 +128,7 @@ def main(argv=None) -> int:
         result = reachability_bound(scenario, observer, args.ceiling, grid=grid)
         refinement.append(result.as_record())
         print(f"   grid {grid:<7} bound {result.bound:.4f}   "
-              f"slack {result.lipschitz_slack:.4f}   samples {result.samples}")
+              f"detour {result.cell_detour:.4f}   samples {result.samples}")
     finest = refinement[-1]
     print(flush=True)
 

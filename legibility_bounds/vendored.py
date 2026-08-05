@@ -63,6 +63,7 @@ from legible_motion_bench.geometry import (  # noqa: E402
     ConvexPolygon,
     orientation,
     polyline_length,
+    segment_segment_distance,
 )
 from legible_motion_bench.observer import Observer  # noqa: E402
 from legible_motion_bench.world import Scenario, load_scenario  # noqa: E402
@@ -82,6 +83,7 @@ __all__ = [
     "metrics",
     "polyline_length",
     "scenario",
+    "segment_segment_distance",
     "straight_line_cost",
 ]
 

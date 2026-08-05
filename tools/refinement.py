@@ -76,7 +76,9 @@ def main(argv=None) -> int:
                 "cells": int(built.usable.size),
                 "bound": result.bound,
                 "weight_from_band": result.weight_from_band,
-                "lipschitz_slack": result.lipschitz_slack,
+                "cell_detour": result.cell_detour,
+                "band_detour": result.band_detour,
+                "detour_certified": result.detour_certified,
                 "band_cells": result.band_cells,
                 "build_seconds": build_seconds,
             }
@@ -84,7 +86,7 @@ def main(argv=None) -> int:
             print(
                 f"   grid {grid:<9} bound {result.bound:.4f}   "
                 f"band {result.weight_from_band:.2f}   "
-                f"slack {result.lipschitz_slack:.4f}   "
+                f"detour {result.band_detour:.4f}   "
                 f"cells {row['cells']:>8}   built in {build_seconds:>6.2f}s",
                 flush=True,
             )

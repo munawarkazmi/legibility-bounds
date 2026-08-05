@@ -32,25 +32,29 @@ bound sits above what a search reached. From `tools/suite_bounds.py`, written
 to `results/suite_bounds.json`:
 
     world                obstacles   worst gap   best gap   worst band
-    door_pair            yes            0.0717     0.0654         0.23
-    fan_middle           no             0.0717     0.0290         0.00
-    fan_outer            no             0.0470     0.0374         0.00
-    keep_out_shortcut    no             0.0377     0.0213         0.00
-    narrow_gap           yes            0.1527     0.1256         0.51
-    open_pair            no             0.0377     0.0213         0.00
-    pillar_aisle         yes            0.0493     0.0282         0.28
-    wall_choice          yes            0.1804     0.1331         0.46
+    door_pair            yes            0.0556     0.0325         0.18
+    fan_middle           no             0.0567     0.0144         0.00
+    fan_outer            no             0.0282     0.0210         0.00
+    keep_out_shortcut    no             0.0198     0.0075         0.00
+    narrow_gap           yes            0.1061     0.0399         0.37
+    open_pair            no             0.0198     0.0075         0.00
+    pillar_aisle         yes            0.0184     0.0072         0.00
+    wall_choice          yes            0.1554     0.0226         0.35
 
 What that licenses, taking `wall_choice` at a 25 per cent cost budget: the
-bound is 0.7559, so no trajectory within that budget reaches legibility 0.76,
+bound is 0.6314, so no trajectory within that budget reaches legibility 0.64,
 whatever search anyone runs. The local optimiser reached 0.6084 there, so the
-statement is not vacuous either. Both ends of the interval are stated rather
-than one.
+statement is not vacuous either. The true optimum lies in an interval of width
+0.0231 and both of its ends are stated.
 
-`band` is the share of a bound decided by cells too close to an obstacle to
-bound properly, which are capped at a belief of one. A high band share means
-a weak bound, and the column exists so that weakness is located rather than
-hidden.
+`band` is the share of a bound decided by cells too close to an obstacle for
+the straight-line argument, which are bounded more loosely. A high band share
+means a weak bound, and the column exists so that weakness is located rather
+than hidden.
+
+At the loosest ceiling the wide gaps are the search's doing rather than the
+bound's: between ceilings 1.25 and 1.50 in `wall_choice` the optimiser gains
+0.0435 while the bound gains 0.1759.
 
 ## What is not true yet
 
@@ -64,11 +68,13 @@ hidden.
 - There is no cell decomposition and no branch and bound. The relaxation
   throws away every constraint linking one sample of a trajectory to the
   next.
-- **Refining the lattice does not fix the weak part.** Eight times the
-  resolution moves a bound by about 0.011 and leaves the band share flat, so
-  the looseness is structural rather than numerical. What is needed is a real
-  bound on the belief over a cell that straddles an obstacle, in place of the
-  cap of one. `tools/refinement.py` is the evidence.
+- **The bound near obstacles rests on a precondition.** Cells too close to an
+  obstacle for the straight-line argument are bounded through the largest
+  geodesic distance between two points of a cell, which exists only if no
+  obstacle is thinner than a cell and no two obstacles are closer together
+  than one. Every scenario is checked against that and reports
+  `detour_certified`; where it fails the bound falls back to a belief of one
+  and says so. No claim is made that the precondition holds in general.
 - One lattice, one observer, one search budget. Nothing here may be read as a
   trend.
 - No result has been reported anywhere, and no venue has been chosen.
@@ -117,7 +123,7 @@ python -m venv .venv && .venv/Scripts/python.exe -m pip install -e ".[dev]"
 .venv/Scripts/python.exe -m pytest -q
 ```
 
-Twenty-eight tests. Three are about the vendored geometry being the right one
+Thirty-three tests. Three are about the vendored geometry being the right one
 and behaving as the bounding argument assumes. Several try to make the bound
 fail, including against the one case where the exact optimum is known without
 searching: at a ceiling of exactly one in a world with no obstacles, the only

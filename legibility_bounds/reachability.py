@@ -78,10 +78,13 @@ class ReachabilityBound:
     path_length: float
     samples: int
     grid: float
-    lipschitz_slack: float
+    cell_detour: float
+    band_detour: float
+    detour_certified: bool
     bound: float
     weight_from_band: float
     band_cells: int
+    uncertified_cells: int
     unusable_cells: int
 
     def as_record(self) -> dict:
@@ -173,23 +176,21 @@ def reachability_bound(
         weight = 1.0 - s
 
         # Split the slice so the band's contribution can be read rather than
-        # inferred. A band cell is capped at one, so the band decided this
-        # slice exactly when no cell we could bound properly reached as high.
+        # inferred: the band decided this slice when its best cell bounded
+        # higher than anything the straight-line argument covers.
         clear = reachable & ~built.near_obstacle
-        in_band = bool((reachable & built.near_obstacle).any())
-        best_clear = float(ceiling_on_belief[clear].max()) if clear.any() else 0.0
+        band = reachable & built.near_obstacle
+        best_clear = float(ceiling_on_belief[clear].max()) if clear.any() else -1.0
+        best_band = float(ceiling_on_belief[band].max()) if band.any() else -1.0
 
-        if in_band:
-            best = max(best_clear, 1.0)
-            banded = best_clear < 1.0
-        elif clear.any():
-            best = best_clear
-            banded = False
-        else:
+        if best_clear < 0.0 and best_band < 0.0:
             # No lattice point survives the lens. The belief is a probability
             # whatever the truth is, so one is still a bound.
             best = 1.0
             banded = True
+        else:
+            best = max(best_clear, best_band)
+            banded = best_band > best_clear
         numerator += best * weight
         denominator += weight
         if banded:
@@ -203,9 +204,12 @@ def reachability_bound(
         path_length=length,
         samples=steps + 1,
         grid=grid,
-        lipschitz_slack=built.slack,
+        cell_detour=built.cell_radius,
+        band_detour=built.band_detour if built.detour_certified else math.inf,
+        detour_certified=built.detour_certified,
         bound=numerator / denominator,
         weight_from_band=from_band / denominator,
         band_cells=int(built.near_obstacle.sum()),
+        uncertified_cells=built.uncertified_cells,
         unusable_cells=int((~built.usable).sum()),
     )

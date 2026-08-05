@@ -8,6 +8,8 @@ obstacle-adjacent cells rests on.
 
 from __future__ import annotations
 
+import math
+
 import numpy as np
 import pytest
 
@@ -85,13 +87,122 @@ def test_the_band_is_exactly_the_cells_near_an_obstacle(walled):
         assert nearest <= built.cell_radius
 
 
-def test_the_belief_bound_is_one_in_the_band_and_slack_elsewhere(walled):
+def test_the_belief_bound_is_above_the_belief_and_is_a_probability(walled):
     _, _, built = walled
     bound = built.belief_bound()
-    assert (bound[built.near_obstacle] == 1.0).all()
-    clear = ~built.near_obstacle
-    assert (bound[clear] <= built.belief[clear] + built.slack + 1e-12).all()
-    assert (bound <= 1.0).all()
+    usable = built.usable
+    assert (bound[usable] >= built.belief[usable] - 1e-12).all()
+    assert (bound >= 0.0).all() and (bound <= 1.0).all()
+    # The band is bounded more loosely than the rest, but no longer by the
+    # cap of one wherever the detour is certified.
+    band = built.near_obstacle & usable
+    if built.detour_certified and band.any():
+        assert (bound[band] < 1.0).any()
+
+
+@pytest.mark.parametrize(
+    "name", ["wall_choice", "narrow_gap", "pillar_aisle", "door_pair"]
+)
+def test_the_detour_bound_holds_against_real_geodesics(name):
+    """The geometric claim the band bound rests on, checked rather than argued.
+
+    The claim is that two free points of the same cell are no further apart
+    geodesically than (4 + 2 pi) times the cell radius, given that no obstacle
+    is thinner than a cell and no two obstacles are closer together than one.
+    This samples point pairs inside real band cells and measures the true
+    geodesic with the vendored implementation.
+
+    The first version of the constant was 24 per cent smaller, derived by
+    counting one diameter of straight travel where the construction needs two.
+    It passed on one world with a single seed, which is why this now runs over
+    four worlds and reports the headroom: a test that only says "passed" would
+    not have distinguished a sound constant from a lucky one.
+    """
+    scenario = vendored.scenario(name)
+    observer = vendored.Observer(condition="geodesic")
+    built = lattice_module.build(scenario, observer, TEST_GRID)
+    assert built.detour_certified, f"{name} at this lattice should certify"
+    band = np.argwhere(built.near_obstacle & built.usable)
+    assert len(band) > 0
+
+    rng = np.random.default_rng(19)
+    radius = built.cell_radius
+
+    # Cells beside an obstacle corner, and a random spread of the rest.
+    #
+    # The precondition says obstacles are wider than a cell, so two points of
+    # one cell can only be separated by an obstacle where the segment between
+    # them clips a corner. Sampling uniformly over the band almost never lands
+    # there, which would leave this test passing without ever measuring a
+    # detour. Corner cells are chosen deliberately for that reason.
+    corners = [v for ob in scenario.obstacles for v in ob.vertices]
+    centres = np.stack([built.x[band[:, 0], band[:, 1]],
+                        built.y[band[:, 0], band[:, 1]]], axis=1)
+    to_corner = np.min(
+        np.stack([
+            np.hypot(centres[:, 0] - c[0], centres[:, 1] - c[1]) for c in corners
+        ]),
+        axis=0,
+    )
+    beside_a_corner = band[np.argsort(to_corner)[:20]]
+    spread = band[rng.choice(len(band), size=min(20, len(band)), replace=False)]
+    sampled = np.concatenate([beside_a_corner, spread])
+
+    checked = 0
+    detoured = 0
+    worst = 0.0
+    worst_detoured = 0.0
+    for row, col in sampled:
+        cx, cy = float(built.x[row, col]), float(built.y[row, col])
+        for _ in range(20):
+            offsets = [float(v) for v in rng.uniform(-radius, radius, size=4)]
+            a = (cx + offsets[0], cy + offsets[1])
+            b = (cx + offsets[2], cy + offsets[3])
+            if any(ob.contains_interior(a) or ob.contains_interior(b)
+                   for ob in scenario.obstacles):
+                continue
+            measured = vendored.geodesic_cost(a, b, scenario.obstacles)
+            worst = max(worst, measured / radius)
+            assert measured <= built.band_detour + 1e-9, (
+                f"{name}: geodesic {measured:.4f} between {a} and {b} exceeds "
+                f"the claimed detour bound {built.band_detour:.4f}"
+            )
+            checked += 1
+            # A pair whose straight line is already free tells us nothing
+            # about a bound that exists for pairs the obstacle separates.
+            straight = math.hypot(a[0] - b[0], a[1] - b[1])
+            if measured > straight + 1e-9:
+                detoured += 1
+                worst_detoured = max(worst_detoured, measured / radius)
+
+    assert checked > 100, f"{name}: only {checked} pairs were actually testable"
+    assert detoured > 0, (
+        f"{name}: not one sampled pair was separated by the obstacle, so this "
+        f"test never exercised the case the bound exists for"
+    )
+    # Recorded so a future change to the constant can be judged against what
+    # the geometry actually does rather than against whether the test passed.
+    print(
+        f"\n{name}: worst detour {worst:.3f} cell radii overall and "
+        f"{worst_detoured:.3f} among the {detoured} pairs the obstacle "
+        f"separated, against a claimed {lattice_module.BAND_DETOUR_FACTOR:.3f}, "
+        f"over {checked} pairs"
+    )
+
+
+def test_the_precondition_is_reported_and_can_fail(walled):
+    """A lattice too coarse for its obstacles must say so rather than claim it."""
+    scenario, observer, _ = walled
+    from legibility_bounds.lattice import certifies_detour, minimum_width
+
+    narrowest = min(minimum_width(ob) for ob in scenario.obstacles)
+    assert certifies_detour(scenario.obstacles, narrowest / 4.0)
+    assert not certifies_detour(scenario.obstacles, narrowest)
+
+    coarse = lattice_module.build(scenario, observer, narrowest * 2.0)
+    assert not coarse.detour_certified
+    assert coarse.uncertified_cells > 0
+    assert (coarse.belief_bound()[coarse.near_obstacle & coarse.usable] == 1.0).all()
 
 
 def test_an_obstacle_free_world_has_no_band_at_all(walled):
