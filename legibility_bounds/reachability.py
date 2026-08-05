@@ -19,9 +19,10 @@ only on position, and the duration cancels out of the weighting.
 A trajectory of length `L_path` that starts at `S`, ends at the goal `G`, and
 passes through `x_i` after `s L_path` of arc length must satisfy
 
-    d(S, x_i) <= s L_path        and        d(x_i, G) <= (1 - s) L_path
+    C*(S -> x_i) <= s L_path      and      C*(x_i -> G) <= (1 - s) L_path
 
-because arc length is at least distance. So `x_i` lies in a lens `R(s)`, and
+because arc length is at least optimal cost-to-go. So `x_i` lies in a lens
+`R(s)`, and
 
     L <= sum_i [ max over R(s_i) of b ] w_i / sum_i w_i.
 
@@ -37,13 +38,11 @@ jump anywhere inside the next lens, so it bounds a trajectory that need not
 be a trajectory. Constraining consecutive samples to lie within `L_path / N`
 of each other is what a tighter bound would add, and it is not done here.
 
-Where it does not apply
------------------------
-
-Worlds with obstacles. The field below is computed from Euclidean distance,
-which equals the geodesic only when nothing stands in the way, and the lens
-condition uses the same distance. A world with obstacles is refused rather
-than bounded wrongly.
+Worlds with obstacles are handled, and the cells where the straight-line
+argument fails are handled separately rather than glossed. See `lattice.py`,
+which is where all of that lives. The one number to read alongside a bound in
+such a world is `weight_from_band`: the share of the result that came from
+cells too close to an obstacle to bound properly.
 """
 
 from __future__ import annotations
@@ -53,7 +52,17 @@ from dataclasses import asdict, dataclass
 
 import numpy as np
 
+from . import lattice as lattice_module
+from .lattice import Lattice, lipschitz_constant
 from .vendored import Observer, Scenario, geodesic_cost, metrics
+
+__all__ = [
+    "BoundError",
+    "ReachabilityBound",
+    "belief_field",
+    "lipschitz_constant",
+    "reachability_bound",
+]
 
 
 class BoundError(ValueError):
@@ -71,23 +80,28 @@ class ReachabilityBound:
     grid: float
     lipschitz_slack: float
     bound: float
+    weight_from_band: float
+    band_cells: int
+    unusable_cells: int
 
     def as_record(self) -> dict:
         return asdict(self)
 
 
 def belief_field(scenario: Scenario, observer: Observer, px, py):
-    """Belief in the true goal at each point of a grid, vectorised.
+    """Belief in the true goal at each of the given points.
 
-    The same quantity the vendored `Observer.posterior` returns, computed for
-    many points at once. It is held to that reference implementation by
-    `tests/test_reachability.py` rather than by argument, in the way the
-    sibling repository holds its fast paths to its slow ones.
+    Kept as the obstacle-free vectorised form, and held to the vendored
+    `Observer.posterior` by `tests/test_reachability.py` rather than by
+    argument, in the way the sibling repository holds its fast paths to its
+    slow ones. A world with obstacles goes through `lattice.build` instead,
+    which uses the exact cost-to-go index.
     """
     if scenario.obstacles:
         raise BoundError(
             f"scenario {scenario.id!r} has obstacles, so the geodesic is not "
-            f"the straight line and this field would be wrong"
+            f"the straight line and this field would be wrong. Build a "
+            f"lattice instead."
         )
     px = np.asarray(px, dtype=float)
     py = np.asarray(py, dtype=float)
@@ -99,31 +113,12 @@ def belief_field(scenario: Scenario, observer: Observer, px, py):
         * (baseline[goal.id] - np.hypot(px - goal.position[0], py - goal.position[1]))
         for goal in scenario.goals
     }
-    # The same shift the reference implementation applies, for the same
-    # reason: without it a point far from every goal underflows every weight
-    # to zero and the normalisation divides by it.
     shift = np.maximum.reduce(list(exponents.values()))
     weights = {
         goal_id: prior[goal_id] * np.exp(value - shift)
         for goal_id, value in exponents.items()
     }
-    total = sum(weights.values())
-    return weights[scenario.true_goal] / total
-
-
-def lipschitz_constant(observer: Observer) -> float:
-    """A bound on |grad b|, used to make a grid maximum into a real maximum.
-
-    The belief is a softmax of terms whose gradients in space have magnitude
-    at most beta, so
-
-        |grad b| <= beta * [ b (1 - b) + b * sum of the other beliefs ]
-                  = 2 beta b (1 - b)
-                  <= beta / 2,
-
-    for any number of goals. Nothing here assumes there are two.
-    """
-    return observer.beta / 2.0
+    return weights[scenario.true_goal] / sum(weights.values())
 
 
 def reachability_bound(
@@ -132,14 +127,13 @@ def reachability_bound(
     ceiling: float,
     grid: float = 0.01,
     spacing: float = metrics.DEFAULT_SAMPLE_SPACING,
+    built: Lattice | None = None,
 ) -> ReachabilityBound:
     """Upper bound on the legibility of any trajectory within the ceiling.
 
-    The bound is computed over a lattice of the world at `grid` spacing. A
-    lattice maximum is not a maximum, so two things make it into one: the
-    lens test is dilated by a whole grid step, which cannot exclude a lattice
-    point near an admissible one, and the Lipschitz slack above is added to
-    the result.
+    Pass `built` to reuse a lattice across several ceilings, which is worth
+    doing because building one is most of the cost in a world with obstacles
+    and it does not depend on the ceiling at all.
     """
     if ceiling < 1.0:
         raise BoundError(
@@ -148,49 +142,58 @@ def reachability_bound(
         )
     if grid <= 0:
         raise BoundError(f"grid spacing must be positive, found {grid!r}")
-    if scenario.obstacles:
+
+    if built is None:
+        built = lattice_module.build(scenario, observer, grid)
+    elif built.grid != grid:
         raise BoundError(
-            f"scenario {scenario.id!r} has obstacles. This bound uses "
-            f"Euclidean distance for both the belief field and the lens "
-            f"condition, and neither is the geodesic once something stands "
-            f"in the way. Worlds with obstacles need their own treatment."
+            f"the lattice given was built at grid {built.grid!r} but a bound "
+            f"at grid {grid!r} was asked for"
+        )
+    if built.scenario_id != scenario.id or built.observer != observer.name:
+        raise BoundError(
+            f"the lattice given is for {built.scenario_id!r} under "
+            f"{built.observer!r}, not {scenario.id!r} under {observer.name!r}"
         )
 
-    start = scenario.start
-    goal = scenario.true_goal_position
-    optimal = geodesic_cost(start, goal, scenario.obstacles)
+    optimal = geodesic_cost(
+        scenario.start, scenario.true_goal_position, scenario.obstacles
+    )
     length = ceiling * optimal
 
-    bounds = scenario.bounds
-    gx = np.arange(bounds.xmin, bounds.xmax + grid, grid)
-    gy = np.arange(bounds.ymin, bounds.ymax + grid, grid)
-    mesh_x, mesh_y = np.meshgrid(gx, gy)
-
-    to_start = np.hypot(mesh_x - start[0], mesh_y - start[1])
-    to_goal = np.hypot(mesh_x - goal[0], mesh_y - goal[1])
-    field = belief_field(scenario, observer, mesh_x, mesh_y)
-
-    # Half the diagonal of a cell is the furthest any point can be from the
-    # nearest lattice point.
-    slack = lipschitz_constant(observer) * grid * math.sqrt(2) / 2.0
-
+    ceiling_on_belief = built.belief_bound()
     steps = max(1, math.ceil(length / spacing))
+
     numerator = 0.0
     denominator = 0.0
+    from_band = 0.0
     for i in range(steps + 1):
         s = i / steps
-        reachable = (to_start <= s * length + grid) & (
-            to_goal <= (1.0 - s) * length + grid
-        )
-        if reachable.any():
-            best = min(1.0, float(field[reachable].max()) + slack)
+        reachable = built.reachable(s * length, (1.0 - s) * length)
+        weight = 1.0 - s
+
+        # Split the slice so the band's contribution can be read rather than
+        # inferred. A band cell is capped at one, so the band decided this
+        # slice exactly when no cell we could bound properly reached as high.
+        clear = reachable & ~built.near_obstacle
+        in_band = bool((reachable & built.near_obstacle).any())
+        best_clear = float(ceiling_on_belief[clear].max()) if clear.any() else 0.0
+
+        if in_band:
+            best = max(best_clear, 1.0)
+            banded = best_clear < 1.0
+        elif clear.any():
+            best = best_clear
+            banded = False
         else:
             # No lattice point survives the lens. The belief is a probability
             # whatever the truth is, so one is still a bound.
             best = 1.0
-        weight = 1.0 - s
+            banded = True
         numerator += best * weight
         denominator += weight
+        if banded:
+            from_band += weight
 
     return ReachabilityBound(
         scenario_id=scenario.id,
@@ -200,6 +203,9 @@ def reachability_bound(
         path_length=length,
         samples=steps + 1,
         grid=grid,
-        lipschitz_slack=slack,
+        lipschitz_slack=built.slack,
         bound=numerator / denominator,
+        weight_from_band=from_band / denominator,
+        band_cells=int(built.near_obstacle.sum()),
+        unusable_cells=int((~built.usable).sum()),
     )

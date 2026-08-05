@@ -50,12 +50,47 @@ def test_the_field_matches_the_reference_observer(open_pair, observer):
     assert np.abs(fast - slow).max() < 1e-12
 
 
-def test_a_world_with_obstacles_is_refused_rather_than_bounded(observer):
+def test_the_vectorised_field_refuses_a_world_it_would_be_wrong_in(observer):
+    """The obstacle-free shortcut must not be reachable for a walled world."""
     walled = vendored.scenario("wall_choice")
     assert walled.obstacles, "wall_choice is supposed to have an obstacle"
     with pytest.raises(BoundError) as raised:
-        reachability_bound(walled, observer, ceiling=1.25, grid=TEST_GRID)
+        belief_field(walled, observer, [1.0], [1.0])
     assert "geodesic" in str(raised.value)
+
+
+def test_it_bounds_the_optimiser_in_a_world_with_an_obstacle(observer):
+    """The case the project exists for, where a local search cannot decide.
+
+    Coarse lattice on purpose: this is about the bound holding in a world
+    where the geodesic is not the straight line, not about how tight it is.
+    """
+    from legible_motion_bench.planners.legible import LegiblePlanner
+
+    walled = vendored.scenario("wall_choice")
+    result = reachability_bound(walled, observer, ceiling=1.25, grid=0.25)
+    plan = LegiblePlanner(
+        waypoints=3, budget=300, restarts=2, cost_budget=1.25
+    ).plan(walled)
+    achieved = vendored.metrics.evaluate(walled, observer, plan.points)
+    assert achieved.feasible
+    assert achieved.cost_ratio <= 1.25 + 1e-9
+    assert achieved.legibility <= result.bound
+
+
+def test_the_band_share_is_reported_and_is_a_share(observer):
+    walled = reachability_bound(
+        vendored.scenario("wall_choice"), observer, ceiling=1.25, grid=0.25
+    )
+    empty = reachability_bound(
+        vendored.scenario("open_pair"), observer, ceiling=1.25, grid=0.25
+    )
+    assert 0.0 <= walled.weight_from_band <= 1.0
+    assert walled.band_cells > 0
+    # An obstacle-free world has nothing the argument cannot cover, so none of
+    # its bound may be attributed to the band.
+    assert empty.weight_from_band == 0.0
+    assert empty.band_cells == 0
 
 
 def test_at_ceiling_one_it_bounds_the_only_admissible_trajectory(open_pair, observer):

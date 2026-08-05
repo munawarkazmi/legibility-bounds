@@ -14,7 +14,10 @@
       "samples": 263,
       "grid": 0.04,
       "lipschitz_slack": 0.014142135623730952,
-      "bound": 0.8575893783895672
+      "bound": 0.8575893783895672,
+      "weight_from_band": 0.0,
+      "band_cells": 0,
+      "unusable_cells": 0
     },
     {
       "scenario_id": "open_pair",
@@ -25,7 +28,10 @@
       "samples": 263,
       "grid": 0.02,
       "lipschitz_slack": 0.007071067811865476,
-      "bound": 0.8506696971694366
+      "bound": 0.8506696971694366,
+      "weight_from_band": 0.0,
+      "band_cells": 0,
+      "unusable_cells": 0
     },
     {
       "scenario_id": "open_pair",
@@ -36,7 +42,10 @@
       "samples": 263,
       "grid": 0.01,
       "lipschitz_slack": 0.003535533905932738,
-      "bound": 0.846983712880822
+      "bound": 0.846983712880822,
+      "weight_from_band": 0.0,
+      "band_cells": 0,
+      "unusable_cells": 0
     }
   ],
   "bound": 0.846983712880822,

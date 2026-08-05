@@ -16,12 +16,18 @@ inspected.
   `tools/open_pair_probe.py` into `results/open_pair_probe.json`. It is the
   loosest useful member of the family and it is here because it decides
   whether the idea is alive. It is not the instrument the project is for.
+- [x] Worlds with obstacles. `legibility_bounds/lattice.py`, seven tests. The
+  exact geodesic comes from the vendored visibility-graph index, and cells
+  too close to an obstacle for that argument to cover are handled separately
+  and their cost is reported rather than argued. All eight worlds of the
+  suite now carry a bound at four ceilings.
 - [ ] Cell decomposition, and a bound that constrains consecutive samples
   rather than letting the path jump between them. Not started, and this is
-  what would tighten the gap below.
+  what would tighten the gaps below.
 - [ ] The lower bound as a construction that certifies what it claims,
   rather than the best value a search happened to reach. Not started.
-- [ ] Worlds with obstacles. Not started, and the hardest part.
+- [ ] A bound for the safety-constrained problem. Not started. See the note
+  on `keep_out_shortcut` below, which is the reason it is now obvious.
 
 ## The kill criterion, run 6 August 2026
 
@@ -75,6 +81,70 @@ maximisers over successive lenses happen to trace something a path can very
 nearly follow. The relaxation throws away every constraint linking one sample
 to the next, so a world where those maximisers jump would loosen it, and
 nothing here says how much. One world, one ceiling, one observer.
+
+## The whole suite, 6 August 2026
+
+`tools/suite_bounds.py` at lattice 0.05, geodesic observer, search budget 500,
+written to `results/suite_bounds.json`. Eight worlds at four cost ceilings,
+32 pairs, and in every one of them the bound sits above what the search
+reached. Nothing here is a trend: it is one lattice, one observer and one
+search budget.
+
+    world                obstacles   worst gap   best gap   worst band
+    door_pair            yes            0.0717     0.0654         0.23
+    fan_middle           no             0.0717     0.0290         0.00
+    fan_outer            no             0.0470     0.0374         0.00
+    keep_out_shortcut    no             0.0377     0.0213         0.00
+    narrow_gap           yes            0.1527     0.1256         0.51
+    open_pair            no             0.0377     0.0213         0.00
+    pillar_aisle         yes            0.0493     0.0282         0.28
+    wall_choice          yes            0.1804     0.1331         0.46
+
+Over the four worlds with obstacles the gap runs 0.0282 to 0.1804, and over
+the four without it runs 0.0213 to 0.0717.
+
+What this buys is the statement the sibling benchmark could not make about
+its own worlds. In `wall_choice` at a 25 per cent cost budget the bound is
+0.7559, so no trajectory within that budget reaches legibility 0.76, whatever
+search anyone runs. The local optimiser reached 0.6084 there, so the property
+is not vacuous either: the true optimum lies somewhere in between, and both
+ends of that interval are now stated rather than one.
+
+## Where the bound is weak, stated in its own column
+
+Every bound reports `weight_from_band`, the share of the result decided by
+cells too close to an obstacle for the straight-line argument to cover. Those
+cells are capped at a belief of one, which is true and nearly useless, so a
+world with a high band share has a weak bound and the column says so.
+
+It reaches 0.51 in `narrow_gap` at ceiling 1.5 and 0.46 in `wall_choice` at
+the same ceiling, and it is zero in every world without obstacles. The two
+worlds with the largest gaps are exactly the two with the largest band
+shares, which is what the column is for: the looseness is located rather than
+merely present. Refining the lattice narrows the band, since its width is
+half a cell diagonal, and that has not been run yet at a finer lattice
+because a lattice build is currently tens of seconds per world.
+
+## Two worlds return identical numbers, and it is not a defect
+
+`open_pair` and `keep_out_shortcut` agree to four decimals in all four rows,
+which is the shape of a bug rather than a result and was checked before being
+reported. The two scenarios have the same bounds, the same start at (1, 5),
+the same goals at (11, 8) and (11, 2), and both declare no obstacles.
+`keep_out_shortcut` is `open_pair` with a keep-out zone added.
+
+Keep-out zones do not block motion, by the sibling project's explicit
+decision, so they enter neither the geodesic cost, nor the belief, nor this
+bound. The unconstrained optimiser ignores them too. Identical numbers are
+therefore forced rather than surprising.
+
+The consequence is a limitation that has to be stated wherever this is
+reported. **This bound is blind to safety.** It bounds legibility alone, so
+two worlds differing only in a safety constraint receive the same bound.
+It also points straight at the next piece: marking keep-out cells unusable in
+the lattice would bound the safety-constrained problem, which is a different
+and lower quantity, and that is the frontier the sibling project exists to
+measure.
 
 ## What the bound throws away, and what would tighten it
 

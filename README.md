@@ -26,30 +26,49 @@ reports what the search found.
 
 ## Where it has got to
 
-One upper bound exists, in worlds with no obstacles, and it has been checked
-against the only case where the true answer is known without searching. On
-`open_pair` at cost ceiling 1.25, from `tools/open_pair_probe.py`:
+Every world in the sibling suite carries an upper bound at four cost
+ceilings, worlds with obstacles included. 32 pairs, and in all of them the
+bound sits above what a search reached. From `tools/suite_bounds.py`, written
+to `results/suite_bounds.json`:
 
-    achieved   0.8374   best legibility any search here reached
-    bound      0.8470   no trajectory within the budget exceeds this
-    gap        0.0096
-    crude      1.0000   the same bound with reachability ignored
+    world                obstacles   worst gap   best gap   worst band
+    door_pair            yes            0.0717     0.0654         0.23
+    fan_middle           no             0.0717     0.0290         0.00
+    fan_outer            no             0.0470     0.0374         0.00
+    keep_out_shortcut    no             0.0377     0.0213         0.00
+    narrow_gap           yes            0.1527     0.1256         0.51
+    open_pair            no             0.0377     0.0213         0.00
+    pillar_aisle         yes            0.0493     0.0282         0.28
+    wall_choice          yes            0.1804     0.1331         0.46
+
+What that licenses, taking `wall_choice` at a 25 per cent cost budget: the
+bound is 0.7559, so no trajectory within that budget reaches legibility 0.76,
+whatever search anyone runs. The local optimiser reached 0.6084 there, so the
+statement is not vacuous either. Both ends of the interval are stated rather
+than one.
+
+`band` is the share of a bound decided by cells too close to an obstacle to
+bound properly, which are capped at a belief of one. A high band share means
+a weak bound, and the column exists so that weakness is located rather than
+hidden.
 
 ## What is not true yet
 
-- **Worlds with obstacles are refused, not bounded.** The bound uses
-  Euclidean distance for both the belief field and the reachability
-  condition, and neither is the geodesic once something stands in the way.
-  Near an obstacle two points a millimetre apart in the plane can be far
-  apart geodesically. This is the hardest part and none of it is done.
+- **The bound is blind to safety.** It bounds legibility alone, so
+  `open_pair` and `keep_out_shortcut`, which differ only by a keep-out zone,
+  receive identical bounds. Bounding the safety-constrained problem is not
+  done.
 - **The lower bound is not certified.** The achieved figure is what a local
   search reached, which is a valid lower bound on the optimum but carries no
   argument of its own.
-- There is no cell decomposition and no branch and bound.
-- The bound is not converged: refining the lattice tightens it, and how much
-  of the remaining gap is the lattice rather than the relaxation has not been
-  separated.
-- One world, one ceiling, one observer. Nothing here may be read as a trend.
+- There is no cell decomposition and no branch and bound. The relaxation
+  throws away every constraint linking one sample of a trajectory to the
+  next.
+- The bound is not converged. Refining the lattice tightens it and narrows
+  the band, and no run at a finer lattice than 0.05 exists for the worlds
+  with obstacles.
+- One lattice, one observer, one search budget. Nothing here may be read as a
+  trend.
 - No result has been reported anywhere, and no venue has been chosen.
 
 ## The objective is not defined here
@@ -96,12 +115,18 @@ python -m venv .venv && .venv/Scripts/python.exe -m pip install -e ".[dev]"
 .venv/Scripts/python.exe -m pytest -q
 ```
 
-Thirteen tests. Three of them are about the vendored geometry being the right
-one and behaving as the bounding argument assumes. Four of them try to make
-the bound fail, including against the one case where the exact optimum is
-known without searching.
+Twenty-two tests. Three are about the vendored geometry being the right one
+and behaving as the bounding argument assumes. Several try to make the bound
+fail, including against the one case where the exact optimum is known without
+searching: at a ceiling of exactly one in a world with no obstacles, the only
+admissible trajectory is the straight line, so the optimum is its legibility
+and no search is involved.
 
-To reproduce the numbers above:
+To reproduce the table above, and the single-world probe it grew out of:
+
+```bash
+.venv/Scripts/python.exe tools/suite_bounds.py
+```
 
 ```bash
 .venv/Scripts/python.exe tools/open_pair_probe.py
