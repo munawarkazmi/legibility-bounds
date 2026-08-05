@@ -8,104 +8,104 @@
       "ceiling": 1.25,
       "grid": 0.05,
       "cells": 48441,
-      "bound": 0.6997603392120465,
-      "weight_from_band": 0.3657078215901745,
+      "bound": 0.6939200741978149,
+      "weight_from_band": 0.3630144365438483,
       "cell_detour": 0.03535533905932738,
-      "band_detour": 0.3635655031452279,
+      "band_detour": 0.3282101640859005,
       "detour_certified": true,
       "band_cells": 300,
-      "build_seconds": 0.07189870000001974
+      "build_seconds": 0.07153660000767559
     },
     {
       "scenario": "wall_choice",
       "ceiling": 1.25,
       "grid": 0.025,
       "cells": 192881,
-      "bound": 0.6623273613691927,
+      "bound": 0.6592106869951448,
       "weight_from_band": 0.36029411764705876,
       "cell_detour": 0.01767766952966369,
-      "band_detour": 0.18178275157261395,
+      "band_detour": 0.16410508204295024,
       "detour_certified": true,
       "band_cells": 600,
-      "build_seconds": 0.3278007000044454
+      "build_seconds": 0.3856474999920465
     },
     {
       "scenario": "wall_choice",
       "ceiling": 1.25,
       "grid": 0.0125,
       "cells": 769761,
-      "bound": 0.6314323462627569,
-      "weight_from_band": 0.34628851540616246,
+      "bound": 0.6298643783579062,
+      "weight_from_band": 0.3375619478560655,
       "cell_detour": 0.008838834764831846,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "detour_certified": true,
       "band_cells": 1200,
-      "build_seconds": 1.7089760999951977
+      "build_seconds": 1.5902607000025455
     },
     {
       "scenario": "wall_choice",
       "ceiling": 1.25,
       "grid": 0.00625,
       "cells": 3075521,
-      "bound": 0.6226384305914447,
-      "weight_from_band": 0.3047565179918121,
+      "bound": 0.6219526213195765,
+      "weight_from_band": 0.29831932773109243,
       "cell_detour": 0.004419417382415923,
-      "band_detour": 0.04544568789315349,
+      "band_detour": 0.04102627051073756,
       "detour_certified": true,
       "band_cells": 2400,
-      "build_seconds": 6.311186899984023
+      "build_seconds": 7.320545399998082
     },
     {
       "scenario": "narrow_gap",
       "ceiling": 1.25,
       "grid": 0.05,
       "cells": 56481,
-      "bound": 0.7919799012909586,
-      "weight_from_band": 0.3577413479052822,
+      "bound": 0.790511714960939,
+      "weight_from_band": 0.3346619522125789,
       "cell_detour": 0.03535533905932738,
-      "band_detour": 0.3635655031452279,
+      "band_detour": 0.3282101640859005,
       "detour_certified": true,
       "band_cells": 520,
-      "build_seconds": 0.21770520001882687
+      "build_seconds": 0.19548880000365898
     },
     {
       "scenario": "narrow_gap",
       "ceiling": 1.25,
       "grid": 0.025,
       "cells": 224961,
-      "bound": 0.7782742367518347,
-      "weight_from_band": 0.3019179256402012,
+      "bound": 0.7775017885909173,
+      "weight_from_band": 0.28888888888888875,
       "cell_detour": 0.01767766952966369,
-      "band_detour": 0.18178275157261395,
+      "band_detour": 0.16410508204295024,
       "detour_certified": true,
       "band_cells": 1040,
-      "build_seconds": 1.1702873000176623
+      "build_seconds": 1.2494865999906324
     },
     {
       "scenario": "narrow_gap",
       "ceiling": 1.25,
       "grid": 0.0125,
       "cells": 897921,
-      "bound": 0.7586105124543634,
+      "bound": 0.7578600429871301,
       "weight_from_band": 0.37329904639451406,
       "cell_detour": 0.008838834764831846,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "detour_certified": true,
       "band_cells": 2080,
-      "build_seconds": 4.83778760000132
+      "build_seconds": 5.3540265999909025
     },
     {
       "scenario": "narrow_gap",
       "ceiling": 1.25,
       "grid": 0.00625,
       "cells": 3587841,
-      "bound": 0.7510936237754651,
+      "bound": 0.7498874746105251,
       "weight_from_band": 0.3708132433301189,
       "cell_detour": 0.004419417382415923,
-      "band_detour": 0.04544568789315349,
+      "band_detour": 0.04102627051073756,
       "detour_certified": true,
       "band_cells": 4160,
-      "build_seconds": 20.748591300012777
+      "build_seconds": 22.73969890002627
     },
     {
       "scenario": "pillar_aisle",
@@ -115,10 +115,10 @@
       "bound": 0.8613893672728727,
       "weight_from_band": 0.0,
       "cell_detour": 0.03535533905932738,
-      "band_detour": 0.3635655031452279,
+      "band_detour": 0.3282101640859005,
       "detour_certified": true,
       "band_cells": 160,
-      "build_seconds": 0.06257650000043213
+      "build_seconds": 0.08220139998593368
     },
     {
       "scenario": "pillar_aisle",
@@ -128,10 +128,10 @@
       "bound": 0.8572432297315212,
       "weight_from_band": 0.0,
       "cell_detour": 0.01767766952966369,
-      "band_detour": 0.18178275157261395,
+      "band_detour": 0.16410508204295024,
       "detour_certified": true,
       "band_cells": 320,
-      "build_seconds": 0.33768830000190064
+      "build_seconds": 0.3828792999847792
     },
     {
       "scenario": "pillar_aisle",
@@ -141,10 +141,10 @@
       "bound": 0.8550890895750874,
       "weight_from_band": 0.0,
       "cell_detour": 0.008838834764831846,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "detour_certified": true,
       "band_cells": 640,
-      "build_seconds": 1.3433647000056226
+      "build_seconds": 1.5632934999885038
     },
     {
       "scenario": "pillar_aisle",
@@ -154,10 +154,10 @@
       "bound": 0.8539883847129017,
       "weight_from_band": 0.0,
       "cell_detour": 0.004419417382415923,
-      "band_detour": 0.04544568789315349,
+      "band_detour": 0.04102627051073756,
       "detour_certified": true,
       "band_cells": 1280,
-      "build_seconds": 5.397722099995008
+      "build_seconds": 6.62838060001377
     }
   ]
 }

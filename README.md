@@ -32,20 +32,20 @@ bound sits above what a search reached. From `tools/suite_bounds.py`, written
 to `results/suite_bounds.json`:
 
     world                obstacles   worst gap   best gap   worst band
-    door_pair            yes            0.0556     0.0325         0.18
+    door_pair            yes            0.0556     0.0322         0.18
     fan_middle           no             0.0567     0.0144         0.00
     fan_outer            no             0.0282     0.0210         0.00
     keep_out_shortcut    no             0.0198     0.0075         0.00
-    narrow_gap           yes            0.1061     0.0399         0.37
+    narrow_gap           yes            0.1059     0.0389         0.37
     open_pair            no             0.0198     0.0075         0.00
     pillar_aisle         yes            0.0184     0.0072         0.00
-    wall_choice          yes            0.1554     0.0226         0.35
+    wall_choice          yes            0.1553     0.0213         0.34
 
 What that licenses, taking `wall_choice` at a 25 per cent cost budget: the
-bound is 0.6314, so no trajectory within that budget reaches legibility 0.64,
+bound is 0.6299, so no trajectory within that budget reaches legibility 0.63,
 whatever search anyone runs. The local optimiser reached 0.6084 there, so the
 statement is not vacuous either. The true optimum lies in an interval of width
-0.0231 and both of its ends are stated.
+0.0215 and both of its ends are stated.
 
 `band` is the share of a bound decided by cells too close to an obstacle for
 the straight-line argument, which are bounded more loosely. A high band share
@@ -68,13 +68,17 @@ bound's: between ceilings 1.25 and 1.50 in `wall_choice` the optimiser gains
 - There is no cell decomposition and no branch and bound. The relaxation
   throws away every constraint linking one sample of a trajectory to the
   next.
-- **The bound near obstacles rests on a precondition.** Cells too close to an
-  obstacle for the straight-line argument are bounded through the largest
-  geodesic distance between two points of a cell, which exists only if no
-  obstacle is thinner than a cell and no two obstacles are closer together
-  than one. Every scenario is checked against that and reports
-  `detour_certified`; where it fails the bound falls back to a belief of one
-  and says so. No claim is made that the precondition holds in general.
+- **The bound near obstacles rests on a precondition, checked cell by cell.**
+  Cells too close to an obstacle for the straight-line argument are bounded
+  through the geodesic distance from a cell point to the cell's centre, which
+  can only be bounded where the obstacle does not pass clean through the cell
+  and no second obstacle touches it. `cells_certified` decides that for each
+  cell by counting boundary crossings of the cell's circle; a cell that fails
+  falls back to a belief of one and is counted in `uncertified_cells`. No
+  claim is made that the precondition holds in general.
+- **The constant in that bound is loose.** The worst detour measured anywhere
+  is about 2.2 cell radii against a claimed 9.28. Closing it needs a real
+  bound on how far a convex boundary can wrap inside a disc.
 - One lattice, one observer, one search budget. Nothing here may be read as a
   trend.
 - No result has been reported anywhere, and no venue has been chosen.
@@ -123,7 +127,7 @@ python -m venv .venv && .venv/Scripts/python.exe -m pip install -e ".[dev]"
 .venv/Scripts/python.exe -m pytest -q
 ```
 
-Thirty-three tests. Three are about the vendored geometry being the right one
+Thirty-five tests. Three are about the vendored geometry being the right one
 and behaving as the bounding argument assumes. Several try to make the bound
 fail, including against the one case where the exact optimum is known without
 searching: at a ceiling of exactly one in a world with no obstacles, the only

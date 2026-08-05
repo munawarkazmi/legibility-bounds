@@ -58,23 +58,34 @@ from .vendored import (
     segment_segment_distance,
 )
 
-# The constant in the detour bound above, applied to the cell radius.
+# The constant in the detour bound, applied to the cell radius.
 #
-#   the free part of a cell has boundary at most 2 pi r from the disc plus
-#   2 pi r from the obstacle, since a convex arc inside a disc of radius r is
-#   no longer than the disc's own perimeter;
-#   reaching that boundary costs at most 2r from each of the two points;
-#   and travelling the shorter way round a closed curve of length L costs at
-#   most L / 2.
+# What has to be bounded is the geodesic distance from a point of the cell to
+# the lattice point at its centre, not between two arbitrary points of the
+# cell, and the centre being free is what makes the argument short:
 #
-#   so  D <= 2r + 2 pi r + 2r = (4 + 2 pi) r
+#   from a point outside a convex body, the ray heading directly away from
+#   that body's nearest point never re-enters it. So the centre reaches the
+#   circle along such a ray in exactly r, and any other point of the cell
+#   reaches it in at most 2r, both staying inside the cell and outside the
+#   obstacle;
 #
-# The first version of this said 2(1 + pi), having counted one diameter of
-# straight travel where there are two. That is 24 per cent too small, which
-# would have made the bound not a bound. `tests/test_lattice.py` samples real
-# point pairs in real band cells across four worlds and measures the true
-# geodesic against this, and reports the headroom rather than only passing.
-BAND_DETOUR_FACTOR = 4.0 + 2.0 * math.pi
+#   and the free part of the circle is a single arc whenever the obstacle does
+#   not cross the cell, so the two arrival points are joined along it in at
+#   most its own length, 2 pi r.
+#
+#   so  D <= r + 2r + 2 pi r = (3 + 2 pi) r
+#
+# Two earlier versions were wrong. The first said 2(1 + pi) and was not a
+# bound at all, having counted one diameter of straight travel where the
+# construction needed two. The second said (4 + 2 pi) and was sound, but
+# bounded the distance between two arbitrary points of a cell, which is a
+# harder quantity than anything here needs.
+#
+# `tests/test_lattice.py` samples real point pairs in real band cells,
+# targeting the corner cells where an obstacle can separate two points of one
+# cell at all, and reports the headroom rather than only passing.
+BAND_DETOUR_FACTOR = 3.0 + 2.0 * math.pi
 
 
 class LatticeError(ValueError):
@@ -162,22 +173,94 @@ def minimum_separation(obstacles) -> float:
     return best
 
 
-def certifies_detour(obstacles, radius: float) -> bool:
-    """Whether a cell of this radius is small enough for the detour bound.
+def _crossings_with_circle(px, py, radius, a, b, tolerance):
+    """How many times one segment crosses each cell's circle, and where it is
+    too close to call.
 
-    Two things have to hold. No obstacle may pass clean through a cell, which
-    would split its free part in two and put the two halves a whole obstacle
-    apart; that is ruled out when every obstacle is wider than the cell. And
-    no cell may meet two obstacles at once, since the argument follows a
-    single boundary; that is ruled out when obstacles are further apart than a
-    cell.
+    Returns the count and a mask of the cells whose count cannot be trusted,
+    which is any cell where the segment is nearly tangent to the circle or
+    meets it nearly at an endpoint. Those cells are treated as uncertified
+    rather than guessed at.
     """
+    ax, ay = float(a[0]), float(a[1])
+    dx, dy = float(b[0]) - ax, float(b[1]) - ay
+    fx, fy = ax - px, ay - py
+
+    quadratic = dx * dx + dy * dy
+    linear = 2.0 * (fx * dx + fy * dy)
+    constant = fx * fx + fy * fy - radius * radius
+
+    if quadratic <= 0.0:
+        return np.zeros(px.shape, dtype=int), np.zeros(px.shape, dtype=bool)
+
+    discriminant = linear * linear - 4.0 * quadratic * constant
+    # A tangency only matters where it actually touches the segment. The line
+    # through an edge can graze the circle far beyond that edge's ends, and
+    # treating those cells as doubtful would cost certification for nothing.
+    grazing = -linear / (2.0 * quadratic)
+    unsure = (np.abs(discriminant) <= tolerance) & (
+        (grazing >= -tolerance) & (grazing <= 1.0 + tolerance)
+    )
+    positive = discriminant > tolerance
+    root = np.sqrt(np.where(positive, discriminant, 0.0))
+
+    count = np.zeros(px.shape, dtype=int)
+    for sign in (-1.0, 1.0):
+        t = (-linear + sign * root) / (2.0 * quadratic)
+        inside = positive & (t > tolerance) & (t < 1.0 - tolerance)
+        near_end = positive & (np.abs(t) <= tolerance) | (
+            positive & (np.abs(t - 1.0) <= tolerance)
+        )
+        count += inside.astype(int)
+        unsure |= near_end
+    return count, unsure
+
+
+def cells_certified(px, py, obstacles, radius: float):
+    """Which cells the detour bound may be claimed for, one by one.
+
+    Two things have to hold and both are local, which is why this is decided
+    per cell rather than per world.
+
+    No obstacle may pass clean through a cell, since that splits the free part
+    in two and puts the halves a whole obstacle apart rather than a cell
+    apart. A convex obstacle crosses a cell exactly when its boundary meets
+    the cell's circle four times, so the crossings are counted.
+
+    And no cell may meet two obstacles at once, since the argument follows a
+    single boundary.
+
+    An earlier version tested `minimum_width(obstacle) > 2 r` for the whole
+    world instead. That is not sufficient and the difference is not academic:
+    minimum width is a global property, and a convex polygon with a sharp
+    vertex, a long acute triangle for instance, can be far wider than a cell
+    overall while its tip is thinner than one and passes straight through.
+    Every obstacle in the vendored suite is a rectangle, so no committed
+    number ever depended on the difference, but the condition was stated as
+    though general and was not.
+    """
+    certified = np.ones(px.shape, dtype=bool)
     if not obstacles:
-        return True
-    span = 2.0 * radius
-    if any(minimum_width(ob) <= span for ob in obstacles):
-        return False
-    return minimum_separation(obstacles) > span
+        return certified
+
+    tolerance = max(radius, 1.0) * 1e-9
+    touching = np.zeros(px.shape, dtype=int)
+    for polygon in obstacles:
+        distance = np.full(px.shape, np.inf)
+        for v, w in polygon.edges():
+            np.minimum(distance, _point_segment_distance(px, py, v, w), out=distance)
+        meets = distance <= radius
+        touching += meets.astype(int)
+
+        crossings = np.zeros(px.shape, dtype=int)
+        unsure = np.zeros(px.shape, dtype=bool)
+        for v, w in polygon.edges():
+            count, doubtful = _crossings_with_circle(px, py, radius, v, w, tolerance)
+            crossings += count
+            unsure |= doubtful
+        certified &= ~(meets & (unsure | (crossings >= 4)))
+
+    return certified & (touching <= 1)
 
 
 @dataclass(frozen=True)
@@ -209,7 +292,11 @@ class Lattice:
     euclidean_to_start: np.ndarray
     euclidean_to_goal: np.ndarray
     beta: float
-    detour_certified: bool
+
+    @property
+    def detour_certified(self) -> bool:
+        """Whether every usable band cell could claim the detour bound."""
+        return self.uncertified_cells == 0
 
     @property
     def cell_radius(self) -> float:
@@ -338,7 +425,7 @@ def build(
         for position in goal_positions:
             usable &= np.isfinite(cost[position])
         near = _near_any_obstacle(mesh_x, mesh_y, obstacles, radius) & usable
-        certified = certifies_detour(obstacles, radius)
+        certified = cells_certified(mesh_x, mesh_y, obstacles, radius)
     else:
         # The geodesic is the straight line everywhere and no cell is near an
         # obstacle, so the whole lattice is exact and nothing needs a sweep.
@@ -349,11 +436,17 @@ def build(
         to_start, to_goal = cost[start], cost[goal]
         usable = np.ones(shape, dtype=bool)
         near = np.zeros(shape, dtype=bool)
-        certified = True
+        certified = np.ones(shape, dtype=bool)
 
-    detour = np.where(near, BAND_DETOUR_FACTOR * radius, radius)
-    if not certified:
-        detour = np.where(near, np.inf, detour)
+    # A clear cell is bounded by its own radius, since the segment from its
+    # centre to any of its points is obstacle free. A band cell takes the
+    # detour bound where its geometry allows it to be claimed, and nothing
+    # otherwise.
+    detour = np.where(
+        near,
+        np.where(certified, BAND_DETOUR_FACTOR * radius, np.inf),
+        radius,
+    )
 
     # The observer's own cost-to-go, which is the geodesic for the observer
     # who can see the room and the straight line for the one who cannot. The
@@ -407,7 +500,6 @@ def build(
         euclidean_to_start=euclid_start,
         euclidean_to_goal=euclid_goal,
         beta=observer.beta,
-        detour_certified=certified,
     )
 
 

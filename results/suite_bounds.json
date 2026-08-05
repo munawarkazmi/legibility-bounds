@@ -14,16 +14,16 @@
       "achieved_cost_ratio": 1.0491991359458195,
       "achieved_source": "searched",
       "shortest_path_legibility": 0.7203999032131269,
-      "bound": 0.8090694331521445,
-      "gap": 0.03961042684493998,
+      "bound": 0.8088082346547285,
+      "gap": 0.03934922834752397,
       "weight_from_band": 0.1391289319045973,
       "band_cells": 1696,
       "uncertified_cells": 0,
       "unusable_cells": 47795,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 10.48916540000937
+      "lattice_build_seconds": 11.10063979998813
     },
     {
       "scenario": "door_pair",
@@ -32,16 +32,16 @@
       "achieved_cost_ratio": 1.0995268211310054,
       "achieved_source": "searched",
       "shortest_path_legibility": 0.7203999032131269,
-      "bound": 0.8191119446054616,
-      "gap": 0.03249458159943108,
+      "bound": 0.8188067282714383,
+      "gap": 0.03218936526540783,
       "weight_from_band": 0.18150197628458503,
       "band_cells": 1696,
       "uncertified_cells": 0,
       "unusable_cells": 47795,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 10.48916540000937
+      "lattice_build_seconds": 11.10063979998813
     },
     {
       "scenario": "door_pair",
@@ -50,16 +50,16 @@
       "achieved_cost_ratio": 1.2497922505253922,
       "achieved_source": "searched",
       "shortest_path_legibility": 0.7203999032131269,
-      "bound": 0.8572418474881441,
-      "gap": 0.05107186082229809,
-      "weight_from_band": 0.10744592092143018,
+      "bound": 0.857219086737748,
+      "gap": 0.051049100071902,
+      "weight_from_band": 0.10386439022404917,
       "band_cells": 1696,
       "uncertified_cells": 0,
       "unusable_cells": 47795,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 10.48916540000937
+      "lattice_build_seconds": 11.10063979998813
     },
     {
       "scenario": "door_pair",
@@ -68,16 +68,16 @@
       "achieved_cost_ratio": 1.4999422007913343,
       "achieved_source": "searched",
       "shortest_path_legibility": 0.7203999032131269,
-      "bound": 0.8777363612460659,
-      "gap": 0.055620610339234156,
-      "weight_from_band": 0.10391489361702125,
+      "bound": 0.8777144584086596,
+      "gap": 0.055598707501827827,
+      "weight_from_band": 0.10099290780141841,
       "band_cells": 1696,
       "uncertified_cells": 0,
       "unusable_cells": 47795,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 10.48916540000937
+      "lattice_build_seconds": 11.10063979998813
     },
     {
       "scenario": "fan_middle",
@@ -93,9 +93,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.0878831000009086
+      "lattice_build_seconds": 0.08820739999646321
     },
     {
       "scenario": "fan_middle",
@@ -111,9 +111,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.0878831000009086
+      "lattice_build_seconds": 0.08820739999646321
     },
     {
       "scenario": "fan_middle",
@@ -129,9 +129,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.0878831000009086
+      "lattice_build_seconds": 0.08820739999646321
     },
     {
       "scenario": "fan_middle",
@@ -147,9 +147,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.0878831000009086
+      "lattice_build_seconds": 0.08820739999646321
     },
     {
       "scenario": "fan_outer",
@@ -165,9 +165,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.09046799998031929
+      "lattice_build_seconds": 0.08452920001582243
     },
     {
       "scenario": "fan_outer",
@@ -183,9 +183,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.09046799998031929
+      "lattice_build_seconds": 0.08452920001582243
     },
     {
       "scenario": "fan_outer",
@@ -201,9 +201,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.09046799998031929
+      "lattice_build_seconds": 0.08452920001582243
     },
     {
       "scenario": "fan_outer",
@@ -219,9 +219,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.09046799998031929
+      "lattice_build_seconds": 0.08452920001582243
     },
     {
       "scenario": "keep_out_shortcut",
@@ -237,9 +237,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.06690199999138713
+      "lattice_build_seconds": 0.06914169999072328
     },
     {
       "scenario": "keep_out_shortcut",
@@ -255,9 +255,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.06690199999138713
+      "lattice_build_seconds": 0.06914169999072328
     },
     {
       "scenario": "keep_out_shortcut",
@@ -273,9 +273,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.06690199999138713
+      "lattice_build_seconds": 0.06914169999072328
     },
     {
       "scenario": "keep_out_shortcut",
@@ -291,9 +291,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.06690199999138713
+      "lattice_build_seconds": 0.06914169999072328
     },
     {
       "scenario": "narrow_gap",
@@ -302,16 +302,16 @@
       "achieved_cost_ratio": 1.0491212796659304,
       "achieved_source": "searched",
       "shortest_path_legibility": 0.6054837050002938,
-      "bound": 0.7015407986840215,
-      "gap": 0.039942308972215956,
+      "bound": 0.7005377129712542,
+      "gap": 0.03893922325944865,
       "weight_from_band": 0.2883329280155642,
       "band_cells": 2080,
       "uncertified_cells": 0,
       "unusable_cells": 133362,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 4.6416957000037655
+      "lattice_build_seconds": 5.026725400006399
     },
     {
       "scenario": "narrow_gap",
@@ -320,16 +320,16 @@
       "achieved_cost_ratio": 1.0545937854526575,
       "achieved_source": "searched",
       "shortest_path_legibility": 0.6054837050002938,
-      "bound": 0.7122965931408516,
-      "gap": 0.04688213493391169,
+      "bound": 0.7112582902331649,
+      "gap": 0.045843832026224995,
       "weight_from_band": 0.3218942462409143,
       "band_cells": 2080,
       "uncertified_cells": 0,
       "unusable_cells": 133362,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 4.6416957000037655
+      "lattice_build_seconds": 5.026725400006399
     },
     {
       "scenario": "narrow_gap",
@@ -338,16 +338,16 @@
       "achieved_cost_ratio": 1.2497324538278913,
       "achieved_source": "searched",
       "shortest_path_legibility": 0.6054837050002938,
-      "bound": 0.7586105124543634,
-      "gap": 0.06885803178692096,
+      "bound": 0.7578600429871301,
+      "gap": 0.06810756231968762,
       "weight_from_band": 0.37329904639451406,
       "band_cells": 2080,
       "uncertified_cells": 0,
       "unusable_cells": 133362,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 4.6416957000037655
+      "lattice_build_seconds": 5.026725400006399
     },
     {
       "scenario": "narrow_gap",
@@ -356,16 +356,16 @@
       "achieved_cost_ratio": 1.4989429646533516,
       "achieved_source": "searched",
       "shortest_path_legibility": 0.6054837050002938,
-      "bound": 0.8050372033463145,
-      "gap": 0.10610849772347675,
-      "weight_from_band": 0.24714424732390147,
+      "bound": 0.8048146063697623,
+      "gap": 0.10588590074692461,
+      "weight_from_band": 0.2404970431918557,
       "band_cells": 2080,
       "uncertified_cells": 0,
       "unusable_cells": 133362,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 4.6416957000037655
+      "lattice_build_seconds": 5.026725400006399
     },
     {
       "scenario": "open_pair",
@@ -381,9 +381,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.06417689999216236
+      "lattice_build_seconds": 0.06824849999975413
     },
     {
       "scenario": "open_pair",
@@ -399,9 +399,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.06417689999216236
+      "lattice_build_seconds": 0.06824849999975413
     },
     {
       "scenario": "open_pair",
@@ -417,9 +417,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.06417689999216236
+      "lattice_build_seconds": 0.06824849999975413
     },
     {
       "scenario": "open_pair",
@@ -435,9 +435,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 0,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.06417689999216236
+      "lattice_build_seconds": 0.06824849999975413
     },
     {
       "scenario": "pillar_aisle",
@@ -453,9 +453,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 25281,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.21591380002792
+      "lattice_build_seconds": 1.5209774999821093
     },
     {
       "scenario": "pillar_aisle",
@@ -471,9 +471,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 25281,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.21591380002792
+      "lattice_build_seconds": 1.5209774999821093
     },
     {
       "scenario": "pillar_aisle",
@@ -489,9 +489,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 25281,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.21591380002792
+      "lattice_build_seconds": 1.5209774999821093
     },
     {
       "scenario": "pillar_aisle",
@@ -507,9 +507,9 @@
       "uncertified_cells": 0,
       "unusable_cells": 25281,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.21591380002792
+      "lattice_build_seconds": 1.5209774999821093
     },
     {
       "scenario": "wall_choice",
@@ -518,16 +518,16 @@
       "achieved_cost_ratio": 1.0491647910746396,
       "achieved_source": "searched",
       "shortest_path_legibility": 0.5456775537280676,
-      "bound": 0.588420826434302,
-      "gap": 0.023018611014979706,
+      "bound": 0.5873696844651213,
+      "gap": 0.021967469045798937,
       "weight_from_band": 0.2080121511296753,
       "band_cells": 1200,
       "uncertified_cells": 0,
       "unusable_cells": 41001,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.235289099975489
+      "lattice_build_seconds": 1.4628183000022545
     },
     {
       "scenario": "wall_choice",
@@ -536,16 +536,16 @@
       "achieved_cost_ratio": 1.0988527465784024,
       "achieved_source": "searched",
       "shortest_path_legibility": 0.5456775537280676,
-      "bound": 0.6013631428091929,
-      "gap": 0.022617195130953616,
+      "bound": 0.60004778607686,
+      "gap": 0.021301838398620765,
       "weight_from_band": 0.26188981868898165,
       "band_cells": 1200,
       "uncertified_cells": 0,
       "unusable_cells": 41001,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.235289099975489
+      "lattice_build_seconds": 1.4628183000022545
     },
     {
       "scenario": "wall_choice",
@@ -554,16 +554,16 @@
       "achieved_cost_ratio": 1.2481708382212053,
       "achieved_source": "searched",
       "shortest_path_legibility": 0.5456775537280676,
-      "bound": 0.6314323462627569,
-      "gap": 0.023060613310917577,
-      "weight_from_band": 0.34628851540616246,
+      "bound": 0.6298643783579062,
+      "gap": 0.02149264540606688,
+      "weight_from_band": 0.3375619478560655,
       "band_cells": 1200,
       "uncertified_cells": 0,
       "unusable_cells": 41001,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.235289099975489
+      "lattice_build_seconds": 1.4628183000022545
     },
     {
       "scenario": "wall_choice",
@@ -572,16 +572,16 @@
       "achieved_cost_ratio": 1.4999548093737491,
       "achieved_source": "searched",
       "shortest_path_legibility": 0.5456775537280676,
-      "bound": 0.8073168390010874,
-      "gap": 0.1554300615165094,
-      "weight_from_band": 0.16054107802855483,
+      "bound": 0.8072260532013386,
+      "gap": 0.15533927571676054,
+      "weight_from_band": 0.15720155344177408,
       "band_cells": 1200,
       "uncertified_cells": 0,
       "unusable_cells": 41001,
       "detour_certified": true,
-      "band_detour": 0.09089137578630697,
+      "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.235289099975489
+      "lattice_build_seconds": 1.4628183000022545
     }
   ],
   "violations": 0

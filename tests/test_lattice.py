@@ -190,19 +190,71 @@ def test_the_detour_bound_holds_against_real_geodesics(name):
     )
 
 
-def test_the_precondition_is_reported_and_can_fail(walled):
-    """A lattice too coarse for its obstacles must say so rather than claim it."""
-    scenario, observer, _ = walled
-    from legibility_bounds.lattice import certifies_detour, minimum_width
+def test_a_lattice_too_coarse_for_its_obstacles_refuses_to_certify(walled):
+    """A cell an obstacle passes clean through must say so rather than claim it."""
+    scenario, observer, fine = walled
+    assert fine.detour_certified, "wall_choice at this lattice should certify"
 
-    narrowest = min(minimum_width(ob) for ob in scenario.obstacles)
-    assert certifies_detour(scenario.obstacles, narrowest / 4.0)
-    assert not certifies_detour(scenario.obstacles, narrowest)
-
+    narrowest = min(
+        lattice_module.minimum_width(ob) for ob in scenario.obstacles
+    )
     coarse = lattice_module.build(scenario, observer, narrowest * 2.0)
     assert not coarse.detour_certified
     assert coarse.uncertified_cells > 0
-    assert (coarse.belief_bound()[coarse.near_obstacle & coarse.usable] == 1.0).all()
+    banded = coarse.near_obstacle & coarse.usable
+    assert (coarse.belief_bound()[banded & ~np.isfinite(coarse.detour)] == 1.0).all()
+
+
+def test_a_sharp_vertex_defeats_the_global_width_test_but_not_this_one():
+    """The reason the precondition is decided per cell rather than per world.
+
+    Minimum width is a property of a whole obstacle. A convex polygon with a
+    sharp vertex can be far wider than a cell overall while its tip is thinner
+    than one and passes straight through, splitting a cell's free part in two
+    and putting the halves an obstacle apart rather than a cell apart.
+
+    The long acute triangle below has minimum width close to 2, so a global
+    test at cell radius 0.5 would certify every cell in the world. A cell
+    beside its tip is crossed by it, and this test asserts that the per-cell
+    check refuses exactly that cell while accepting one out at the fat end.
+    """
+    needle = vendored.ConvexPolygon.from_vertices(
+        "needle", [(0.0, 0.0), (20.0, 1.0), (20.0, -1.0)]
+    )
+    radius = 0.5
+    assert lattice_module.minimum_width(needle) > 2.0 * radius, (
+        "the point of this fixture is an obstacle a global width test accepts"
+    )
+
+    # Near the tip, where the triangle is 0.2 thick against a cell radius of
+    # 0.5, so a cell centred just outside it still reaches free ground on the
+    # far side and the triangle passes clean through. Spanning an obstacle
+    # needs it thinner than the radius, not the diameter, since the centre has
+    # to sit outside it to begin with.
+    thin_x = np.array([[2.0]])
+    thin_y = np.array([[0.15]])
+    assert not lattice_module.cells_certified(
+        thin_x, thin_y, [needle], radius
+    )[0, 0]
+
+    # Out at the blunt end, where it is thicker than the cell and only its
+    # edge passes through.
+    fat_x = np.array([[19.5]])
+    fat_y = np.array([[1.3]])
+    assert lattice_module.cells_certified(fat_x, fat_y, [needle], radius)[0, 0]
+
+
+def test_a_cell_meeting_two_obstacles_is_not_certified():
+    """The argument follows one boundary, so two obstacles is out of scope."""
+    scenario = vendored.scenario("narrow_gap")
+    assert len(scenario.obstacles) >= 2
+
+    # A cell wide enough to reach both sides of the gap.
+    gap = lattice_module.minimum_separation(scenario.obstacles)
+    assert math.isfinite(gap)
+    observer = vendored.Observer(condition="geodesic")
+    coarse = lattice_module.build(scenario, observer, gap * 2.0)
+    assert coarse.uncertified_cells > 0
 
 
 def test_an_obstacle_free_world_has_no_band_at_all(walled):

@@ -95,35 +95,35 @@ search reached. Nothing here is a trend: it is one lattice, one observer and
 one search budget.
 
     world                obstacles   worst gap   best gap   worst band
-    door_pair            yes            0.0556     0.0325         0.18
+    door_pair            yes            0.0556     0.0322         0.18
     fan_middle           no             0.0567     0.0144         0.00
     fan_outer            no             0.0282     0.0210         0.00
     keep_out_shortcut    no             0.0198     0.0075         0.00
-    narrow_gap           yes            0.1061     0.0399         0.37
+    narrow_gap           yes            0.1059     0.0389         0.37
     open_pair            no             0.0198     0.0075         0.00
     pillar_aisle         yes            0.0184     0.0072         0.00
-    wall_choice          yes            0.1554     0.0226         0.35
+    wall_choice          yes            0.1553     0.0213         0.34
 
-Over the four worlds with obstacles the gap runs 0.0072 to 0.1554, and over
+Over the four worlds with obstacles the gap runs 0.0072 to 0.1553, and over
 the four without it runs 0.0075 to 0.0567.
 
 What this buys is the statement the sibling benchmark could not make about
 its own worlds. In `wall_choice` at a 25 per cent cost budget the bound is
-0.6314, so no trajectory within that budget reaches legibility 0.64, whatever
+0.6299, so no trajectory within that budget reaches legibility 0.63, whatever
 search anyone runs. The local optimiser reached 0.6084 there, so the property
-is not vacuous either: the true optimum lies in an interval of width 0.0231,
+is not vacuous either: the true optimum lies in an interval of width 0.0215,
 and both of its ends are now stated rather than one.
 
 ## At loose ceilings the weak end is the search, not the bound
 
 Two rows do not fit the pattern and they say something worth acting on.
-`wall_choice` at ceiling 1.50 has a gap of 0.1554 where the same world at 1.25
-has 0.0231, and `narrow_gap` at 1.50 has 0.1061 against 0.0689 at 1.25.
+`wall_choice` at ceiling 1.50 has a gap of 0.1553 where the same world at 1.25
+has 0.0215, and `narrow_gap` at 1.50 has 0.1059 against 0.0681 at 1.25.
 
 The upper bound rises with the ceiling because it must: a looser budget admits
 more trajectories. What fails to rise with it is the achieved value. In
 `wall_choice` the search gains only 0.0435 between ceilings 1.25 and 1.50
-while the bound gains 0.1759. The interval widens at the bottom.
+while the bound gains 0.1773. The interval widens at the bottom.
 
 So at tight ceilings the certificate is what limits the result and at loose
 ones the search is. That is an argument for the certified lower bound, a
@@ -232,13 +232,13 @@ deliberately too-coarse lattice and checks that it refuses to certify.
 Same tool, same three worlds, after the change:
 
     world           grid 0.05 to 0.00625      bound moved   band moved
-    wall_choice     0.6998 to 0.6226               0.0771       0.0610
-    narrow_gap      0.7920 to 0.7511               0.0409      -0.0131
+    wall_choice     0.6969 to 0.6220               0.0720       0.0647
+    narrow_gap      0.7905 to 0.7499               0.0406      -0.0362
     pillar_aisle    0.8614 to 0.8540               0.0074       0.0000
 
 Two things changed together. The bounds are much lower: `wall_choice` at grid
-0.05 falls from 0.7559 to 0.6998, and at the finest lattice to 0.6226 against
-an achieved 0.6084, so a gap of 0.1475 becomes 0.0142. And refinement now
+0.05 falls from 0.7559 to 0.6969, and at the finest lattice to 0.6220 against
+an achieved 0.6084, so a gap of 0.1475 becomes 0.0136. And refinement now
 works, moving the bound six times as far as it did before, because D scales
 with the lattice. In `pillar_aisle` the band no longer decides a single slice.
 
@@ -246,37 +246,64 @@ The earlier conclusion, that refining cannot fix the band, was true of the cap
 and is not true of the bound that replaced it. It is recorded here rather than
 removed, because the reasoning that led to it is what produced this.
 
-## The constant in that bound was wrong once, 6 August 2026
+## Three versions of the constant, and a precondition that was not sufficient
 
-The first version said `D <= 2(1 + pi) r`, having counted one diameter of
-straight travel where the construction needs two: reaching the free part's
-boundary costs up to `2r` from each of the two points, not `2r` between them.
-The correct constant is `(4 + 2 pi) r`, twenty-four per cent larger, and the
-smaller one would have meant the bound was not a bound.
+The constant went through three forms in one day and the history is kept
+because two of them were wrong in different ways.
 
-It was found by rereading the derivation rather than by a failing test, which
-is the part worth recording. The test that should have caught it sampled point
-pairs in one world with one seed and asserted only that nothing exceeded the
-claim. It passed on a constant that was too small, because random pairs inside
-a cell are almost never separated by an obstacle.
+`2(1 + pi) r` was **not a bound**. It counted one diameter of straight travel
+where the construction needs two, and was twenty-four per cent too small.
 
-That test now runs over four worlds and counts the pairs the obstacle actually
-separated, failing if there are none, and it samples cells beside obstacle
-corners deliberately. The precondition guarantees obstacles are wider than a
-cell, so two points of one cell can only be separated where the segment
-between them clips a corner, and uniform sampling almost never lands there.
-Across `wall_choice`, `narrow_gap`, `pillar_aisle` and `door_pair` it now
-measures 5, 16, 11 and 21 separated pairs.
+`(4 + 2 pi) r` was sound but answered a harder question than anything here
+asks: the distance between two arbitrary points of a cell. What the belief
+bound and the reachability test both need is only the distance from a cell
+point to the lattice point at its centre, and the centre being free shortens
+the argument. From a point outside a convex body, the ray heading directly
+away from that body's nearest point never re-enters it, so the centre reaches
+the circle in exactly `r` and any other cell point in at most `2r`; the free
+part of the circle is a single arc, so the two arrivals join along it in at
+most `2 pi r`. Hence
 
-The correction cost very little: `wall_choice` at grid 0.05 moved from 0.6877
-to 0.6998.
+    D <= r + 2r + 2 pi r = (3 + 2 pi) r
 
-What the same measurements say about the constant is that it is loose. The
-worst detour observed anywhere is about 2.2 cell radii against a claimed
-10.28. The constant is not tuned to that and must not be, since a bound fitted
-to samples is not a bound. But a sharper argument, bounding the detour round a
-single clipped corner rather than round the whole free part of the cell, would
-tighten every number in the suite and is worth doing.
+which is what the code now uses. The correction is worth little on its own:
+`wall_choice` at grid 0.05 moved from 0.6998 to 0.6969.
+
+**The precondition was the real defect.** It tested
+`minimum_width(obstacle) > 2r` once per world. Minimum width is a global
+property, and a convex polygon with a sharp vertex can be far wider than a
+cell overall while its tip is thinner than one and passes clean through a
+cell, splitting its free part in two and putting the halves an obstacle apart
+rather than a cell apart. That is precisely the case the precondition exists
+to exclude and it did not exclude it.
+
+`cells_certified` now decides it per cell, by counting where each obstacle's
+boundary crosses the cell's circle: four crossings means the obstacle passes
+through. It also refuses a cell that two obstacles touch, since the argument
+follows one boundary. Deciding per cell is better as well as correct, because
+a failing cell loses the bound instead of the whole world losing it.
+
+Every obstacle in the vendored suite is a rectangle, so no committed number
+ever depended on the difference. The condition was stated as though general
+and was not, which is the part that mattered.
+`test_a_sharp_vertex_defeats_the_global_width_test_but_not_this_one` holds it
+with a long acute triangle a global test would wave through.
+
+Neither error was found by a failing test. The test that should have caught
+the first sampled point pairs in one world with one seed and asserted only
+that nothing exceeded the claim, which a too-small constant passes, because
+random pairs inside a cell are almost never separated by an obstacle. It now
+runs over four worlds, deliberately samples cells beside obstacle corners,
+counts the pairs the obstacle actually separated, and fails if there are none.
+Across `wall_choice`, `narrow_gap`, `pillar_aisle` and `door_pair` it measures
+5, 16, 11 and 21 separated pairs.
+
+Those same measurements say the constant is still loose. The worst detour
+observed anywhere is about 2.2 cell radii against a claimed 9.28. It is not
+tuned to that and must not be, since a bound fitted to samples is not a bound.
+Closing the rest needs a real bound on how far a convex boundary can wrap
+inside a disc, which is a geometry problem rather than a tidier version of
+this argument, and it is not scoped.
 
 ## Where the bound is weak, stated in its own column
 
