@@ -1,0 +1,82 @@
+{
+  "scenario": "open_pair",
+  "observer": "geodesic_beta1",
+  "geometry_commit": "a376ab28ce6cccc7a5af75fe64c06e60dd197db6",
+  "ceiling": 1.25,
+  "search_budget": 4000,
+  "refinement": [
+    {
+      "scenario_id": "open_pair",
+      "observer": "geodesic_beta1",
+      "ceiling": 1.25,
+      "optimal_cost": 10.44030650891055,
+      "path_length": 13.050383136138189,
+      "samples": 263,
+      "grid": 0.04,
+      "lipschitz_slack": 0.014142135623730952,
+      "bound": 0.8575893783895672
+    },
+    {
+      "scenario_id": "open_pair",
+      "observer": "geodesic_beta1",
+      "ceiling": 1.25,
+      "optimal_cost": 10.44030650891055,
+      "path_length": 13.050383136138189,
+      "samples": 263,
+      "grid": 0.02,
+      "lipschitz_slack": 0.007071067811865476,
+      "bound": 0.8506696971694366
+    },
+    {
+      "scenario_id": "open_pair",
+      "observer": "geodesic_beta1",
+      "ceiling": 1.25,
+      "optimal_cost": 10.44030650891055,
+      "path_length": 13.050383136138189,
+      "samples": 263,
+      "grid": 0.01,
+      "lipschitz_slack": 0.003535533905932738,
+      "bound": 0.846983712880822
+    }
+  ],
+  "bound": 0.846983712880822,
+  "crude_bound": 1.0,
+  "achieved": {
+    "legibility": 0.8374282898721145,
+    "cost_ratio": 1.249992058139822,
+    "by": "optimiser k=8 restarts=4 budget=4000"
+  },
+  "attempts": [
+    {
+      "legibility": 0.6967558394953979,
+      "cost_ratio": 1.0,
+      "by": "shortest path"
+    },
+    {
+      "legibility": 0.8353264189409506,
+      "cost_ratio": 1.2498333301149993,
+      "by": "optimiser k=3 restarts=4 budget=4000"
+    },
+    {
+      "legibility": 0.8371671432376443,
+      "cost_ratio": 1.2499961963667479,
+      "by": "optimiser k=5 restarts=4 budget=4000"
+    },
+    {
+      "legibility": 0.8374282898721145,
+      "cost_ratio": 1.249992058139822,
+      "by": "optimiser k=8 restarts=4 budget=4000"
+    },
+    {
+      "legibility": 0.8339579641856517,
+      "cost_ratio": 1.2499908613281527,
+      "by": "optimiser k=12 restarts=4 budget=4000"
+    }
+  ],
+  "gap": 0.009555423008707487,
+  "ceiling_one": {
+    "exact_optimum": 0.6967558394953979,
+    "bound": 0.7278880543954787,
+    "gap": 0.03113221490008078
+  }
+}

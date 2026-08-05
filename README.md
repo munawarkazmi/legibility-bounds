@@ -24,18 +24,32 @@ clears a legibility threshold in a given world. A local search cannot decide
 it. The legibility literature optimises with local trajectory methods and
 reports what the search found.
 
+## Where it has got to
+
+One upper bound exists, in worlds with no obstacles, and it has been checked
+against the only case where the true answer is known without searching. On
+`open_pair` at cost ceiling 1.25, from `tools/open_pair_probe.py`:
+
+    achieved   0.8374   best legibility any search here reached
+    bound      0.8470   no trajectory within the budget exceeds this
+    gap        0.0096
+    crude      1.0000   the same bound with reachability ignored
+
 ## What is not true yet
 
-Everything below is the plan, not the state. Nothing here is a claim.
-
-- No bound of any kind is computed by this repository yet.
-- Nothing has been shown about worlds containing obstacles. The argument
-  sketched below relies on cost-to-go being 1-Lipschitz in the geodesic
-  metric, and near an obstacle two points a millimetre apart in the plane can
-  be far apart geodesically. Cells touching obstacles need their own
-  treatment and have not had it.
-- There is no cell decomposition, no branch and bound, and no lower bound
-  construction.
+- **Worlds with obstacles are refused, not bounded.** The bound uses
+  Euclidean distance for both the belief field and the reachability
+  condition, and neither is the geodesic once something stands in the way.
+  Near an obstacle two points a millimetre apart in the plane can be far
+  apart geodesically. This is the hardest part and none of it is done.
+- **The lower bound is not certified.** The achieved figure is what a local
+  search reached, which is a valid lower bound on the optimum but carries no
+  argument of its own.
+- There is no cell decomposition and no branch and bound.
+- The bound is not converged: refining the lattice tightens it, and how much
+  of the remaining gap is the lattice rather than the relaxation has not been
+  separated.
+- One world, one ceiling, one observer. Nothing here may be read as a trend.
 - No result has been reported anywhere, and no venue has been chosen.
 
 ## The objective is not defined here
@@ -82,6 +96,13 @@ python -m venv .venv && .venv/Scripts/python.exe -m pip install -e ".[dev]"
 .venv/Scripts/python.exe -m pytest -q
 ```
 
-Five tests. Three of them are about the vendored geometry being the right
-one and behaving as the bounding argument assumes, rather than about anything
-this repository computes.
+Thirteen tests. Three of them are about the vendored geometry being the right
+one and behaving as the bounding argument assumes. Four of them try to make
+the bound fail, including against the one case where the exact optimum is
+known without searching.
+
+To reproduce the numbers above:
+
+```bash
+.venv/Scripts/python.exe tools/open_pair_probe.py
+```

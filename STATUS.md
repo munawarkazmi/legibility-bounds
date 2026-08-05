@@ -11,12 +11,80 @@ inspected.
   `legibility_bounds/vendored.py` is the only module that knows where it is.
   Five tests, three of which hold the two facts about the objective that the
   bounding argument rests on.
-- [ ] The budget-admissible region. Not started.
-- [ ] Cell decomposition of that region. Not started.
-- [ ] Bounding the posterior over a cell. Not started.
-- [ ] The lower bound, a construction that achieves what it claims. Not
-  started.
+- [x] A first upper bound, from reachability alone, in worlds with no
+  obstacles. `legibility_bounds/reachability.py`, eight tests, reproduced by
+  `tools/open_pair_probe.py` into `results/open_pair_probe.json`. It is the
+  loosest useful member of the family and it is here because it decides
+  whether the idea is alive. It is not the instrument the project is for.
+- [ ] Cell decomposition, and a bound that constrains consecutive samples
+  rather than letting the path jump between them. Not started, and this is
+  what would tighten the gap below.
+- [ ] The lower bound as a construction that certifies what it claims,
+  rather than the best value a search happened to reach. Not started.
 - [ ] Worlds with obstacles. Not started, and the hardest part.
+
+## The kill criterion, run 6 August 2026
+
+The question was whether a crude upper bound sits so far above what the local
+optimiser reaches that tightening it would need a different idea rather than
+more cells. On `open_pair` at cost ceiling 1.25, under the geodesic observer,
+against `legible-motion-bench` at `a376ab2`:
+
+    achieved   0.8374   optimiser, 12 free waypoints tried, 4000 evaluations
+    bound      0.8470   reachability, lattice 0.01
+    gap        0.0096
+    crude      1.0000   the bound that ignores reachability
+
+The crude bound is the one the plan expected to be useless and it is: the
+largest belief anywhere in the admissible ellipse is the belief at the goal
+itself, and rounded to four places that is 1.0000. It says nothing.
+
+The reachability bound is not useless. At normalised arc length `s` the robot
+has spent `s L` of its path and must still reach the goal on what is left, so
+it lies in the lens `d(S, x) <= s L` and `d(x, G) <= (1 - s) L`. Both radii
+grow with `L`, so evaluating at the largest admissible length covers every
+shorter one in a single pass and the bound does not have to range over path
+lengths at all.
+
+The gap of 0.0096 is small enough to be suspicious, so the result was
+attacked rather than reported.
+
+- At a ceiling of exactly one the true optimum is known without searching: in
+  a world with no obstacles the only path no longer than the optimal path is
+  the straight line. Its legibility is exactly 0.6968 and the bound there is
+  0.7279, so the bound is above the exact answer by 0.0311 in the one place
+  the exact answer exists.
+- Four optimiser configurations at 3, 5, 8 and 12 free waypoints, 4000
+  evaluations each, reached 0.8353, 0.8372, 0.8374 and 0.8340. All four sit
+  under the bound, and all four sit on the cost ceiling, so the constraint
+  binds.
+- 5333 admissible random polylines, drawn in the scratch probe rather than by
+  the committed tool, reached 0.8349. Also under.
+
+Nothing exceeded it.
+
+The bound is not converged. Refining the lattice tightens it monotonically in
+what has been run, 0.8576 at grid 0.04, 0.8507 at 0.02, and 0.8470 at 0.01,
+which is the tool's default and the figure quoted above. The remaining
+looseness is therefore partly the lattice and partly the relaxation, and the
+two have not been separated.
+
+What this does not establish. `open_pair` is the easiest world in the suite:
+no obstacles, two goals placed symmetrically, and a belief field whose
+maximisers over successive lenses happen to trace something a path can very
+nearly follow. The relaxation throws away every constraint linking one sample
+to the next, so a world where those maximisers jump would loosen it, and
+nothing here says how much. One world, one ceiling, one observer.
+
+## What the bound throws away, and what would tighten it
+
+The relaxation bounds a trajectory that need not be a trajectory: the point
+may jump anywhere inside the next lens. Adding the constraint that
+consecutive samples lie within `L / N` of each other turns the problem into a
+resource-constrained shortest path over position and path spent, which is a
+dynamic program rather than a per-slice maximum. That is the obvious next
+piece, and it is also where a certified lower bound would come from, since
+any path the dynamic program returns is realisable. It is not built.
 
 ## Decisions taken
 
