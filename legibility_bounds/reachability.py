@@ -73,6 +73,7 @@ class BoundError(ValueError):
 class ReachabilityBound:
     scenario_id: str
     observer: str
+    respect_keep_out: bool
     ceiling: float
     optimal_cost: float
     path_length: float
@@ -131,6 +132,7 @@ def reachability_bound(
     grid: float = 0.01,
     spacing: float = metrics.DEFAULT_SAMPLE_SPACING,
     built: Lattice | None = None,
+    respect_keep_out: bool = False,
 ) -> ReachabilityBound:
     """Upper bound on the legibility of any trajectory within the ceiling.
 
@@ -147,7 +149,9 @@ def reachability_bound(
         raise BoundError(f"grid spacing must be positive, found {grid!r}")
 
     if built is None:
-        built = lattice_module.build(scenario, observer, grid)
+        built = lattice_module.build(
+            scenario, observer, grid, respect_keep_out=respect_keep_out
+        )
     elif built.grid != grid:
         raise BoundError(
             f"the lattice given was built at grid {built.grid!r} but a bound "
@@ -157,6 +161,15 @@ def reachability_bound(
         raise BoundError(
             f"the lattice given is for {built.scenario_id!r} under "
             f"{built.observer!r}, not {scenario.id!r} under {observer.name!r}"
+        )
+    if built.respect_keep_out != respect_keep_out:
+        raise BoundError(
+            f"the lattice given describes the "
+            f"{'safety-constrained' if built.respect_keep_out else 'unconstrained'}"
+            f" problem, but the "
+            f"{'safety-constrained' if respect_keep_out else 'unconstrained'}"
+            f" bound was asked for. They are different problems with different "
+            f"answers and their lattices are not interchangeable."
         )
 
     optimal = geodesic_cost(
@@ -199,6 +212,7 @@ def reachability_bound(
     return ReachabilityBound(
         scenario_id=scenario.id,
         observer=observer.name,
+        respect_keep_out=respect_keep_out,
         ceiling=ceiling,
         optimal_cost=optimal,
         path_length=length,

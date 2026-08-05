@@ -54,14 +54,31 @@ than hidden.
 
 At the loosest ceiling the wide gaps are the search's doing rather than the
 bound's: between ceilings 1.25 and 1.50 in `wall_choice` the optimiser gains
-0.0435 while the bound gains 0.1759.
+0.0435 while the bound gains 0.1773.
+
+## What safety costs, certifiably
+
+A keep-out zone constrains the robot and not the watcher, so the same
+machinery bounds the safety-constrained problem: how legible a trajectory can
+be if it never enters a zone. Putting that bound beside an unconstrained
+trajectory that exists gives a certified lower bound on the price of the
+constraint. From `tools/safety_price.py`:
+
+    world                ceiling   free ach   safe bound    price
+    keep_out_shortcut       1.25     0.8353       0.8235   0.0119
+    pillar_aisle            1.05     0.8022       0.7632   0.0389
+
+Something is achievable within the budget, and nothing respecting the zone can
+match it, so the constraint costs at least the difference. Comparing two
+searches cannot establish that: a search that did worse under a constraint may
+simply have been a worse search.
 
 ## What is not true yet
 
-- **The bound is blind to safety.** It bounds legibility alone, so
-  `open_pair` and `keep_out_shortcut`, which differ only by a keep-out zone,
-  receive identical bounds. Bounding the safety-constrained problem is not
-  done.
+- **The certified price of safety exists only where it is positive.** Three
+  of eight world and ceiling pairs certify that respecting a keep-out zone
+  costs legibility; the other five certify nothing and are reported as
+  nothing.
 - **The lower bound is not certified.** The achieved figure is what a local
   search reached, which is a valid lower bound on the optimum but carries no
   argument of its own.
@@ -127,7 +144,7 @@ python -m venv .venv && .venv/Scripts/python.exe -m pip install -e ".[dev]"
 .venv/Scripts/python.exe -m pytest -q
 ```
 
-Thirty-five tests. Three are about the vendored geometry being the right one
+Forty-one tests. Three are about the vendored geometry being the right one
 and behaving as the bounding argument assumes. Several try to make the bound
 fail, including against the one case where the exact optimum is known without
 searching: at a ceiling of exactly one in a world with no obstacles, the only

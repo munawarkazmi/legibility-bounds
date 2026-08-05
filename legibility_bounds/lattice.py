@@ -287,11 +287,13 @@ class Lattice:
     belief: np.ndarray
     log_odds: np.ndarray
     detour: np.ndarray
+    motion_detour: np.ndarray
     geodesic_to_start: np.ndarray
     geodesic_to_goal: np.ndarray
     euclidean_to_start: np.ndarray
     euclidean_to_goal: np.ndarray
     beta: float
+    respect_keep_out: bool = False
 
     @property
     def detour_certified(self) -> bool:
@@ -309,7 +311,8 @@ class Lattice:
 
     @property
     def uncertified_cells(self) -> int:
-        return int(((~np.isfinite(self.detour)) & self.usable).sum())
+        unbounded = ~np.isfinite(self.detour) | ~np.isfinite(self.motion_detour)
+        return int((unbounded & self.usable).sum())
 
     def belief_bound(self) -> np.ndarray:
         """An upper bound on the belief anywhere in each cell.
@@ -351,8 +354,8 @@ class Lattice:
         beyond reach.
         """
         with np.errstate(invalid="ignore"):
-            geodesic = (self.geodesic_to_start <= spent + self.detour) & (
-                self.geodesic_to_goal <= remaining + self.detour
+            geodesic = (self.geodesic_to_start <= spent + self.motion_detour) & (
+                self.geodesic_to_goal <= remaining + self.motion_detour
             )
         euclidean = (self.euclidean_to_start <= spent + self.cell_radius) & (
             self.euclidean_to_goal <= remaining + self.cell_radius
@@ -387,8 +390,18 @@ def build(
     observer: Observer,
     grid: float,
     progress=None,
+    respect_keep_out: bool = False,
 ) -> Lattice:
-    """Evaluate the exact geometry at every point of a lattice of this world."""
+    """Evaluate the exact geometry at every point of a lattice of this world.
+
+    With `respect_keep_out` the lattice describes the safety-constrained
+    problem instead: trajectories that never enter a keep-out zone. Keep-out
+    zones constrain the robot and not the watcher, so they enter the
+    reachability conditions and leave the belief alone, and that asymmetry is
+    the whole of the difference. It costs a second geodesic sweep, because the
+    distances the motion obeys and the distances the observer reasons with are
+    then two different things over the same lattice.
+    """
     if grid <= 0:
         raise LatticeError(f"grid spacing must be positive, found {grid!r}")
 
@@ -403,6 +416,12 @@ def build(
     obstacles = scenario.obstacles
     goal_positions = [g.position for g in scenario.goals]
 
+    # What blocks the robot, and what the watcher reasons about, are not the
+    # same set once keep-out zones are respected.
+    blockers = tuple(obstacles)
+    if respect_keep_out:
+        blockers = blockers + tuple(scenario.keep_out_zones)
+
     targets = list(goal_positions)
     if start not in targets:
         targets.append(start)
@@ -414,39 +433,72 @@ def build(
 
     euclid_start = np.hypot(mesh_x - start[0], mesh_y - start[1])
     euclid_goal = np.hypot(mesh_x - goal[0], mesh_y - goal[1])
+    wanted = list(dict.fromkeys([start, goal, *goal_positions]))
 
-    if obstacles:
-        cost = _geodesic_costs(
-            mesh_x, mesh_y, obstacles, index, targets,
-            list(dict.fromkeys([start, goal, *goal_positions])), progress,
+    def straight_costs():
+        return {p: np.hypot(mesh_x - p[0], mesh_y - p[1]) for p in wanted}
+
+    # Distances the motion obeys, which the reachability conditions use.
+    if blockers:
+        motion_index = CostToGoIndex(blockers, targets)
+        motion = _geodesic_costs(
+            mesh_x, mesh_y, blockers, motion_index, targets, wanted, progress
         )
-        to_start, to_goal = cost[start], cost[goal]
-        usable = np.isfinite(to_start) & np.isfinite(to_goal)
-        for position in goal_positions:
-            usable &= np.isfinite(cost[position])
-        near = _near_any_obstacle(mesh_x, mesh_y, obstacles, radius) & usable
-        certified = cells_certified(mesh_x, mesh_y, obstacles, radius)
     else:
-        # The geodesic is the straight line everywhere and no cell is near an
-        # obstacle, so the whole lattice is exact and nothing needs a sweep.
-        cost = {
-            position: np.hypot(mesh_x - position[0], mesh_y - position[1])
-            for position in dict.fromkeys([start, goal, *goal_positions])
-        }
-        to_start, to_goal = cost[start], cost[goal]
-        usable = np.ones(shape, dtype=bool)
-        near = np.zeros(shape, dtype=bool)
-        certified = np.ones(shape, dtype=bool)
+        motion = straight_costs()
 
-    # A clear cell is bounded by its own radius, since the segment from its
-    # centre to any of its points is obstacle free. A band cell takes the
-    # detour bound where its geometry allows it to be claimed, and nothing
-    # otherwise.
-    detour = np.where(
-        near,
-        np.where(certified, BAND_DETOUR_FACTOR * radius, np.inf),
-        radius,
-    )
+    # Distances the observer reasons with, which the belief uses. These are
+    # the same arrays unless keep-out zones are being respected, since then
+    # and only then do the two blocker sets differ.
+    if not respect_keep_out or not scenario.keep_out_zones:
+        seen = motion
+    elif obstacles:
+        seen = _geodesic_costs(
+            mesh_x, mesh_y, obstacles, index, targets, wanted, progress
+        )
+    else:
+        seen = straight_costs()
+
+    to_start, to_goal = motion[start], motion[goal]
+    usable = np.isfinite(to_start) & np.isfinite(to_goal)
+    for position in goal_positions:
+        usable &= np.isfinite(seen[position])
+
+    def band_and_detour(against):
+        """Cells near the given blockers, and the detour bound for each.
+
+        A clear cell is bounded by its own radius, since the segment from its
+        centre to any of its points misses everything. A band cell takes the
+        detour bound where its geometry allows it to be claimed, and nothing
+        otherwise.
+        """
+        if not against:
+            return (
+                np.zeros(shape, dtype=bool),
+                np.full(shape, radius),
+            )
+        band = _near_any_obstacle(mesh_x, mesh_y, against, radius) & usable
+        allowed = cells_certified(mesh_x, mesh_y, against, radius)
+        return band, np.where(
+            band, np.where(allowed, BAND_DETOUR_FACTOR * radius, np.inf), radius
+        )
+
+    # Two different detours, because they bound two different things. The
+    # belief is a function of the observer's cost-to-go, which is defined over
+    # obstacles alone, so a keep-out zone cannot make the belief harder to
+    # bound inside a cell. The reachability conditions are about where the
+    # robot can be, so they answer to everything that blocks it.
+    #
+    # Using one array for both was a real error and not a tidiness point: it
+    # made the safety-constrained bound come out above the unconstrained one
+    # in `keep_out_shortcut`, because the keep-out boundary manufactured band
+    # cells for a quantity it has no bearing on.
+    near, detour = band_and_detour(obstacles)
+    if blockers == tuple(obstacles):
+        near_motion, motion_detour = near, detour
+    else:
+        near_motion, motion_detour = band_and_detour(blockers)
+    certified = np.isfinite(detour) & np.isfinite(motion_detour)
 
     # The observer's own cost-to-go, which is the geodesic for the observer
     # who can see the room and the straight line for the one who cannot. The
@@ -455,7 +507,7 @@ def build(
     # believes.
     def observed(position):
         if observer.condition == "geodesic":
-            return cost[position]
+            return seen[position]
         return np.hypot(mesh_x - position[0], mesh_y - position[1])
 
     true_goal = scenario.true_goal
@@ -495,11 +547,13 @@ def build(
         belief=belief,
         log_odds=log_odds,
         detour=detour,
+        motion_detour=motion_detour,
         geodesic_to_start=to_start,
         geodesic_to_goal=to_goal,
         euclidean_to_start=euclid_start,
         euclidean_to_goal=euclid_goal,
         beta=observer.beta,
+        respect_keep_out=respect_keep_out,
     )
 
 

@@ -26,8 +26,8 @@ inspected.
   what would tighten the gaps below.
 - [ ] The lower bound as a construction that certifies what it claims,
   rather than the best value a search happened to reach. Not started.
-- [ ] A bound for the safety-constrained problem. Not started. See the note
-  on `keep_out_shortcut` below, which is the reason it is now obvious.
+- [x] A bound for the safety-constrained problem, and with it a certified
+  lower bound on what safety costs. `tools/safety_price.py`, six tests.
 
 ## The kill criterion, run 6 August 2026
 
@@ -340,6 +340,67 @@ It also points straight at the next piece: marking keep-out cells unusable in
 the lattice would bound the safety-constrained problem, which is a different
 and lower quantity, and that is the frontier the sibling project exists to
 measure.
+
+## The certified price of safety, 6 August 2026
+
+`tools/safety_price.py` at lattice 0.025, written to
+`results/safety_price.json`. Two worlds in the suite carry keep-out zones.
+
+    world                ceiling   free ach   safe ach   safe bound    price
+    keep_out_shortcut       1.05     0.7870     0.7509       0.7915     none
+    keep_out_shortcut       1.10     0.8079     0.7737       0.8013   0.0066
+    keep_out_shortcut       1.25     0.8353     0.7890       0.8235   0.0119
+    keep_out_shortcut       1.50     0.8594     0.8170       0.8661     none
+    pillar_aisle            1.05     0.8022     0.7274       0.7632   0.0389
+    pillar_aisle            1.10     0.8208     0.7407       0.8370     none
+    pillar_aisle            1.25     0.8456     0.8446       0.8572     none
+    pillar_aisle            1.50     0.8682     0.8663       0.8772     none
+
+Two of those columns are of different kinds and putting them together is the
+point. `free ach` is a trajectory that exists, scored by the vendored metric,
+which may cross a keep-out zone. `safe bound` is an upper bound no trajectory
+within the budget can pass if it never enters one. Where the first exceeds the
+second, the difference is a certified lower bound on what the constraint
+costs: something is achievable and nothing safe can match it.
+
+Three of the eight pairs certify a positive price, the largest 0.0389 in
+`pillar_aisle` at ceiling 1.05. The rest certify nothing and say so rather
+than reporting a negative number as though it were a finding.
+
+This is the statement the sibling benchmark cannot make. Comparing two
+searches cannot show a constraint costs anything, because a search that did
+worse under a constraint may simply have been a worse search. Comparing an
+achieved trajectory against a bound over all trajectories can.
+
+The jump in `pillar_aisle` between ceilings 1.05 and 1.10, where the safe
+bound moves from 0.7632 to 0.8370, was checked rather than reported. It agrees
+with what the sibling's own status file records about that world, that its
+interesting structure sits between those two ceilings, so it corroborates
+rather than surprises.
+
+## Two detours, because they bound two different things
+
+Building the constrained lattice turned up an error that had been latent in
+the unconstrained one. The first version treated keep-out zones as ordinary
+blockers throughout, and the constrained bound in `keep_out_shortcut` came out
+**above** the unconstrained one, 0.8551 against 0.8519, with the band's share
+of the result jumping to 0.58.
+
+A smaller feasible set cannot admit a more legible trajectory, so the number
+was impossible as a bound on the constrained optimum and had to be a defect.
+It was: a keep-out zone constrains the robot and not the watcher. The belief
+is a function of the observer's cost-to-go, which is defined over obstacles
+alone, so a keep-out boundary cannot make the belief harder to bound inside a
+cell. Treating it as a blocker manufactured band cells for a quantity it has
+no bearing on.
+
+The lattice now carries two detours: one against obstacles, which bounds how
+much the belief can move inside a cell, and one against everything that blocks
+the robot, which bounds how much its cost-to-go can. They are the same array
+whenever keep-out zones are not being respected.
+`test_the_observer_does_not_see_the_keep_out_zone` holds the belief field
+identical between the two lattices while requiring the reachability side to
+have moved.
 
 ## What the bound throws away, and what would tighten it
 
