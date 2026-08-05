@@ -56,11 +56,13 @@ _ensure_on_path()
 from legible_motion_bench import metrics  # noqa: E402
 from legible_motion_bench.costs import (  # noqa: E402
     CostToGoIndex,
+    geodesic,
     geodesic_cost,
     straight_line_cost,
 )
 from legible_motion_bench.geometry import (  # noqa: E402
     ConvexPolygon,
+    GeometryError,
     orientation,
     polyline_length,
     segment_segment_distance,
@@ -71,6 +73,7 @@ from legible_motion_bench.world import Scenario, load_scenario  # noqa: E402
 __all__ = [
     "ConvexPolygon",
     "CostToGoIndex",
+    "GeometryError",
     "Observer",
     "orientation",
     "PINNED_COMMIT",
@@ -78,6 +81,7 @@ __all__ = [
     "Scenario",
     "VENDOR_ROOT",
     "VendorError",
+    "geodesic",
     "geodesic_cost",
     "load_scenario",
     "metrics",

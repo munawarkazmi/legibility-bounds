@@ -24,8 +24,10 @@ inspected.
 - [ ] Cell decomposition, and a bound that constrains consecutive samples
   rather than letting the path jump between them. Not started, and this is
   what would tighten the gaps below.
-- [ ] The lower bound as a construction that certifies what it claims,
-  rather than the best value a search happened to reach. Not started.
+- [x] The lower bound as a construction rather than the best value a search
+  happened to reach. `legibility_bounds/witness.py`, eleven tests. It beat the
+  vendored optimiser in 12 of the suite's 32 world and ceiling pairs, by up to
+  0.1485.
 - [x] A bound for the safety-constrained problem, and with it a certified
   lower bound on what safety costs. `tools/safety_price.py`, six tests.
 
@@ -95,17 +97,19 @@ search reached. Nothing here is a trend: it is one lattice, one observer and
 one search budget.
 
     world                obstacles   worst gap   best gap   worst band
-    door_pair            yes            0.0556     0.0322         0.18
+    door_pair            yes            0.0277     0.0067         0.18
     fan_middle           no             0.0567     0.0144         0.00
-    fan_outer            no             0.0282     0.0210         0.00
-    keep_out_shortcut    no             0.0198     0.0075         0.00
-    narrow_gap           yes            0.1059     0.0389         0.37
-    open_pair            no             0.0198     0.0075         0.00
-    pillar_aisle         yes            0.0184     0.0072         0.00
-    wall_choice          yes            0.1553     0.0213         0.34
+    fan_outer            no             0.0282     0.0162         0.00
+    keep_out_shortcut    no             0.0198     0.0067         0.00
+    narrow_gap           yes            0.0681     0.0344         0.37
+    open_pair            no             0.0198     0.0067         0.00
+    pillar_aisle         yes            0.0184     0.0071         0.00
+    wall_choice          yes            0.0220     0.0068         0.34
 
-Over the four worlds with obstacles the gap runs 0.0072 to 0.1553, and over
-the four without it runs 0.0075 to 0.0567.
+Over the four worlds with obstacles the gap runs 0.0067 to 0.0681, and over
+the four without it runs 0.0067 to 0.0567. The `achieved` column is the better
+of the vendored search and a witness built from the bound, and which of the
+two produced it is recorded on every row.
 
 What this buys is the statement the sibling benchmark could not make about
 its own worlds. In `wall_choice` at a 25 per cent cost budget the bound is
@@ -114,21 +118,78 @@ search anyone runs. The local optimiser reached 0.6084 there, so the property
 is not vacuous either: the true optimum lies in an interval of width 0.0215,
 and both of its ends are now stated rather than one.
 
-## At loose ceilings the weak end is the search, not the bound
+## Building the lower end instead of searching for it, 6 August 2026
 
-Two rows do not fit the pattern and they say something worth acting on.
-`wall_choice` at ceiling 1.50 has a gap of 0.1553 where the same world at 1.25
-has 0.0215, and `narrow_gap` at 1.50 has 0.1059 against 0.0681 at 1.25.
+`legibility_bounds/witness.py`. The upper bound already knows, for every
+fraction of the way along, which reachable cells hold a high belief. A witness
+takes the best of those as anchors and threads a trajectory through them.
 
-The upper bound rises with the ceiling because it must: a looser budget admits
-more trajectories. What fails to rise with it is the achieved value. In
-`wall_choice` the search gains only 0.0435 between ceilings 1.25 and 1.50
-while the bound gains 0.1773. The interval widens at the bottom.
+Two properties make the result trustworthy without any argument about the
+construction. The anchors are joined by exact geodesics, so the trajectory
+cannot pass through an obstacle however badly they are placed. And the result
+is scored by the vendored metric, so the number is a measurement of a real
+trajectory rather than an estimate of one. Anchors that overshoot the budget
+are pulled back towards the shortest path until it holds, which is a search on
+one scalar rather than an optimisation over waypoints.
 
-So at tight ceilings the certificate is what limits the result and at loose
-ones the search is. That is an argument for the certified lower bound, a
-construction that achieves what it claims rather than a search that reports
-what it found, and it is now visible in the table rather than suspected.
+Against the vendored optimiser at 500 evaluations, over the suite's 32 world
+and ceiling pairs, the witness won 12 of them by up to 0.1485. The largest
+single case is `wall_choice` at ceiling 1.50, where the search reached 0.6519
+and the witness reaches 0.8004 against a bound of 0.8072.
+
+It does not always win, and it is not meant to: in `fan_middle` and at tight
+ceilings in `wall_choice` the search is better. Both are reported and the
+larger is taken, with `achieved_source` recording which produced it.
+
+The effect on the interval is the point. The worst gap anywhere in the suite
+falls from 0.1553 to 0.0681, and every pair where the bound was previously
+limited by the search has closed:
+
+    world             ceiling   search   witness    bound   was     now
+    wall_choice          1.50   0.6519    0.8004   0.8072  0.1553  0.0068
+    narrow_gap           1.50   0.6989    0.7584   0.8048  0.1059  0.0464
+    door_pair            1.50   0.8221    0.8507   0.8777  0.0556  0.0270
+    door_pair            1.25   0.8062    0.8505   0.8572  0.0510  0.0067
+
+## A catch-all that turned a bug into a finding
+
+Worth recording because it is the pattern this project inherited from next
+door. The first version of the pullback search wrapped its geodesic join in
+`except Exception`, meaning to treat a waypoint landing inside an obstacle as
+a fact about the geometry.
+
+`_point_at` returned numpy scalars, which the vendored exact predicate cannot
+take: it branches on comparisons and builds a sign by subtracting them, and a
+numpy boolean refuses subtraction. So every attempt raised `TypeError`, the
+catch-all swallowed it, and the tool reported that no admissible trajectory
+could be built in any world with an obstacle. A defect, presenting as a
+geometric fact about five worlds.
+
+The catch is now narrowed to the geometry error alone, and
+`test_a_geometry_failure_is_not_read_as_infeasibility` drives a foreign
+exception through the same path and requires it to escape.
+
+## At loose ceilings the weak end was the search, and that is what was fixed
+
+Recorded because it is what motivated the witness, and because the diagnosis
+came from the table rather than from a hunch.
+
+Before the witness existed, two rows did not fit the pattern. `wall_choice` at
+ceiling 1.50 had a gap of 0.1553 where the same world at 1.25 had 0.0215, and
+`narrow_gap` at 1.50 had 0.1059 against 0.0681 at 1.25. The upper bound rises
+with the ceiling because it must, a looser budget admitting more trajectories.
+What failed to rise with it was the achieved value: between ceilings 1.25 and
+1.50 in `wall_choice` the search gained 0.0435 while the bound gained 0.1773.
+The interval was widening at the bottom.
+
+So at tight ceilings the certificate limited the result and at loose ones the
+search did. Building the lower end rather than searching for it closed exactly
+those rows: `wall_choice` at 1.50 is now 0.0068 and `narrow_gap` at 1.50 is
+0.0464.
+
+What remains is the reverse. The widest gap left is `narrow_gap` at 1.25,
+0.0681, where the witness does worse than the search and the band decides 0.37
+of the bound. That one is the upper end again.
 
 ## Where the tool spends its time, and the flag that fixes it
 

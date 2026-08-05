@@ -32,14 +32,14 @@ bound sits above what a search reached. From `tools/suite_bounds.py`, written
 to `results/suite_bounds.json`:
 
     world                obstacles   worst gap   best gap   worst band
-    door_pair            yes            0.0556     0.0322         0.18
+    door_pair            yes            0.0277     0.0067         0.18
     fan_middle           no             0.0567     0.0144         0.00
-    fan_outer            no             0.0282     0.0210         0.00
-    keep_out_shortcut    no             0.0198     0.0075         0.00
-    narrow_gap           yes            0.1059     0.0389         0.37
-    open_pair            no             0.0198     0.0075         0.00
-    pillar_aisle         yes            0.0184     0.0072         0.00
-    wall_choice          yes            0.1553     0.0213         0.34
+    fan_outer            no             0.0282     0.0162         0.00
+    keep_out_shortcut    no             0.0198     0.0067         0.00
+    narrow_gap           yes            0.0681     0.0344         0.37
+    open_pair            no             0.0198     0.0067         0.00
+    pillar_aisle         yes            0.0184     0.0071         0.00
+    wall_choice          yes            0.0220     0.0068         0.34
 
 What that licenses, taking `wall_choice` at a 25 per cent cost budget: the
 bound is 0.6299, so no trajectory within that budget reaches legibility 0.63,
@@ -52,9 +52,14 @@ the straight-line argument, which are bounded more loosely. A high band share
 means a weak bound, and the column exists so that weakness is located rather
 than hidden.
 
-At the loosest ceiling the wide gaps are the search's doing rather than the
-bound's: between ceilings 1.25 and 1.50 in `wall_choice` the optimiser gains
-0.0435 while the bound gains 0.1773.
+Both ends of each interval are constructed rather than searched for. The lower
+end is a **witness**: a trajectory threaded through the cells where the bound
+itself found belief high and reachable, joined by exact geodesics so it cannot
+walk through a wall, and scored by the vendored metric so what it claims is
+what it measures. Against the vendored optimiser at 500 evaluations it wins 12
+of the 32 pairs by up to 0.1485, and it is what brought the worst gap in the
+suite down from 0.1553 to 0.0681. Where the search still wins, the search's
+figure is used and the row says so.
 
 ## What safety costs, certifiably
 
@@ -79,9 +84,10 @@ simply have been a worse search.
   of eight world and ceiling pairs certify that respecting a keep-out zone
   costs legibility; the other five certify nothing and are reported as
   nothing.
-- **The lower bound is not certified.** The achieved figure is what a local
-  search reached, which is a valid lower bound on the optimum but carries no
-  argument of its own.
+- **The witness is a construction, not an optimum.** It certifies what it
+  scores and nothing more; it does not claim to be the best trajectory, and in
+  `fan_middle` and at tight ceilings in `wall_choice` the vendored search
+  beats it.
 - There is no cell decomposition and no branch and bound. The relaxation
   throws away every constraint linking one sample of a trajectory to the
   next.
@@ -144,7 +150,7 @@ python -m venv .venv && .venv/Scripts/python.exe -m pip install -e ".[dev]"
 .venv/Scripts/python.exe -m pytest -q
 ```
 
-Forty-one tests. Three are about the vendored geometry being the right one
+Fifty-two tests. Three are about the vendored geometry being the right one
 and behaving as the bounding argument assumes. Several try to make the bound
 fail, including against the one case where the exact optimum is known without
 searching: at a ceiling of exactly one in a world with no obstacles, the only

@@ -37,6 +37,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from legibility_bounds import lattice as lattice_module  # noqa: E402
 from legibility_bounds import vendored  # noqa: E402
+from legibility_bounds import witness as witness_module  # noqa: E402
 from legibility_bounds.reachability import reachability_bound  # noqa: E402
 
 from legible_motion_bench.planners.legible import LegiblePlanner  # noqa: E402
@@ -124,8 +125,8 @@ def main(argv=None) -> int:
     print()
 
     header = (
-        f"{'world':<20}{'ceiling':>9}{'achieved':>10}{'bound':>9}"
-        f"{'gap':>8}{'band':>7}"
+        f"{'world':<20}{'ceiling':>9}{'search':>9}{'witness':>9}"
+        f"{'bound':>9}{'gap':>8}{'band':>7}"
     )
     print(header)
     print("-" * len(header))
@@ -144,6 +145,12 @@ def main(argv=None) -> int:
             result = reachability_bound(
                 scenario, observer, ceiling, grid=args.grid, built=built
             )
+            # The witness is built from the lattice, so unlike the search it
+            # does depend on it and is never reused.
+            found = witness_module.best_witness(
+                scenario, observer, ceiling, built
+            )
+
             previous = reused.get((scenario.id, ceiling))
             if previous is None:
                 plan = LegiblePlanner(
@@ -167,14 +174,27 @@ def main(argv=None) -> int:
                         f"the stored shortest path legibility is {stored!r} but "
                         f"this world scores {baseline.legibility!r}"
                     )
-                achieved = previous["achieved"]
+                # Old files stored only the search's figure under this name,
+                # so it is read as the search's figure here.
+                achieved = previous.get("search_achieved", previous["achieved"])
                 achieved_ratio = previous["achieved_cost_ratio"]
                 source = f"reused from {Path(args.reuse).name}"
+
+            searched = achieved
+            witnessed = found.legibility if found is not None else None
+            if witnessed is not None and witnessed > achieved:
+                achieved = witnessed
+                achieved_ratio = found.cost_ratio
+                source = f"witness, {found.anchors} anchors"
 
             row = {
                 "scenario": scenario.id,
                 "ceiling": ceiling,
                 "achieved": achieved,
+                "search_achieved": searched,
+                "witness_achieved": witnessed,
+                "witness_anchors": None if found is None else found.anchors,
+                "witness_pullback": None if found is None else found.pullback,
                 "achieved_cost_ratio": achieved_ratio,
                 "achieved_source": source,
                 "shortest_path_legibility": baseline.legibility,
@@ -191,7 +211,8 @@ def main(argv=None) -> int:
             }
             rows.append(row)
             print(
-                f"{scenario.id:<20}{ceiling:>9.2f}{achieved:>10.4f}"
+                f"{scenario.id:<20}{ceiling:>9.2f}{searched:>9.4f}"
+                f"{'none' if witnessed is None else format(witnessed, '.4f'):>9}"
                 f"{result.bound:>9.4f}{row['gap']:>8.4f}"
                 f"{result.weight_from_band:>7.2f}",
                 flush=True,
@@ -221,7 +242,20 @@ def main(argv=None) -> int:
     output.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
 
     obstacle_rows = [r for r in rows if r["has_obstacles"]]
+    won = [
+        r for r in rows
+        if r["witness_achieved"] is not None
+        and r["witness_achieved"] > r["search_achieved"]
+    ]
     print(f"{len(rows)} world and ceiling pairs, {len(broken)} violations")
+    print(
+        f"the witness beat the search in {len(won)} of them"
+        + (
+            f", by up to "
+            f"{max(r['witness_achieved'] - r['search_achieved'] for r in won):.4f}"
+            if won else ""
+        )
+    )
     if obstacle_rows:
         worst = max(obstacle_rows, key=lambda r: r["weight_from_band"])
         print(
