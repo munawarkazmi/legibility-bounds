@@ -1,0 +1,139 @@
+{
+  "geometry_commit": "a376ab28ce6cccc7a5af75fe64c06e60dd197db6",
+  "observer": "geodesic_beta1",
+  "ceiling": 1.25,
+  "rows": [
+    {
+      "scenario": "wall_choice",
+      "ceiling": 1.25,
+      "grid": 0.05,
+      "cells": 48441,
+      "bound": 0.7559007187217823,
+      "weight_from_band": 0.3657078215901745,
+      "lipschitz_slack": 0.01767766952966369,
+      "band_cells": 300,
+      "build_seconds": 0.1172742000198923
+    },
+    {
+      "scenario": "wall_choice",
+      "ceiling": 1.25,
+      "grid": 0.025,
+      "cells": 192881,
+      "bound": 0.750263337900189,
+      "weight_from_band": 0.3657078215901745,
+      "lipschitz_slack": 0.008838834764831846,
+      "band_cells": 600,
+      "build_seconds": 0.8054722000088077
+    },
+    {
+      "scenario": "wall_choice",
+      "ceiling": 1.25,
+      "grid": 0.0125,
+      "cells": 769761,
+      "bound": 0.7474301274656391,
+      "weight_from_band": 0.3657078215901745,
+      "lipschitz_slack": 0.004419417382415923,
+      "band_cells": 1200,
+      "build_seconds": 2.7053317000099923
+    },
+    {
+      "scenario": "wall_choice",
+      "ceiling": 1.25,
+      "grid": 0.00625,
+      "cells": 3075521,
+      "bound": 0.7432144756164609,
+      "weight_from_band": 0.35784313725490197,
+      "lipschitz_slack": 0.0022097086912079614,
+      "band_cells": 2400,
+      "build_seconds": 10.288930100010475
+    },
+    {
+      "scenario": "narrow_gap",
+      "ceiling": 1.25,
+      "grid": 0.05,
+      "cells": 56481,
+      "bound": 0.8258337804734943,
+      "weight_from_band": 0.41487195971284685,
+      "lipschitz_slack": 0.01767766952966369,
+      "band_cells": 520,
+      "build_seconds": 0.3431026999896858
+    },
+    {
+      "scenario": "narrow_gap",
+      "ceiling": 1.25,
+      "grid": 0.025,
+      "cells": 224961,
+      "bound": 0.8189322841552694,
+      "weight_from_band": 0.41015750562520087,
+      "lipschitz_slack": 0.008838834764831846,
+      "band_cells": 1040,
+      "build_seconds": 1.8226386999886017
+    },
+    {
+      "scenario": "narrow_gap",
+      "ceiling": 1.25,
+      "grid": 0.0125,
+      "cells": 897921,
+      "bound": 0.816101832222669,
+      "weight_from_band": 0.4080145719489981,
+      "lipschitz_slack": 0.004419417382415923,
+      "band_cells": 2080,
+      "build_seconds": 7.443465599993942
+    },
+    {
+      "scenario": "narrow_gap",
+      "ceiling": 1.25,
+      "grid": 0.00625,
+      "cells": 3587841,
+      "bound": 0.8147151281253616,
+      "weight_from_band": 0.4080145719489981,
+      "lipschitz_slack": 0.0022097086912079614,
+      "band_cells": 4160,
+      "build_seconds": 41.749763900006656
+    },
+    {
+      "scenario": "pillar_aisle",
+      "ceiling": 1.25,
+      "grid": 0.05,
+      "cells": 48441,
+      "bound": 0.8781127435568241,
+      "weight_from_band": 0.26912025077642016,
+      "lipschitz_slack": 0.01767766952966369,
+      "band_cells": 160,
+      "build_seconds": 0.1090342000243254
+    },
+    {
+      "scenario": "pillar_aisle",
+      "ceiling": 1.25,
+      "grid": 0.025,
+      "cells": 192881,
+      "bound": 0.8727401236384841,
+      "weight_from_band": 0.3453980785417817,
+      "lipschitz_slack": 0.008838834764831846,
+      "band_cells": 320,
+      "build_seconds": 0.5810032000008505
+    },
+    {
+      "scenario": "pillar_aisle",
+      "ceiling": 1.25,
+      "grid": 0.0125,
+      "cells": 769761,
+      "bound": 0.8695376790591374,
+      "weight_from_band": 0.361826256058979,
+      "lipschitz_slack": 0.004419417382415923,
+      "band_cells": 640,
+      "build_seconds": 2.0408023000054527
+    },
+    {
+      "scenario": "pillar_aisle",
+      "ceiling": 1.25,
+      "grid": 0.00625,
+      "cells": 3075521,
+      "bound": 0.8680002358830992,
+      "weight_from_band": 0.361826256058979,
+      "lipschitz_slack": 0.0022097086912079614,
+      "band_cells": 1280,
+      "build_seconds": 11.720035500009544
+    }
+  ]
+}

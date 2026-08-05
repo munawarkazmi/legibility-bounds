@@ -41,7 +41,48 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .vendored import CostToGoIndex, Observer, Scenario, straight_line_cost
+from . import visibility
+from .vendored import CostToGoIndex, Observer, Scenario
+
+
+def _reference(polygon, a, b) -> bool:
+    """The vendored guarded predicate, for the cases the fast path declines."""
+    return polygon.segment_enters_interior(a, b)
+
+
+def _point_segment_distance(px, py, a, b):
+    """Distance from each point to one segment, vectorised."""
+    ax, ay = float(a[0]), float(a[1])
+    ex, ey = float(b[0]) - ax, float(b[1]) - ay
+    length_squared = ex * ex + ey * ey
+    if length_squared <= 0.0:
+        return np.hypot(px - ax, py - ay)
+    t = np.clip(((px - ax) * ex + (py - ay) * ey) / length_squared, 0.0, 1.0)
+    return np.hypot(px - (ax + t * ex), py - (ay + t * ey))
+
+
+def _near_any_obstacle(px, py, obstacles, radius):
+    """Cells whose disc of the given radius meets an obstacle.
+
+    Computed in plain floating point, and deliberately generous: counting a
+    cell as near an obstacle when it is not costs tightness, since such a
+    cell is capped at a belief of one, while missing one would cost
+    soundness. The margin makes the error fall on the safe side.
+    """
+    margin = radius * 1e-6 + 1e-12
+    near = np.zeros(px.shape, dtype=bool)
+    for polygon in obstacles:
+        distance = np.full(px.shape, np.inf)
+        for v, w in polygon.edges():
+            np.minimum(distance, _point_segment_distance(px, py, v, w), out=distance)
+        # Points inside the polygon are at distance zero from it, and the
+        # edge loop above measures them from the boundary instead.
+        inside = np.ones(px.shape, dtype=bool)
+        for v, w in polygon.edges():
+            ex, ey = float(w[0]) - float(v[0]), float(w[1]) - float(v[1])
+            inside &= ex * (py - float(v[1])) - ey * (px - float(v[0])) >= 0.0
+        near |= inside | (distance <= radius + margin)
+    return near
 
 
 class LatticeError(ValueError):
@@ -214,47 +255,94 @@ def build(
             lipschitz=lipschitz_constant(observer),
         )
 
-    total = shape[0] * shape[1]
-    done = 0
-    for row in range(shape[0]):
-        for col in range(shape[1]):
-            point = (float(mesh_x[row, col]), float(mesh_y[row, col]))
-            done += 1
-            if progress is not None and done % 20000 == 0:
-                progress(done, total)
+    # Cost-to-go to every target at every lattice point, in one sweep per
+    # node of the visibility graph rather than one call per point.
+    #
+    # A shortest path from a point to a target either runs straight there or
+    # turns first at an obstacle vertex, and that first hop is by definition a
+    # visible segment. So the cost is the smallest, over nodes visible from
+    # the point, of the hop plus the node's own distance to the target. That
+    # is the vendored index's own reasoning; what changes here is that the
+    # visibility test is answered for the whole lattice at once.
+    #
+    # The node-to-target distances come from the index's public interface. A
+    # node is visible from itself, so asking the index for the cost from a
+    # node returns exactly the distance it precomputed for it.
+    nodes = []
+    seen = set()
+    for obstacle in obstacles:
+        for vertex in obstacle.vertices:
+            if vertex not in seen:
+                seen.add(vertex)
+                nodes.append(vertex)
+    for target in targets:
+        if target not in seen:
+            seen.add(target)
+            nodes.append(target)
 
-            if any(ob.contains_interior(point) for ob in obstacles):
-                usable[row, col] = False
+    goal_positions = [g.position for g in scenario.goals]
+    wanted = list(dict.fromkeys([start, goal, *goal_positions]))
+    from_node = {
+        target: [index.cost_to(node, target) for node in nodes] for target in wanted
+    }
+    cost = {target: np.full(shape, np.inf) for target in wanted}
+
+    for i, node in enumerate(nodes):
+        if progress is not None:
+            progress(i, len(nodes))
+        seen_from = visibility.visible(
+            mesh_x, mesh_y, node, obstacles, _reference
+        ).visible
+        hop = np.hypot(mesh_x - node[0], mesh_y - node[1])
+        for target in wanted:
+            remainder = from_node[target][i]
+            if remainder == math.inf:
                 continue
-            if any(ob.distance_to_point(point) <= radius for ob in obstacles):
-                near[row, col] = True
+            candidate = np.where(seen_from, hop + remainder, np.inf)
+            np.minimum(cost[target], candidate, out=cost[target])
 
-            to_start[row, col] = index.cost_to(point, start)
-            to_goal[row, col] = index.cost_to(point, goal)
+    to_start = cost[start]
+    to_goal = cost[goal]
 
-            # The observer's own cost-to-go, which is the geodesic for the
-            # observer who can see the room and the straight line for the one
-            # who cannot. The reachability terms above are always geodesic,
-            # because they are about where the robot can physically be rather
-            # than about what the watcher believes.
-            exponents = {
-                g.id: observer.beta
-                * (
-                    baseline[g.id]
-                    - (
-                        index.cost_to(point, g.position)
-                        if observer.condition == "geodesic"
-                        else straight_line_cost(point, g.position)
-                    )
-                )
-                for g in scenario.goals
-            }
-            shift = max(exponents.values())
-            weights = {
-                gid: prior[gid] * math.exp(value - shift)
-                for gid, value in exponents.items()
-            }
-            belief[row, col] = weights[scenario.true_goal] / sum(weights.values())
+    # A point inside an obstacle sees no node at all, so its cost-to-go comes
+    # back infinite and it drops out here without needing a separate interior
+    # test. Nothing downstream can use a point with no finite cost anyway.
+    usable = np.isfinite(to_start) & np.isfinite(to_goal)
+    for position in goal_positions:
+        usable &= np.isfinite(cost[position])
+
+    # Restricted to usable cells. A cell inside an obstacle is near one by any
+    # measure, but it is masked out of every reachable set already, so
+    # counting it in the band would inflate the one statistic that says how
+    # much of a bound rests on the part of the argument that is loose.
+    near = _near_any_obstacle(mesh_x, mesh_y, obstacles, radius) & usable
+
+    # The observer's own cost-to-go, which is the geodesic for the observer
+    # who can see the room and the straight line for the one who cannot. The
+    # reachability terms above are always geodesic, because they are about
+    # where the robot can physically be rather than about what the watcher
+    # believes.
+    exponents = {}
+    for g in scenario.goals:
+        if observer.condition == "geodesic":
+            reach = cost[g.position]
+        else:
+            reach = np.hypot(mesh_x - g.position[0], mesh_y - g.position[1])
+        exponents[g.id] = observer.beta * (baseline[g.id] - reach)
+
+    order = [g.id for g in scenario.goals]
+    # Unusable points carry infinities that would poison the arithmetic. They
+    # are zeroed here and masked out at the end; nothing reads their belief.
+    stacked = np.stack([exponents[gid] for gid in order])
+    stacked = np.where(np.isfinite(stacked), stacked, 0.0)
+    # The same shift the reference implementation applies, for the same
+    # reason: without it a point far from every goal underflows every weight
+    # to zero and the normalisation divides by it.
+    shifted = np.exp(stacked - stacked.max(axis=0))
+    weights = np.array([prior[gid] for gid in order])[:, None, None] * shifted
+    belief = np.where(
+        usable, weights[order.index(scenario.true_goal)] / weights.sum(axis=0), 0.0
+    )
 
     return Lattice(
         scenario_id=scenario.id,

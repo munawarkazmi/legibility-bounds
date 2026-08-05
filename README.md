@@ -64,9 +64,11 @@ hidden.
 - There is no cell decomposition and no branch and bound. The relaxation
   throws away every constraint linking one sample of a trajectory to the
   next.
-- The bound is not converged. Refining the lattice tightens it and narrows
-  the band, and no run at a finer lattice than 0.05 exists for the worlds
-  with obstacles.
+- **Refining the lattice does not fix the weak part.** Eight times the
+  resolution moves a bound by about 0.011 and leaves the band share flat, so
+  the looseness is structural rather than numerical. What is needed is a real
+  bound on the belief over a cell that straddles an obstacle, in place of the
+  cap of one. `tools/refinement.py` is the evidence.
 - One lattice, one observer, one search budget. Nothing here may be read as a
   trend.
 - No result has been reported anywhere, and no venue has been chosen.
@@ -115,7 +117,7 @@ python -m venv .venv && .venv/Scripts/python.exe -m pip install -e ".[dev]"
 .venv/Scripts/python.exe -m pytest -q
 ```
 
-Twenty-two tests. Three are about the vendored geometry being the right one
+Twenty-eight tests. Three are about the vendored geometry being the right one
 and behaving as the bounding argument assumes. Several try to make the bound
 fail, including against the one case where the exact optimum is known without
 searching: at a ceiling of exactly one in a world with no obstacles, the only

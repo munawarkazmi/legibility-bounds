@@ -110,6 +110,64 @@ search anyone runs. The local optimiser reached 0.6084 there, so the property
 is not vacuous either: the true optimum lies somewhere in between, and both
 ends of that interval are now stated rather than one.
 
+## The lattice is 450 times faster, 6 August 2026
+
+`legibility_bounds/visibility.py`. Building a lattice used to ask the vendored
+predicate one call at a time: 40.9 seconds for `pillar_aisle` at grid 0.05 and
+49.8 for `wall_choice`. Both are now 0.12 seconds, and the bounds are
+unchanged at 0.8781 and 0.7559.
+
+The fast path is floating point and does not trust itself. Every decision is
+taken with a tolerance scaled to the magnitudes in it, and any point whose
+decision falls inside that tolerance is handed to the vendored predicate.
+`tests/test_visibility.py` compares the two at every point of a lattice over
+three worlds with obstacles, against the fully rational implementation rather
+than the guarded one, so a defect in the guard could not hide behind it.
+Cost-to-go agrees with the vendored index to 1.776e-15 over sampled points.
+
+Two things had to be got right and only one was obvious.
+
+The clip is degenerate when the segment ends on a vertex of the polygon being
+tested, which is the common case, since most nodes of the visibility graph are
+obstacle corners: the segment touches the boundary at t = 1 and floating point
+cannot say which side it arrived from. Two thirds of points fell back on the
+first attempt. That case needs no clip at all. The polygon is convex, so if
+the query point lies in the closed outer half plane of either edge meeting the
+node, the whole segment lies in that half plane and never reaches the
+interior; and if it lies strictly inside both, the points just before the
+corner are interior. The two adjacent edges settle it.
+
+The first version of that shortcut fired on the wrong condition and was caught
+by the differential test, with 4205 disagreements in `narrow_gap`. It keyed on
+the node lying on an edge's *line*, which a node can do while sitting far
+outside the polygon, and in `narrow_gap` a corner of one obstacle is exactly
+collinear with an edge of the other. The argument needs the node on the
+boundary itself.
+
+## Refining the lattice does not fix the band, 6 August 2026
+
+`tools/refinement.py`, written to `results/refinement.json`. This was run
+expecting the band to narrow with the lattice, since its width is half a cell
+diagonal. That expectation was wrong and the tool records it.
+
+    world           grid 0.05 to 0.00625      bound moved   band moved
+    wall_choice     0.7559 to 0.7432               0.0127       0.0079
+    narrow_gap      0.8258 to 0.8147               0.0111       0.0069
+    pillar_aisle    0.8781 to 0.8680               0.0101      -0.0927
+
+The Lipschitz slack behaves as expected, falling from 0.0177 to 0.0022 across
+that refinement. The band does not. Its share is flat in two worlds and rises
+in the third, and the reason is structural rather than numerical: a slice is
+decided by the band whenever its reachable set touches an obstacle at all, and
+a thinner band is still touched. Eight times the resolution and 3 million
+cells buy about 0.011 of bound.
+
+Two consequences. The committed suite at grid 0.05 was already close to
+whatever a finer lattice would give, so those numbers stand. And the next
+improvement has to be a real bound on the belief over a cell that straddles an
+obstacle, in place of the cap of one, rather than more cells. Refinement is
+not the route and now there is a committed tool saying so.
+
 ## Where the bound is weak, stated in its own column
 
 Every bound reports `weight_from_band`, the share of the result decided by

@@ -59,13 +59,19 @@ from legible_motion_bench.costs import (  # noqa: E402
     geodesic_cost,
     straight_line_cost,
 )
-from legible_motion_bench.geometry import polyline_length  # noqa: E402
+from legible_motion_bench.geometry import (  # noqa: E402
+    ConvexPolygon,
+    orientation,
+    polyline_length,
+)
 from legible_motion_bench.observer import Observer  # noqa: E402
 from legible_motion_bench.world import Scenario, load_scenario  # noqa: E402
 
 __all__ = [
+    "ConvexPolygon",
     "CostToGoIndex",
     "Observer",
+    "orientation",
     "PINNED_COMMIT",
     "SCENARIO_DIR",
     "Scenario",
