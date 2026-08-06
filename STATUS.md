@@ -661,6 +661,32 @@ value was written as `--`, which LaTeX renders as an en dash, and an absent
 safety price as `\textemdash`. Both now write the word `none`. The rule against
 dashes applies to generated output as much as to prose.
 
+## The draft, 6 August 2026
+
+A first draft builds to three pages against a limit of six, with no undefined
+references and no overfull boxes. It is a draft in the sense that every
+section carries real content and real numbers, not in the sense that it is
+finished.
+
+What the paper is, decided 6 August 2026: the instrument and the certificate.
+The safety price gets half a page as a results subsection. The witness is a
+subsection of the bound rather than a section of its own, since it exists to
+make the interval two-sided rather than as a contribution in itself.
+
+Related work is not written. Every sentence that would attribute a finding to
+another paper is absent rather than approximate, because this project's rule
+is that such a sentence is checked against that paper's body with the date of
+the check recorded, and that pass has not happened. One citation is present
+and its bibliographic details are marked unverified in `references.bib`.
+
+**One dash survives and it needs a decision.** `references.bib` carries the
+page range `301--308`, which is the BibTeX convention and which `IEEEtran.bst`
+typesets as an en dash. It is the only one left anywhere in `paper/` or in the
+generating tool. The standing rule against dashes is unambiguous, and IEEE's
+own style expects a range dash in a bibliography, so the two are in conflict
+in exactly one place. It is left as the convention until decided, and it is
+recorded here rather than passed over.
+
 ## Decisions taken
 
 - 6 August 2026. The exact geometry is imported from `legible-motion-bench`

@@ -1,6 +1,11 @@
-% Skeleton only. It exists to prove the build works and to fix the section
-% structure. No number appears in this file by hand: every quantity comes from
-% paper/generated/, written by a tool from the committed results.
+% First draft. Every quantity comes from paper/generated/, written by
+% tools/build_paper_tables.py from the committed results. No number is typed
+% into this file by hand.
+%
+% Where the related work has to say what another paper found, the sentence is
+% marked TODO and left unwritten. This project's rule is that a finding
+% attributed to a paper is checked against that paper's body, with the date of
+% the check recorded, and that pass has not happened.
 \documentclass[journal]{IEEEtran}
 
 \usepackage{amsmath}
@@ -9,9 +14,9 @@
 \usepackage{booktabs}
 \usepackage[hidelinks]{hyperref}
 
-% Every quantity quoted in prose is a macro written by
-% tools/build_paper_tables.py from the committed results.
 \input{generated/facts}
+
+\newcommand{\costto}[2]{C^{*}(#1, #2)}
 
 \begin{document}
 
@@ -27,15 +32,19 @@
 \maketitle
 
 \begin{abstract}
-Legible motion is optimised, not decided. Existing methods report what a local
-search found, which cannot establish that no better trajectory exists. This
-paper presents an instrument that decides the question for a bounded planar
-problem: given a world of convex polygonal obstacles, a finite goal set, a
-Boltzmann-rational observer and a budget on path cost, it returns a trajectory
-achieving a stated legibility and a bound no trajectory within the budget can
-exceed. The gap between them is reported rather than hidden. The bound extends
-to trajectories constrained to avoid keep-out zones, which yields a certified
-lower bound on what such a constraint costs in legibility.
+Legible motion is optimised, not decided. A trajectory optimiser reports the
+clarity it found, which does not establish that no clearer trajectory exists,
+so a question of the form ``can any trajectory within this budget be read
+correctly here'' has not been answerable. This paper gives an instrument that
+answers it for a bounded planar problem. Given a world of convex polygonal
+obstacles, a finite goal set, a Boltzmann-rational observer and a ceiling on
+path cost, it returns a trajectory achieving a stated legibility together with
+a bound that no trajectory within the budget exceeds, and reports the gap
+between them rather than hiding it. Over \suiteWorlds{} published scenarios at
+\suiteCeilings{} cost ceilings the gap is at most \suiteWorstGap{} and no
+bound is violated. The same argument bounds trajectories constrained to avoid
+keep-out zones, which turns the usual comparison of two searches into a
+certified lower bound on what such a constraint costs in legibility.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -45,63 +54,243 @@ Legible motion, human-robot interaction, motion planning, formal guarantees.
 \section{Introduction}
 \label{sec:introduction}
 
-Placeholder. States the gap: legibility is reported as a search outcome, and a
-search that fails to find a trajectory has not shown that none exists. Cites
-the founding formulation \cite{dragan2013legibility}.
+\IEEEPARstart{A}{robot} that moves legibly lets an observer infer where it is
+going before it arrives. The formulation of Dragan, Lee and Srinivasa
+\cite{dragan2013legibility} makes this precise: an observer holds a posterior
+over candidate goals, updates it from the motion so far under an assumption of
+efficiency, and legibility is that posterior's mass on the true goal averaged
+along the trajectory with early motion weighted more heavily.
 
-\section{Problem and Observer Model}
+Work since has optimised this objective. Optimisation answers what a
+particular search found under a particular budget, which is a different
+statement from what is achievable. The distinction matters whenever the
+interesting claim is negative. A scenario designer who wants to assert that a
+world is genuinely hard, that no trajectory within a twenty five per cent cost
+budget can be read correctly there, cannot get that from a search: a search
+that failed to find one has not shown that none exists.
+
+This paper closes that gap for a bounded problem. The contribution is an
+instrument that returns two numbers rather than one: a trajectory achieving a
+stated legibility, and a bound no trajectory within the budget can exceed. The
+interval between them is the answer, and its width is reported.
+
+Three things follow that are worth stating separately. The bound is exact in
+the geometry rather than sampled: cost-to-go comes from a visibility graph and
+carries no discretisation. The lower end is constructed from the bound itself
+rather than searched for, which matters because a search is exactly what
+cannot be trusted here. And because the argument is about a feasible set, it
+transfers unchanged to the safety-constrained problem, which yields a
+certified statement about the price of a constraint.
+
+\section{Problem}
 \label{sec:problem}
 
-Placeholder. The objective is not redefined here; it is the formulation of
-Dragan, Lee and Srinivasa as implemented in the benchmark this work bounds.
-Two consequences belong beside every number: legibility cannot reach one when
-more than one goal is present, and the cost ceiling is that paper's trust
-region expressed as a ratio rather than an idea of ours.
+A world is a compact planar region containing finitely many disjoint convex
+polygonal obstacles, a start $S$, and a finite goal set $\mathcal{G}$ with a
+true goal $A \in \mathcal{G}$. Write $\costto{x}{G}$ for the length of the
+shortest obstacle-avoiding path from $x$ to $G$, computed exactly over the
+visibility graph on the obstacle vertices.
+
+The observer is Boltzmann-rational in the form of
+\cite{dragan2013legibility}. After the robot has reached $x$, its belief in
+goal $G$ is proportional to
+$p_G \exp \beta ( \costto{S}{G} - \ell - \costto{x}{G} )$, where $\ell$ is the
+distance travelled and $p_G$ the prior. A trajectory is scored by averaging
+the belief in $A$ along it, weighting early motion more heavily, and its cost
+is bounded by a ceiling $c$ on the ratio of its length to $\costto{S}{A}$.
+
+Two consequences of that definition are used throughout and neither is
+apparent from it.
+
+First, the belief is a function of position alone. The travelled distance
+$\ell$ enters every goal's score identically and cancels when they are
+normalised, so the observer's belief is a fixed scalar field over the free
+space rather than something carried along the path. Legibility is therefore a
+weighted average of a fixed field.
+
+Second, the objective does not see duration. The weights are
+$T - t$ for a trajectory of duration $T$, sampled uniformly, and they are
+divided by their own sum, so $T$ cancels exactly. The weighting is over
+normalised arc length. A bound therefore does not have to range over the
+interval of durations a cost budget permits, which was the difficulty the
+formulation appears to pose.
+
+The ceiling $c$ is not an addition of ours. It is the trust region of
+\cite{dragan2013legibility} expressed as a ratio, and that paper is explicit
+that its observer model is only to be trusted inside one. Legibility also
+cannot reach one when more than one goal is present, by the same paper's
+statement, so a value near one is not a percentage of some attainable ideal.
 
 \section{The Bound}
 \label{sec:bound}
 
-Placeholder. The belief written as odds against the true goal, so that
-bounding it needs a lower bound on a difference of cost-to-go values rather
-than an upper bound on either. The reachability conditions. The per-cell
-detour and the precondition it is checked against.
+\subsection{Reachability}
 
-\section{The Witness}
-\label{sec:witness}
+Let $\xi$ be a trajectory from $S$ to $A$ of length $L \le c\,\costto{S}{A}$,
+and let $x$ be the point at normalised arc length $s$ along it. Arc length is
+at least distance, so
+\begin{equation}
+\costto{S}{x} \le sL
+\quad\text{and}\quad
+\costto{x}{A} \le (1-s)L .
+\label{eq:lens}
+\end{equation}
+Every sample of every admissible trajectory lies in the region cut out by
+\eqref{eq:lens}, so the legibility of any such trajectory is at most the
+weighted average, over $s$, of the largest belief in that region. Both radii
+grow with $L$, so evaluating at the largest admissible length bounds every
+shorter one and the bound does not range over lengths.
 
-Placeholder. Construction of the lower end from the bound's own maximisers,
-joined by exact geodesics and scored by the same metric.
+This relaxation permits each sample to sit anywhere its own region allows,
+independently of the others. It bounds a trajectory that need not be one.
+
+\subsection{Bounding the belief over a cell}
+
+Evaluating \eqref{eq:lens} on a lattice requires bounding the belief over a
+cell rather than at a point, and near an obstacle that is where the difficulty
+lies: two points a millimetre apart on opposite sides of a wall are a wall's
+length apart in the geodesic metric, so no small bound on the variation of
+cost-to-go is available inside such a cell.
+
+Writing the belief as odds against the true goal removes the need for one.
+Let
+\begin{equation}
+\Delta_G(x) = \big( \costto{S}{G} - \costto{x}{G} \big)
+            - \big( \costto{S}{A} - \costto{x}{A} \big) ,
+\label{eq:delta}
+\end{equation}
+so that the belief $b$ in the true goal is
+\begin{equation}
+b(x) = \Big( 1 + \sum_{G \neq A}
+  \tfrac{p_G}{p_A}\, e^{\beta \Delta_G(x)} \Big)^{-1} .
+\label{eq:odds}
+\end{equation}
+Bounding $b$ from above needs a lower bound on $\Delta_G$, which is a
+\emph{difference} of cost-to-go values, not an upper bound on either. The upper bound is what an
+obstacle denies; the difference is available. Each cost-to-go is $1$-Lipschitz
+in the geodesic metric, so moving a distance $D$ within a cell shifts
+$\Delta_G$ by at most $2D$, and for every $x$ in a cell whose lattice point is
+$p$,
+\begin{equation}
+b(x) \le \big( 1 + \mathrm{odds}(p)\, e^{-2\beta D} \big)^{-1} .
+\label{eq:cellbound}
+\end{equation}
+The obstacle problem reduces to one scalar per cell: an upper bound $D$ on the
+geodesic distance from a point of the cell to its centre.
+
+\subsection{The detour bound and its precondition}
+
+Away from obstacles $D$ is the cell radius $r$, since the segment from the
+centre to any point of the cell is free. Near one, no universal bound exists:
+an obstacle thinner than a cell separates two of its points by an obstacle's
+length rather than a cell's. A bound exists under a precondition that can be
+checked. If an obstacle does not pass clean through the cell, and no second
+obstacle meets it, then from a point outside a convex body the ray heading
+directly away from that body's nearest point never re-enters it, so the centre
+reaches the cell boundary in $r$ and any other point in at most $2r$; the free
+part of that boundary is a single arc, joining the two arrivals in at most
+$2\pi r$. Hence $D \le (3 + 2\pi) r$.
+
+The precondition is decided per cell, by counting where each obstacle's
+boundary crosses the cell, and is reported rather than assumed. A cell failing
+it is bounded by one, which always holds. Deciding it per cell rather than per
+world matters: minimum width is a global property and a convex polygon with a
+sharp vertex can be far wider than a cell overall while its tip is thinner
+than one.
+
+In practice almost no cell needs the wrapping bound at all. A cell that no
+obstacle passes through and that holds no obstacle vertex meets that
+obstacle's boundary within a single edge, which cuts the cell with a half
+plane and leaves a convex free part, so $D = r$ there as well. Only cells
+holding a corner are affected, and they are $O(1)$ per obstacle against
+$O(1/h)$ boundary cells.
+
+\subsection{The witness}
+
+The lower end of the interval is constructed rather than searched for, because
+a search is the thing this paper exists to avoid trusting. The bound already
+identifies, for each fraction of the way along, the reachable cells where the
+belief is highest. A witness takes the best of those as anchors and threads a
+trajectory through them, joining consecutive anchors by exact geodesics so the
+result cannot pass through an obstacle however the anchors fall, and pulling
+them back towards the shortest path until the cost ceiling holds. The result
+is scored by the same metric as everything else, so what it claims is what it
+measures. Against a local search at \searchBudget{} evaluations it produces
+the better trajectory in \witnessWins{} of the \suitePairs{} cases below, by
+up to \witnessBestMargin{}; where the search wins, the search's value is used.
 
 \section{Results}
 \label{sec:results}
 
-Placeholder prose, real numbers. Over \suiteWorlds{} worlds at
-\suiteCeilings{} cost ceilings, \suitePairs{} pairs in all, every bound holds:
-\suiteViolations{} violations. Table~\ref{tab:suite} gives each world at the
-ceiling where its interval is widest, together with its narrowest gap, at
-lattice \suiteLattice{}. Across the grid the gaps run from \suiteBestGap{} to
-\suiteWorstGap{}, the widest in \suiteWorstGapWorld{} at ceiling
-\suiteWorstGapCeiling{}, which has no obstacles at all.
+The instrument is run on the \suiteWorlds{} scenarios of a published legible
+motion benchmark, at \suiteCeilings{} cost ceilings, on a lattice of
+\suiteLattice{} world units, under the observer that can see the obstacles.
+Table~\ref{tab:suite} reports each world at the ceiling where its interval is
+widest, together with its narrowest gap over all four.
 
-The lower end is constructed rather than searched for. Against a local search
-at \searchBudget{} evaluations the witness wins \witnessWins{} of the
-\suitePairs{} pairs, by up to \witnessBestMargin{}.
-
-Table~\ref{tab:safety} gives what a keep-out zone costs. Of \safetyPairs{}
-pairs, \safetyPriced{} certify a positive price, the largest
-\safetyLargestPrice{} in \safetyLargestWorld{} at ceiling
-\safetyLargestCeiling{}.
+Across all \suitePairs{} pairs there are \suiteViolations{} violations: no
+achieved trajectory ever exceeds the bound claimed against it. The gaps run
+from \suiteBestGap{} to \suiteWorstGap{}. The widest is in
+\suiteWorstGapWorld{} at ceiling \suiteWorstGapCeiling{}, a world with no
+obstacles at all, which is worth noting because the obstacle machinery is
+where the argument is loosest and is not where the widest interval sits.
 
 \input{generated/suite}
+
+What such a row licenses is a statement no search can make. Reading
+\suiteWorstGapWorld{} at its widest, the bound says that no trajectory within
+that cost budget attains a legibility above the value in the \emph{bnd}
+column, whatever method is used to look for one, while the \emph{ach} column
+exhibits a trajectory attaining its own value. The optimum lies between them.
+
+\subsection{What safety costs}
+
+Keep-out zones are regions a trajectory may enter and is penalised for
+entering, rather than obstacles that block motion. The usual way to measure
+what avoiding them costs is to run two searches and compare, which cannot
+establish that the constraint costs anything: a search that did worse under a
+constraint may simply have been a worse search.
+
+The bound transfers to the constrained problem with one change. A keep-out
+zone constrains the robot and not the observer, so it enters the reachability
+conditions of \eqref{eq:lens} and leaves the belief field of \eqref{eq:odds}
+untouched. The two are therefore computed against different blocking sets over
+the same lattice.
+
+Putting the constrained bound beside an unconstrained trajectory that exists
+gives a certified lower bound on the price of the constraint: something is
+achievable within the budget, and nothing that respects the zone can match it,
+so the constraint costs at least the difference. Of the \safetyPairs{} world
+and ceiling pairs carrying keep-out zones, \safetyPriced{} certify a positive
+price, the largest \safetyLargestPrice{} in \safetyLargestWorld{} at ceiling
+\safetyLargestCeiling{}. The remainder certify nothing and are reported as
+nothing rather than as a negative price.
+
 \input{generated/safety}
 
 \section{Limitations}
 \label{sec:limitations}
 
-Placeholder, and this section is not optional. The observer model is exactly
-reproducible and has not been validated against people. The bound holds for a
-stated observer and a stated budget, and says nothing about whether a person
-watching would agree.
+The bound is exactly reproducible and is not validated against people. It
+certifies a statement about a stated observer model under a stated budget, and
+says nothing about whether a person watching the robot would agree with that
+model. The founding formulation bounds its own user studies to inside a trust
+region and is explicit that it can only be trusted there, which is why every
+result here is reported at a ceiling and why no unbounded figure appears.
+
+The observer has no option to believe in neither goal. Its posterior sums to
+one over the declared goals however strange the motion becomes, which is a
+known direction of error that grows with the cost ratio.
+
+The results are one lattice, one observer condition and one search budget over
+\suiteWorlds{} worlds. Nothing here is a trend.
+
+Finally, the relaxation of \eqref{eq:lens} discards every constraint linking
+one sample to the next. Restoring one of them, by requiring the trajectory to
+pass through an anchor, tightens the bound by at most a small fraction of the
+gaps reported above and costs more than refining the lattice would, so the
+remaining looseness is not mainly the discarded coupling. Where it does lie is
+not established.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
