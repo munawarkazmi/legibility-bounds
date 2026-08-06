@@ -157,58 +157,86 @@ work outside those two.
 A world is a compact planar region containing finitely many disjoint convex
 polygonal obstacles, a start $S$, and a finite goal set $\mathcal{G}$ with a
 true goal $A \in \mathcal{G}$. Write $\costto{x}{G}$ for the length of the
-shortest obstacle-avoiding path from $x$ to $G$, computed exactly over the
-visibility graph on the obstacle vertices.
+shortest obstacle-avoiding path from $x$ to $G$. This is computed exactly, by
+shortest path search over the visibility graph on the obstacle vertices, so
+nothing below rests on a discretisation of the geometry.
 
-The observer is Boltzmann-rational in the form of
-\cite{dragan2013legibility}. After the robot has reached $x$, its belief in
-goal $G$ is proportional to
-$p_G \exp \beta ( \costto{S}{G} - \ell - \costto{x}{G} )$, where $\ell$ is the
-distance travelled and $p_G$ the prior. A trajectory is scored by averaging
-the belief in $A$ along it, weighting early motion more heavily, and its cost
-is bounded by a ceiling $c$ on the ratio of its length to $\costto{S}{A}$.
+An observer of \cite{dragan2013legibility} assumes the robot is efficient and
+scores each goal by how much the motion so far has cost against the best it
+could have done. After the robot has travelled a distance $\ell$ and arrived at
+$x$, the belief in goal $G$ is
+\begin{equation}
+b_G(x) \propto p_G \exp \beta \big( \costto{S}{G} - \ell - \costto{x}{G} \big),
+\label{eq:belief}
+\end{equation}
+normalised over $\mathcal{G}$, with $p_G$ a prior and $\beta > 0$ a rationality
+coefficient. Write $b = b_A$ for the belief in the true goal.
 
-Two consequences of that definition are used throughout and neither is
-apparent from it.
+A trajectory $\xi$ of length $L$ is sampled at $N + 1$ points $x_0 \dots x_N$
+spaced equally in arc length, and scored by averaging $b$ over them under the
+weight $f(t) = T - t$ of \cite{dragan2013legibility}, divided by the sum of
+those weights:
+\begin{equation}
+\mathrm{Leg}(\xi)
+  = \frac{\sum_i b(x_i)\,(T - t_i)}{\sum_i (T - t_i)}
+  = \frac{\sum_i b(x_i)\,(1 - i/N)}{\sum_i (1 - i/N)} .
+\label{eq:legibility}
+\end{equation}
+Its cost is constrained by a ceiling $c$ on the ratio of $L$ to
+$\costto{S}{A}$, which is the trust region of \cite{dragan2013generating}
+expressed as a ratio, for the reasons given in Section~\ref{sec:related}.
 
-First, the belief is a function of position alone. The travelled distance
-$\ell$ enters every goal's score identically and cancels when they are
-normalised, so the observer's belief is a fixed scalar field over the free
-space rather than something carried along the path. Legibility is therefore a
-weighted average of a fixed field.
+Two consequences of these definitions do the work below, and neither is
+apparent on first reading.
 
-Second, the objective does not see duration. The weights are
-$T - t$ for a trajectory of duration $T$, sampled uniformly, and they are
-divided by their own sum, so $T$ cancels exactly. The weighting is over
-normalised arc length. A bound therefore does not have to range over the
-interval of durations a cost budget permits, which was the difficulty the
-formulation appears to pose.
+\emph{The belief is a field.} The travelled distance $\ell$ enters every goal's
+score in \eqref{eq:belief} identically, so it cancels under normalisation. The
+observer's belief is therefore a fixed scalar function of position over the
+free space, not a quantity carried along the path, and \eqref{eq:legibility} is
+a weighted average of a fixed field. Everything the bound needs to know about
+a world can be computed once, before any trajectory is considered.
 
-The ceiling $c$ is the trust region of \cite{dragan2013generating} expressed as
-a ratio, for the reasons given in Section~\ref{sec:related}.
+\emph{The objective does not see duration.} Sampling at equal arc length puts
+$t_i = iT/N$, so the weights are $T(1 - i/N)$ and the factor $T$ cancels
+between the numerator and the denominator of \eqref{eq:legibility}. That is the
+second equality there. The weighting is over normalised arc length, and a bound
+does not have to range over the interval of durations a cost budget permits.
+What survives is the sample count $N$, which follows the length.
 
 \section{The Bound}
 \label{sec:bound}
 
 \subsection{Reachability}
 
-Let $\xi$ be a trajectory from $S$ to $A$ of length $L \le c\,\costto{S}{A}$,
-and let $x$ be the point at normalised arc length $s$ along it. Arc length is
-at least distance, so
+Let $\xi$ be admissible, meaning it runs from $S$ to $A$ with
+$L \le c\,\costto{S}{A}$, and let $x$ be its point at normalised arc length
+$s$. The arc from $S$ to $x$ is at least the shortest path between them, and
+likewise from $x$ onwards, so
 \begin{equation}
 \costto{S}{x} \le sL
 \quad\text{and}\quad
 \costto{x}{A} \le (1-s)L .
 \label{eq:lens}
 \end{equation}
-Every sample of every admissible trajectory lies in the region cut out by
-\eqref{eq:lens}, so the legibility of any such trajectory is at most the
-weighted average, over $s$, of the largest belief in that region. Both radii
-grow with $L$, so evaluating at the largest admissible length bounds every
-shorter one and the bound does not range over lengths.
+Write $R(s)$ for the set these two conditions cut out. Every sample of every
+admissible trajectory lies in the $R(s)$ for its own $s$, so substituting the
+largest belief available there into \eqref{eq:legibility} bounds every
+admissible trajectory at once:
+\begin{equation}
+\mathrm{Leg}(\xi) \le
+  \frac{\sum_i \big( \max_{x \in R(i/N)} b(x) \big) (1 - i/N)}
+       {\sum_i (1 - i/N)} .
+\label{eq:bound}
+\end{equation}
+Both radii in \eqref{eq:lens} grow with $L$, so $R(s)$ grows with it, and
+evaluating \eqref{eq:bound} at the largest admissible length bounds every
+shorter one. One evaluation therefore covers the whole budget rather than a
+single path length.
 
-This relaxation permits each sample to sit anywhere its own region allows,
-independently of the others. It bounds a trajectory that need not be one.
+What \eqref{eq:bound} discards is the coupling between samples: it lets each
+one sit wherever its own $R(s)$ allows, independently of the rest. It bounds a
+trajectory that need not be a trajectory. Section~\ref{sec:limitations}
+reports how much that costs, which is less than it appears.
 
 \begin{figure}[t]
 \centering
@@ -261,30 +289,46 @@ geodesic distance from a point of the cell to its centre.
 
 \subsection{The detour bound and its precondition}
 
-Away from obstacles $D$ is the cell radius $r$, since the segment from the
-centre to any point of the cell is free. Near one, no universal bound exists:
-an obstacle thinner than a cell separates two of its points by an obstacle's
-length rather than a cell's. A bound exists under a precondition that can be
-checked. If an obstacle does not pass clean through the cell, and no second
-obstacle meets it, then from a point outside a convex body the ray heading
-directly away from that body's nearest point never re-enters it, so the centre
-reaches the cell boundary in $r$ and any other point in at most $2r$; the free
-part of that boundary is a single arc, joining the two arrivals in at most
-$2\pi r$. Hence $D \le (3 + 2\pi) r$.
+Take a cell of radius $r$ about a lattice point $p$. Away from any obstacle
+$D = r$, since the segment from $p$ to any point of the cell is free and is
+therefore the geodesic between them.
 
-The precondition is decided per cell, by counting where each obstacle's
-boundary crosses the cell, and is reported rather than assumed. A cell failing
-it is bounded by one, which always holds. Deciding it per cell rather than per
-world matters: minimum width is a global property and a convex polygon with a
-sharp vertex can be far wider than a cell overall while its tip is thinner
-than one.
+Near an obstacle no universal bound exists. An obstacle thinner than a cell
+separates two of the cell's points by its own length rather than by the cell's,
+and that length is unrelated to $r$. What exists instead is a bound under a
+precondition, and the precondition is checkable. Suppose the obstacle does not
+pass clean through the cell and no second obstacle meets it. Then three facts
+compose:
 
-In practice almost no cell needs the wrapping bound at all. A cell that no
-obstacle passes through and that holds no obstacle vertex meets that
+\begin{enumerate}
+\item from a point outside a convex body, the ray heading directly away from
+      that body's nearest point never re-enters it, so any point of the cell
+      reaches the cell's boundary along a free ray;
+\item $p$ is the centre, so its own such ray is of length exactly $r$, and any
+      other point of the cell reaches the boundary in at most $2r$;
+\item the free part of that boundary is a single arc, since the obstacle does
+      not cross the cell, so the two arrival points are joined along it in at
+      most $2\pi r$.
+\end{enumerate}
+
+\noindent Hence $D \le (3 + 2\pi)\,r$, which scales with the lattice as $r$
+does.
+
+The precondition is decided for each cell separately, by counting where each
+obstacle's boundary crosses that cell, and a cell that fails it is bounded by
+one, which holds unconditionally. Deciding it per cell rather than per world is
+not fastidiousness. Minimum width is a global property of an obstacle, and a
+convex polygon with a sharp vertex can be many cells wide overall while its tip
+is thinner than one, so a test applied to the whole world would certify cells
+that the argument does not cover.
+
+In practice almost no cell needs the wrapping bound at all. Consider a cell
+that no obstacle passes through and that contains no obstacle vertex. Two
+edges of a convex polygon meet only at a vertex, so that cell meets the
 obstacle's boundary within a single edge, which cuts the cell with a half
-plane and leaves a convex free part, so $D = r$ there as well. Only cells
-holding a corner are affected, and they are $O(1)$ per obstacle against
-$O(1/h)$ boundary cells.
+plane and leaves the free part convex. Then $D = r$ there as well. Only cells
+holding a corner are left, and for a lattice of spacing $h$ there are $O(1)$
+of those per obstacle against $O(1/h)$ cells along its boundary.
 
 \subsection{The witness}
 

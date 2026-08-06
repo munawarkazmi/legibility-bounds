@@ -705,6 +705,26 @@ That last one matters procedurally. It was carried into this project from the
 sibling repository's notes and was written into a draft here before it had
 been checked. It holds, but the order was wrong, and the log says so.
 
+## Sections III and IV rewritten, 6 August 2026
+
+Both described the objective and the bound in words without stating either,
+which for a paper whose contribution is the bound is the wrong way round. The
+objective is now equation (2), the reachability conditions are (3), and the
+bound itself is (4), so a reader can check the argument rather than take it.
+
+Three things that were asserted are now shown. The cancellation of duration is
+visible in the second equality of (2) rather than claimed in a sentence. The
+detour argument, which was one sentence carrying a four step proof, is broken
+into the three facts that compose. And the reason the precondition is decided
+per cell rather than per world is given as the failure it prevents, that a
+polygon with a sharp vertex can be many cells wide overall while its tip is
+thinner than one, so a whole-world test would certify cells the argument does
+not cover.
+
+Still four pages. The sections got clearer rather than longer, which is what
+was wanted, and the two pages that remain are for whatever a reader turns out
+to need rather than for filling.
+
 ## The figure, 6 August 2026
 
 `tools/build_paper_figures.py`, written to `paper/generated/mechanism.pdf`.
