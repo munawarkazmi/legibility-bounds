@@ -21,9 +21,10 @@ inspected.
   too close to an obstacle for that argument to cover are handled separately
   and their cost is reported rather than argued. All eight worlds of the
   suite now carry a bound at four ceilings.
-- [ ] Cell decomposition, and a bound that constrains consecutive samples
-  rather than letting the path jump between them. Not started, and this is
-  what would tighten the gaps below.
+- [x] A bound that constrains the trajectory to pass through somewhere, rather
+  than letting every sample sit where it likes. `legibility_bounds/anchored.py`,
+  eight tests. **It does not pay**, and the measurement is below. It is kept as
+  evidence for that decision, not as a tool anything runs.
 - [x] The lower bound as a construction rather than the best value a search
   happened to reach. `legibility_bounds/witness.py`, eleven tests. It beat the
   vendored optimiser in 12 of the suite's 32 world and ceiling pairs, by up to
@@ -495,6 +496,52 @@ whenever keep-out zones are not being respected.
 `test_the_observer_does_not_see_the_keep_out_zone` holds the belief field
 identical between the two lattices while requiring the reachability side to
 have moved.
+
+## Anchoring the trajectory does not pay, 6 August 2026
+
+The relaxation lets every sample sit wherever its own lens allows,
+independently of every other sample, and the standing assumption here was that
+this discarded coupling held most of the remaining looseness. Adding one
+anchor puts a piece of it back: the trajectory passes through a point at a
+stated fraction of the way along, so every sample at fraction `s` obeys
+`d(y, x) <= |s - f| L`. The anchor is unknown, so the bound is the largest
+value over every anchor it could have had.
+
+Evaluating one candidate anchor costs as much as the whole plain bound, and
+there are as many candidates as lattice points. What makes it affordable is
+that the value at every candidate at once, for one slice, is a maximum over a
+window around each point, so one sweep per slice serves every candidate.
+
+At the lattice the suite reports:
+
+    world           ceiling    plain   anchored   tighter   anchor cost
+    narrow_gap         1.25   0.7271     0.7202    0.0068          136s
+    wall_choice        1.25   0.6218     0.6217    0.0001           94s
+    door_pair          1.50   0.8777     0.8762    0.0014          293s
+
+Set against the alternative, refining the lattice from 0.025 to 0.0125
+tightens `narrow_gap` by 0.026 and costs 5.5 seconds, where one anchor at
+0.0125 tightens it by 0.0068 and costs 136. Refinement buys roughly twenty
+times more per second, so the multi-anchor version was not built: it would
+cost a full dynamic program over anchor placements to beat a baseline a
+lattice refinement already beats.
+
+The standing assumption is therefore wrong at one anchor. Whatever is left in
+these gaps, it is not mostly the coupling between samples.
+
+Three things were checked before believing that, because a negative result
+caused by slack in its own instrument is worth nothing.
+
+- The window was rounded up to a power of two, which is sound but can nearly
+  double it, and a window twice as wide weakens exactly the constraint being
+  measured. Making it exact roughly doubled the measured tightening.
+- A candidate anchor with no reachable sample at some fraction was being
+  scored at one, as though its value were unknown. It is not unknown, it is
+  infeasible, and scoring it at one let impossible anchors win a maximum taken
+  over anchors. `test_an_anchor_can_only_tighten` is the regression.
+- The exact window maximum is held to brute force over 40 random cases,
+  including at the edges, where an earlier version returned minus infinity for
+  every window overhanging one.
 
 ## What the bound throws away, and what would tighten it
 

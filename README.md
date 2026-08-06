@@ -90,9 +90,12 @@ simply have been a worse search.
   scores and nothing more; it does not claim to be the best trajectory, and in
   `fan_middle` and at tight ceilings in `wall_choice` the vendored search
   beats it.
-- There is no cell decomposition and no branch and bound. The relaxation
-  throws away every constraint linking one sample of a trajectory to the
-  next.
+- The relaxation throws away every constraint linking one sample of a
+  trajectory to the next. Putting one of them back, by requiring the
+  trajectory to pass through an anchor, tightens the bound by at most 0.0068
+  anywhere in the suite and costs more than refining the lattice would.
+  `legibility_bounds/anchored.py` is kept as the evidence for that rather than
+  as a tool anything runs.
 - **The bound near obstacles rests on a precondition, checked cell by cell.**
   Cells too close to an obstacle for the straight-line argument are bounded
   through the geodesic distance from a cell point to the cell's centre, which
@@ -152,7 +155,7 @@ python -m venv .venv && .venv/Scripts/python.exe -m pip install -e ".[dev]"
 .venv/Scripts/python.exe -m pytest -q
 ```
 
-Fifty-two tests. Three are about the vendored geometry being the right one
+Sixty-two tests. Three are about the vendored geometry being the right one
 and behaving as the bounding argument assumes. Several try to make the bound
 fail, including against the one case where the exact optimum is known without
 searching: at a ceiling of exactly one in a world with no obstacles, the only
