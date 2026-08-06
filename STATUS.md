@@ -705,6 +705,46 @@ That last one matters procedurally. It was carried into this project from the
 sibling repository's notes and was written into a draft here before it had
 been checked. It holds, but the order was wrong, and the log says so.
 
+## The figure, 6 August 2026
+
+`tools/build_paper_figures.py`, written to `paper/generated/mechanism.pdf`.
+`wall_choice` at ceiling 1.5, drawn from the same lattice, the same reachable
+sets and the same witness the bound is computed from, so the figure and the
+tables cannot disagree.
+
+It shows the belief field as shading, the reachable set at the half way point
+as an outline, the shortest path, and the witness. The set has two parts,
+because the wall can be passed on either side, and that turned out to be the
+most informative thing in the picture: the shortest path takes the upper one
+and reads ambiguously for most of its length, while the witness takes the
+lower one.
+
+Three decisions worth recording, since a figure has constraints prose does
+not.
+
+- The belief is a magnitude, so it takes one hue running light to dark with a
+  scale legend. A multi-hue ramp would put magnitude in a channel that does
+  not order.
+- Identity never rests on colour. IEEE is read in print and in greyscale as
+  often as on a screen, so the three curves separate by line style and weight
+  first and survive with every colour removed.
+- Fonts are embedded as TrueType. Matplotlib writes Type 3 into a PDF unless
+  told otherwise and publishers commonly refuse it, which is why `make check`
+  fails on a Type 3 font.
+
+**The figure carries a check.** The witness is an admissible trajectory, so
+its own half way point has to lie inside the set drawn as reachable at half
+way. The tool computes that point, tests it against the set, and refuses to
+draw anything if it fails. A figure that would have shown the witness escaping
+its own bound now stops the build instead.
+
+That marker was added because the first version looked wrong. The witness
+leaves the outlined region for most of its length, which is correct, since the
+region constrains only where a trajectory may be at one moment. Drawn without
+the marker it read as a contradiction. Two earlier versions were worse: three
+reachable sets at once, which rendered as overlapping circles with no legible
+shape, and a legend sitting directly on top of the witness.
+
 ## The survey changed the paper's claim, 6 August 2026
 
 Four papers read in the body, four in the log. The one that mattered is Miura

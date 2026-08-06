@@ -7,6 +7,10 @@ dependencies = ["numpy>=1.26"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+# Only the paper figure needs this, and nothing under legibility_bounds/ or
+# tests/ imports it, so a checkout that never builds the paper does not need
+# it either.
+figures = ["matplotlib>=3.8"]
 
 # Named explicitly rather than discovered. vendor/ holds the submodule, which
 # is a checkout of another project and not a package of this one.

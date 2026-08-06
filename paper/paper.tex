@@ -210,6 +210,21 @@ shorter one and the bound does not range over lengths.
 This relaxation permits each sample to sit anywhere its own region allows,
 independently of the others. It bounds a trajectory that need not be one.
 
+\begin{figure}[t]
+\centering
+\includegraphics{generated/mechanism}
+\caption{The mechanism in one world, with a wall between the start and both
+goals. Shading is the observer's belief in the true goal $A$, which depends on
+position alone and is computed from exact geodesic cost-to-go. The outlined
+region is where \eqref{eq:lens} permits a trajectory to be when it is half way
+along, and it has two parts because the wall can be passed on either side. The
+shortest path takes the upper one and reads ambiguously for most of its
+length; the witness takes the lower one, which costs path and buys belief. The
+marked point is the witness at its own half way point, which lies inside the
+region as any admissible trajectory must.}
+\label{fig:mechanism}
+\end{figure}
+
 \subsection{Bounding the belief over a cell}
 
 Evaluating \eqref{eq:lens} on a lattice requires bounding the belief over a

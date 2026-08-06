@@ -22,3 +22,6 @@ paper/*.out
 paper/*.run.xml
 paper/*.synctex.gz
 paper/paper.pdf
+# Raster previews of the figure, rendered to look at it during development.
+# The figure itself is committed; these are not.
+paper/generated/*.png

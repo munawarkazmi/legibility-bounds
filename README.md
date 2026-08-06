@@ -151,6 +151,13 @@ Then, on Windows:
 python -m venv .venv && .venv/Scripts/python.exe -m pip install -e ".[dev]"
 ```
 
+Building the paper additionally needs `matplotlib` for its figure, and a TeX
+distribution:
+
+```bash
+.venv/Scripts/python.exe -m pip install -e ".[dev,figures]"
+```
+
 ## Tests
 
 ```bash

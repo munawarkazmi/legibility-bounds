@@ -10,6 +10,7 @@
 
 PAPER = paper
 GENERATED = generated/suite.tex generated/safety.tex generated/facts.tex
+FIGURES = generated/mechanism.pdf
 RESULTS = ../results/suite_bounds.json ../results/safety_price.json
 # The tool runs on the project's Windows interpreter. WSL executes Windows
 # binaries directly, so the build does not need a second environment.
@@ -21,12 +22,19 @@ all: $(PAPER).pdf
 
 # Regenerated whenever a results file is newer, so a paper cannot be built
 # from a table that is older than the numbers it claims to report.
-tables: $(GENERATED)
+tables: $(GENERATED) $(FIGURES)
 
 $(GENERATED): ../tools/build_paper_tables.py $(RESULTS)
 	$(PYTHON) ../tools/build_paper_tables.py
 
-$(PAPER).pdf: $(PAPER).tex references.bib IEEEtran.cls IEEEtran.bst $(GENERATED)
+# Drawn from the geometry rather than from a results file, so it depends on
+# the code that computes the bound rather than on its output.
+$(FIGURES): ../tools/build_paper_figures.py ../legibility_bounds/lattice.py \
+            ../legibility_bounds/reachability.py ../legibility_bounds/witness.py
+	$(PYTHON) ../tools/build_paper_figures.py
+
+$(PAPER).pdf: $(PAPER).tex references.bib IEEEtran.cls IEEEtran.bst \
+              $(GENERATED) $(FIGURES)
 	latexmk -pdf -halt-on-error -interaction=nonstopmode $(PAPER).tex
 
 # Fails loudly on the two things that pass silently and matter: an undefined
