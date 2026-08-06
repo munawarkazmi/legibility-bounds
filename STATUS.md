@@ -716,6 +716,37 @@ That last one matters procedurally. It was carried into this project from the
 sibling repository's notes and was written into a draft here before it had
 been checked. It holds, but the order was wrong, and the log says so.
 
+## Read cold, 6 August 2026
+
+Read again as printed pages rather than as source, which is a different act
+and found three things the first pass did not.
+
+**The worked example's numbers were not findable in its own table.** The
+example is `wall_choice` at ceiling 1.50, and Table I shows each world at the
+ceiling where its interval is *widest*, which for `wall_choice` is 1.10. A
+reader checking 0.8069 against the table would not have found it. The numbers
+were there all along, as that row's narrowest-gap entry, and nothing said so.
+One sentence now points at it. This is the one a reviewer would have caught,
+and it would have looked like the paper quoting figures from nowhere.
+
+**The introduction and the related work argued the same point twice.** Both ran
+hardness, then what an optimiser reports, then why a search cannot settle a
+negative claim, then the scenario designer who needs one. Nearly the same
+paragraph a column apart. The related work now draws the consequence in two
+sentences and leaves the argument to the introduction.
+
+**The limitations contradicted the worked example.** Limitations said model
+error grows with the cost ratio, "which is a further reason the tightest
+ceilings are the ones worth reading", while the headline example sits at the
+loosest ceiling in the suite. Both statements were true and they could not both
+stand as written. The example now says outright that its ceiling is the loosest
+reported and carries the most model risk, and the limitations states the trade
+rather than a preference.
+
+The pattern across both readings: every defect was a correct sentence in the
+wrong relation to another correct sentence, and no check in the build can see
+that.
+
 ## Read end to end, 6 August 2026
 
 The draft had been written in pieces over a day and never read as a whole.

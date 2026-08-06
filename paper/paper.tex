@@ -122,20 +122,13 @@ Bayesian observer, and remains NP-hard when restricted to stationary policies
 or to deterministic environments. Approximation and partially observable
 extensions follow, for instance \cite{lepers2025observer}.
 
-That hardness result is the reason a bound is worth having, and it shapes what
-this paper claims. Computing the optimum is intractable in general, so the
-question is not why nobody has computed it. What is available in the
-continuous trajectory setting is what a local optimiser found, and a search
-that returns nothing better has not shown that nothing better exists. The
-statement a scenario designer needs, that no trajectory within a stated budget
-can be read correctly in a given world, is therefore not obtainable from the
-methods above at all.
-
-This paper does not compute the optimum either. It brackets it. The setting is
-the continuous one of \cite{dragan2013legibility}, with exact cost-to-go
-rather than a discretised state space, and the two ends of the bracket are a
-trajectory that exists and a bound that no trajectory within the budget can
-pass.
+That result places this paper. It does not compute the optimum either; it
+brackets it. The setting is the continuous one of
+\cite{dragan2013legibility}, with exact cost-to-go rather than a discretised
+state space, and the two ends of the bracket are a trajectory that exists and a
+bound no trajectory within the budget can pass. Optimality remains computable
+in discretised stochastic formulations, up to the discretisation, so the claim
+here is specifically about the continuous setting under a path cost budget.
 
 In the continuous setting the tools remain local. Recent work incorporates
 legibility into cost-based local planning for mobile robots in real time
@@ -388,9 +381,10 @@ where the argument is loosest and is not where the widest interval sits.
 \label{sec:licenses}
 
 Take \exampleWorld{} at a cost ceiling of \exampleCeiling{}, the world drawn in
-Fig.~\ref{fig:mechanism}. The bound there is \exampleBound{} and a trajectory
-attaining \exampleAchieved{} is exhibited, the one drawn. In words, and this is
-the form a scenario designer needs:
+Fig.~\ref{fig:mechanism}. This is that world's narrowest interval, the
+\exampleGap{} in the last column of its row in Table~\ref{tab:suite}. The bound
+is \exampleBound{} and a trajectory attaining \exampleAchieved{} is exhibited,
+the one drawn. In words, and this is the form a scenario designer needs:
 
 \begin{quote}
 No trajectory from $S$ to $A$ in this world, spending at most
@@ -418,7 +412,10 @@ It is conditional in ways that must travel with it. It holds for this observer,
 at this rationality coefficient, under this cost ceiling, and it says nothing
 about a person watching the robot. Section~\ref{sec:limitations} is not
 decoration; the statement above is only as good as the model it quantifies
-over.
+over. That applies with particular force here, since \exampleCeiling{} is the
+loosest ceiling reported and model error grows with the cost ratio. The rows at
+tighter ceilings carry less of that risk and wider intervals, and Table
+\ref{tab:suite} gives both ends of that trade.
 
 The same reading applies to every row of Table~\ref{tab:suite}, which is the
 point of reporting the suite rather than one world. A scenario suite whose
@@ -499,8 +496,9 @@ one over the declared goals however strange the motion becomes. This is not a
 hypothetical failure: \cite{dragan2013generating} reports that observers do
 form exactly that belief once motion departs far enough from expectation, and
 measures it. It is a known direction of error here, and it grows with the cost
-ratio, which is a further reason the tightest ceilings are the ones worth
-reading.
+ratio, so a result at a loose ceiling rests on the model further from where it
+was checked than one at a tight ceiling. Both are reported, and the ceiling is
+stated with every number for that reason.
 
 The results are one lattice, one observer condition and one search budget over
 \suiteWorlds{} worlds. Nothing here is a trend.
