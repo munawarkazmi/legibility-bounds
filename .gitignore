@@ -8,3 +8,17 @@ venv/
 # Scratch output from probes. Anything a result rests on is committed
 # deliberately, under results/, and never left here.
 scratch/
+
+# LaTeX build products. IEEEtran.cls and IEEEtran.bst are vendored and are
+# committed on purpose; everything derived from them is not. The PDF is
+# committed at milestones rather than on every build.
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.fdb_latexmk
+paper/*.fls
+paper/*.log
+paper/*.out
+paper/*.run.xml
+paper/*.synctex.gz
+paper/paper.pdf

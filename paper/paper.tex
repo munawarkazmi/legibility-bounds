@@ -1,0 +1,88 @@
+% Skeleton only. It exists to prove the build works and to fix the section
+% structure. No number appears in this file by hand: every quantity comes from
+% paper/generated/, written by a tool from the committed results.
+\documentclass[journal]{IEEEtran}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+
+\begin{document}
+
+\title{Certified Bounds on Achievable Legibility \\ under a Path Cost Budget}
+
+% Double-anonymous review. The author block is filled in for the final
+% version only.
+\author{Anonymous}
+
+\markboth{IEEE Robotics and Automation Letters. Preprint version.}%
+{Anonymous: Certified Bounds on Achievable Legibility}
+
+\maketitle
+
+\begin{abstract}
+Legible motion is optimised, not decided. Existing methods report what a local
+search found, which cannot establish that no better trajectory exists. This
+paper presents an instrument that decides the question for a bounded planar
+problem: given a world of convex polygonal obstacles, a finite goal set, a
+Boltzmann-rational observer and a budget on path cost, it returns a trajectory
+achieving a stated legibility and a bound no trajectory within the budget can
+exceed. The gap between them is reported rather than hidden. The bound extends
+to trajectories constrained to avoid keep-out zones, which yields a certified
+lower bound on what such a constraint costs in legibility.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Legible motion, human-robot interaction, motion planning, formal guarantees.
+\end{IEEEkeywords}
+
+\section{Introduction}
+\label{sec:introduction}
+
+Placeholder. States the gap: legibility is reported as a search outcome, and a
+search that fails to find a trajectory has not shown that none exists. Cites
+the founding formulation \cite{dragan2013legibility}.
+
+\section{Problem and Observer Model}
+\label{sec:problem}
+
+Placeholder. The objective is not redefined here; it is the formulation of
+Dragan, Lee and Srinivasa as implemented in the benchmark this work bounds.
+Two consequences belong beside every number: legibility cannot reach one when
+more than one goal is present, and the cost ceiling is that paper's trust
+region expressed as a ratio rather than an idea of ours.
+
+\section{The Bound}
+\label{sec:bound}
+
+Placeholder. The belief written as odds against the true goal, so that
+bounding it needs a lower bound on a difference of cost-to-go values rather
+than an upper bound on either. The reachability conditions. The per-cell
+detour and the precondition it is checked against.
+
+\section{The Witness}
+\label{sec:witness}
+
+Placeholder. Construction of the lower end from the bound's own maximisers,
+joined by exact geodesics and scored by the same metric.
+
+\section{Results}
+\label{sec:results}
+
+Placeholder. The suite table and the certified price of safety go here, from
+\texttt{paper/generated/}, never typed.
+
+\section{Limitations}
+\label{sec:limitations}
+
+Placeholder, and this section is not optional. The observer model is exactly
+reproducible and has not been validated against people. The bound holds for a
+stated observer and a stated budget, and says nothing about whether a person
+watching would agree.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

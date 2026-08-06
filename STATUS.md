@@ -586,10 +586,37 @@ alternative and was declined. It buys a hard date in exchange for a venue that
 suits an instrument paper less well, and a rejection in January would cost
 four and a half months with nothing archival.
 
-Nothing about the format has been set up yet. The sibling project's LaTeX
-notes do not transfer: it vendors the ACM `acmart` class because its
-distribution does not ship it, and RA-L wants IEEE's, which is a different
-problem with different gotchas.
+## Building the paper
+
+From the TeX distribution, which on this machine is the one inside WSL:
+
+    cd paper && make
+    cd paper && make check
+
+The distribution is TeX Live 2025 on Debian and it does not ship `IEEEtran`,
+the same problem the sibling project has with the ACM class and solved the
+same way. `texlive-publishers` would supply it through apt but needs root and
+is a machine-wide change, and `tlmgr --usermode` would put it in `~/texmf` but
+would leave a fresh clone unable to build. So both files are vendored beside
+the paper, taken from CTAN on 6 August 2026:
+
+    IEEEtran.cls   281957 bytes   version V1.8b, 2015/08/26
+      sha256 da751920a317ed318b7b5cd7fa585a6cc7d28502d457856382e9be24b10a3bd7
+    IEEEtran.bst    57748 bytes
+      sha256 314f0ece704568faf827011bac498650691b2b5ee06320720830e782416d5a5f
+
+`make check` fails on the two things that otherwise pass silently and matter
+at submission. An undefined reference, which a build reports and then carries
+on from. And a Type 3 font, which IEEE refuses and which matplotlib writes
+into a PDF unless told not to; the sibling project shipped one without
+noticing and caught it only by running `pdffonts`. As of 6 August 2026 the
+skeleton builds to one page with no undefined references and five fonts, all
+Type 1, embedded and subset.
+
+The document carries no number by hand. Every quantity is to come from
+`paper/generated/`, written by a tool from the committed results, so the paper
+cannot drift from the code. That tool does not exist yet and the sections are
+placeholders.
 
 ## Decisions taken
 
