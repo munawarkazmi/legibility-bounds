@@ -47,6 +47,12 @@ check: $(PAPER).pdf
 # and which swamp the handful that are.
 	@echo '--- font warnings (not errors, but worth reading):'
 	@grep -c 'LaTeX Font Warning' $(PAPER).log || true
+# A table wider than its column runs into the margin and the build still
+# succeeds. In a two-column layout that is easy to miss on screen and
+# impossible to miss in print.
+	@echo '--- overfull boxes:'
+	@grep -c 'Overfull' $(PAPER).log || true
+	@grep -n 'Overfull \\hbox' $(PAPER).log | head -5 || true
 	@echo '--- fonts:'
 	@pdffonts $(PAPER).pdf
 	@! pdffonts $(PAPER).pdf | grep -q 'Type 3' || (echo 'TYPE 3 FONT PRESENT'; exit 1)

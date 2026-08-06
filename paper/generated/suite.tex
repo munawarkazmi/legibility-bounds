@@ -2,24 +2,24 @@
 % Do not edit. Any change here is lost on the next build, and a number
 % typed by hand is a number that can disagree with the code.
 
-\begin{table*}[t]
+\begin{table}[t]
 \centering
-\caption{Achievable legibility and the bound on it, over the scenario suite at four cost ceilings. \emph{ach} is the better of a local search and a witness built from the bound; \emph{bnd} is the upper bound no trajectory within the budget can exceed. Every interval is two-sided and no bound is violated.}
+\caption{Each world at the cost ceiling where its interval is widest. \emph{ach} is the better of a local search and a witness built from the bound; \emph{bnd} is the upper bound no trajectory within the budget can exceed. The last column is the same world's narrowest gap over all four ceilings. No bound is violated anywhere in the grid.}
 \label{tab:suite}
-\begin{tabular}{lrrrrrrrr}
+\begin{tabular}{lrrrrr}
 \toprule
-world & \multicolumn{2}{c}{$c = 1.05$} & \multicolumn{2}{c}{$c = 1.10$} & \multicolumn{2}{c}{$c = 1.25$} & \multicolumn{2}{c}{$c = 1.50$} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
- & ach & bnd & ach & bnd & ach & bnd & ach & bnd \\
+ & \multicolumn{4}{c}{widest} & narrowest \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-6}
+world & $c$ & ach & bnd & gap & gap \\
 \midrule
-\texttt{door\_pair} & 0.7819 & 0.8072 & 0.7951 & 0.8170 & 0.8505 & 0.8572 & 0.8507 & 0.8777 \\
-\texttt{fan\_middle} & 0.4343 & 0.4487 & 0.4343 & 0.4593 & 0.4343 & 0.4909 & 0.5248 & 0.5394 \\
-\texttt{fan\_outer} & 0.6112 & 0.6393 & 0.6410 & 0.6692 & 0.6893 & 0.7055 & 0.7181 & 0.7403 \\
-\texttt{keep\_out\_shortcut} & 0.7870 & 0.8068 & 0.8079 & 0.8247 & 0.8386 & 0.8453 & 0.8594 & 0.8669 \\
-\texttt{narrow\_gap} & 0.6661 & 0.6936 & 0.6764 & 0.7045 & 0.6898 & 0.7271 & 0.7584 & 0.8047 \\
-\texttt{open\_pair} & 0.7870 & 0.8068 & 0.8079 & 0.8247 & 0.8386 & 0.8453 & 0.8594 & 0.8669 \\
-\texttt{pillar\_aisle} & 0.8022 & 0.8205 & 0.8208 & 0.8356 & 0.8480 & 0.8551 & 0.8682 & 0.8754 \\
-\texttt{wall\_choice} & 0.5691 & 0.5817 & 0.5787 & 0.5931 & 0.6084 & 0.6218 & 0.8004 & 0.8069 \\
+door\_pair & 1.50 & 0.8507 & 0.8777 & 0.0270 & 0.0067 \\
+fan\_middle & 1.25 & 0.4343 & 0.4909 & 0.0567 & 0.0144 \\
+fan\_outer & 1.10 & 0.6410 & 0.6692 & 0.0282 & 0.0162 \\
+keep\_out\_shortcut & 1.05 & 0.7870 & 0.8068 & 0.0198 & 0.0067 \\
+narrow\_gap & 1.50 & 0.7584 & 0.8047 & 0.0462 & 0.0275 \\
+open\_pair & 1.05 & 0.7870 & 0.8068 & 0.0198 & 0.0067 \\
+pillar\_aisle & 1.05 & 0.8022 & 0.8205 & 0.0184 & 0.0071 \\
+wall\_choice & 1.10 & 0.5787 & 0.5931 & 0.0144 & 0.0065 \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}

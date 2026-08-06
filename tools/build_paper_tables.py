@@ -60,12 +60,77 @@ def _load(name: str) -> dict:
 
 
 def _world(name: str) -> str:
-    """A world's name as it should appear in LaTeX."""
-    return r"\texttt{" + name.replace("_", r"\_") + "}"
+    """A world's name as it should appear in LaTeX.
+
+    Set in the body font rather than in typewriter. Typewriter is wider, and
+    at the class's own table size it pushed the folded table 12.94pt past the
+    column, which the build reports as an overfull box and otherwise passes.
+    Shrinking the type would have hidden that; setting the names in the body
+    font removes it.
+    """
+    return name.replace("_", r"\_")
 
 
 def _number(value, places: int = 4) -> str:
-    return "--" if value is None else f"{value:.{places}f}"
+    """A number, or the word for its absence.
+
+    Deliberately a word. LaTeX turns `--` into an en dash and `---` into an em
+    dash, and neither belongs in this project's output.
+    """
+    return "none" if value is None else f"{value:.{places}f}"
+
+
+def folded_suite_table(record: dict) -> str:
+    """One row per world: its widest interval, and its narrowest gap.
+
+    The full grid is eight worlds by four ceilings, which is a full-width
+    table with eight numeric columns and most of a page. Folded, each world
+    reports the ceiling where its gap is widest, with both ends of the
+    interval there so the row still carries a concrete certified statement,
+    and then the narrowest gap it achieves anywhere. A reader who wants the
+    whole grid has `suite_full.tex` and the committed records.
+    """
+    rows = record["rows"]
+    worlds = sorted({r["scenario"] for r in rows})
+
+    lines = [
+        BANNER,
+        r"\begin{table}[t]",
+        # No size command here. IEEEtran already sets table bodies in
+        # \footnotesize, so asking for it again does nothing, and asking
+        # before the caption does nothing either because the class sets the
+        # size itself around it. Both were tried while chasing an overfull box
+        # that turned out to be the typewriter world names.
+        r"\centering",
+        r"\caption{Each world at the cost ceiling where its interval is "
+        r"widest. \emph{ach} is the better of a local search and a witness "
+        r"built from the bound; \emph{bnd} is the upper bound no trajectory "
+        r"within the budget can exceed. The last column is the same world's "
+        r"narrowest gap over all four ceilings. No bound is violated anywhere "
+        r"in the grid.}",
+        r"\label{tab:suite}",
+        r"\begin{tabular}{lrrrrr}",
+        r"\toprule",
+        r" & \multicolumn{4}{c}{widest} & narrowest \\",
+        r"\cmidrule(lr){2-5}\cmidrule(lr){6-6}",
+        r"world & $c$ & ach & bnd & gap & gap \\",
+        r"\midrule",
+    ]
+    for world in worlds:
+        here = [r for r in rows if r["scenario"] == world]
+        widest = max(here, key=lambda r: r["gap"])
+        narrowest = min(here, key=lambda r: r["gap"])
+        lines.append(" & ".join([
+            _world(world),
+            f"{widest['ceiling']:.2f}",
+            _number(widest["achieved"]),
+            _number(widest["bound"]),
+            _number(widest["gap"]),
+            _number(narrowest["gap"]),
+        ]) + r" \\")
+
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}", ""]
+    return "\n".join(lines)
 
 
 def suite_table(record: dict) -> str:
@@ -78,6 +143,11 @@ def suite_table(record: dict) -> str:
     lines = [
         BANNER,
         r"\begin{table*}[t]",
+        # No size command here. IEEEtran already sets table bodies in
+        # \footnotesize, so asking for it again does nothing, and asking
+        # before the caption does nothing either because the class sets the
+        # size itself around it. Both were tried while chasing an overfull box
+        # that turned out to be the typewriter world names.
         r"\centering",
         r"\caption{Achievable legibility and the bound on it, over the "
         r"scenario suite at four cost ceilings. \emph{ach} is the better of a "
@@ -118,6 +188,11 @@ def safety_table(record: dict) -> str:
     lines = [
         BANNER,
         r"\begin{table}[t]",
+        # No size command here. IEEEtran already sets table bodies in
+        # \footnotesize, so asking for it again does nothing, and asking
+        # before the caption does nothing either because the class sets the
+        # size itself around it. Both were tried while chasing an overfull box
+        # that turned out to be the typewriter world names.
         r"\centering",
         r"\caption{What respecting a keep-out zone certifiably costs. "
         r"\emph{free} is a trajectory that exists within the budget and may "
@@ -138,7 +213,7 @@ def safety_table(record: dict) -> str:
                 f"{row['ceiling']:.2f}",
                 _number(row["free_achieved"]),
                 _number(row["safe_bound"]),
-                r"\textemdash" if price is None else _number(price),
+                _number(price),
             ]) + r" \\"
         )
     lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}", ""]
@@ -209,7 +284,11 @@ def main(argv=None) -> int:
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
     written = {
-        "suite.tex": suite_table(suite),
+        # The folded table is the one the paper inputs. The full grid is
+        # written too, because six pages is not a reason to stop being able to
+        # produce the numbers.
+        "suite.tex": folded_suite_table(suite),
+        "suite_full.tex": suite_table(suite),
         "safety.tex": safety_table(safety),
         "facts.tex": facts(suite, safety),
     }

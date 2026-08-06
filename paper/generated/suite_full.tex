@@ -1,0 +1,25 @@
+% Written by tools/build_paper_tables.py from the committed results.
+% Do not edit. Any change here is lost on the next build, and a number
+% typed by hand is a number that can disagree with the code.
+
+\begin{table*}[t]
+\centering
+\caption{Achievable legibility and the bound on it, over the scenario suite at four cost ceilings. \emph{ach} is the better of a local search and a witness built from the bound; \emph{bnd} is the upper bound no trajectory within the budget can exceed. Every interval is two-sided and no bound is violated.}
+\label{tab:suite}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+world & \multicolumn{2}{c}{$c = 1.05$} & \multicolumn{2}{c}{$c = 1.10$} & \multicolumn{2}{c}{$c = 1.25$} & \multicolumn{2}{c}{$c = 1.50$} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
+ & ach & bnd & ach & bnd & ach & bnd & ach & bnd \\
+\midrule
+door\_pair & 0.7819 & 0.8072 & 0.7951 & 0.8170 & 0.8505 & 0.8572 & 0.8507 & 0.8777 \\
+fan\_middle & 0.4343 & 0.4487 & 0.4343 & 0.4593 & 0.4343 & 0.4909 & 0.5248 & 0.5394 \\
+fan\_outer & 0.6112 & 0.6393 & 0.6410 & 0.6692 & 0.6893 & 0.7055 & 0.7181 & 0.7403 \\
+keep\_out\_shortcut & 0.7870 & 0.8068 & 0.8079 & 0.8247 & 0.8386 & 0.8453 & 0.8594 & 0.8669 \\
+narrow\_gap & 0.6661 & 0.6936 & 0.6764 & 0.7045 & 0.6898 & 0.7271 & 0.7584 & 0.8047 \\
+open\_pair & 0.7870 & 0.8068 & 0.8079 & 0.8247 & 0.8386 & 0.8453 & 0.8594 & 0.8669 \\
+pillar\_aisle & 0.8022 & 0.8205 & 0.8208 & 0.8356 & 0.8480 & 0.8551 & 0.8682 & 0.8754 \\
+wall\_choice & 0.5691 & 0.5817 & 0.5787 & 0.5931 & 0.6084 & 0.6218 & 0.8004 & 0.8069 \\
+\bottomrule
+\end{tabular}
+\end{table*}

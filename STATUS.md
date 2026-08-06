@@ -634,12 +634,32 @@ warnings are all `OT1/ptm/m/scit`, the small caps italic that IEEEtran asks
 for and the Nimbus clone of Times does not carry. They are cosmetic and are
 recorded here so they are not rediscovered later.
 
-Two checks were wrong when first written and both would have been worse than
-having none. Searching the log for `undefined` also matches
-`Font shape ... undefined`, which is a benign substitution, so the check
-failed on a clean build; a check that cries wolf gets ignored and then misses
-the real thing. And counting `Font shape` counted 44 where only 4 were
-warnings, the rest being routine bold-extended substitution in Times.
+The suite table is folded to one row per world: the ceiling where that world's
+interval is widest, with both ends of it, and the world's narrowest gap over
+all four ceilings. The full eight by four grid is still written, to
+`generated/suite_full.tex`, and is simply not part of a six page paper.
+
+Three checks were wrong when first written and all three would have been worse
+than having none.
+
+- Searching the log for `undefined` also matches `Font shape ... undefined`,
+  a benign substitution, so the check failed on a clean build. A check that
+  cries wolf gets ignored, and then misses the real thing.
+- Counting `Font shape` counted 44 where only 4 were warnings, the rest being
+  routine bold-extended substitution in Times.
+- The overfull box check was added last and immediately found a real one, 12.94
+  points, which took four wrong guesses to place. It was not the cmidrules, not
+  the running head, and not the font size: IEEEtran already sets table bodies in
+  `\footnotesize` and sets the size itself around the caption, so asking for a
+  smaller size before the caption did nothing at all and asking again after it
+  did nothing either. The cause was the world names being set in typewriter,
+  which is wider. They are set in the body font now and the table fits at the
+  class's own size, which is a better fix than shrinking the type.
+
+Two rule breaches of mine were in the generator and are fixed there. A missing
+value was written as `--`, which LaTeX renders as an en dash, and an absent
+safety price as `\textemdash`. Both now write the word `none`. The rule against
+dashes applies to generated output as much as to prose.
 
 ## Decisions taken
 
