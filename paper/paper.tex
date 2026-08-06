@@ -82,6 +82,57 @@ cannot be trusted here. And because the argument is about a feasible set, it
 transfers unchanged to the safety-constrained problem, which yields a
 certified statement about the price of a constraint.
 
+\section{Related Work}
+\label{sec:related}
+
+The formulation this paper bounds is that of Dragan, Lee and Srinivasa
+\cite{dragan2013legibility}. Legibility there is the observer's posterior in
+the true goal, averaged along the trajectory under a weight that favours early
+motion, and divided by the integral of that weight. The objective used here is
+theirs and is not modified.
+
+Two statements in that paper shape what a result about it is allowed to say.
+The first is that legibility cannot be driven to one: with more than one
+candidate goal a robot can make a trajectory more and more legible without
+ever reaching a score of one, at ever greater cost. A value near one is
+therefore not a proportion of an attainable ideal, and is not reported as one
+here. The second follows immediately from it. Because the objective alone runs
+away with cost, that paper adds a regulariser to keep the robot from departing
+too far from what the observer expects. The cost ceiling in this work is the
+same idea in hard form and is not an invention of ours.
+
+Its companion \cite{dragan2013generating} makes the bound on cost an explicit
+constraint, maximising legibility subject to a ceiling on trajectory cost,
+which it calls a trust region of predictability. That paper is direct about
+what lies outside it: the legibility model can only be trusted inside the
+trust region. This is why every number reported here is reported at a stated
+ceiling, and why an unbounded optimum is treated as a diagnostic rather than
+as a result.
+
+Both papers optimise. They generate a trajectory and report the legibility it
+attains, which is the right thing to do when the question is how to move well.
+It does not answer whether a world admits a legible trajectory at all, because
+a search that returns nothing better has not shown that nothing better exists.
+That is the question this paper addresses, and the authors' own two
+observations are what make it worth addressing: the objective is unbounded in
+cost without a ceiling, so the interesting statements are all budgeted ones,
+and the model is only meaningful inside that budget.
+
+Two further findings in those papers bear directly on sections below.
+\cite{dragan2013legibility} observes that legibility is not obstacle
+avoidance, and that a legible trajectory exaggerates away from competing goals
+even when that carries it closer to a wall. The phenomenon is identified there
+and not measured, which is what makes a bound on the safety-constrained
+problem worth having. And \cite{dragan2013generating} reports that observers
+may stop reasoning about the declared goals altogether once motion becomes
+strange enough, and may come to believe the robot is pursuing none of them,
+a belief its follow-up study measures directly. The observer used here cannot
+represent that belief, and Section~\ref{sec:limitations} says so.
+
+No survey of subsequent legibility work is offered. This section covers the
+founding formulation, and no claim is made here about what later work does or
+does not establish.
+
 \section{Problem}
 \label{sec:problem}
 
@@ -115,11 +166,8 @@ normalised arc length. A bound therefore does not have to range over the
 interval of durations a cost budget permits, which was the difficulty the
 formulation appears to pose.
 
-The ceiling $c$ is not an addition of ours. It is the trust region of
-\cite{dragan2013legibility} expressed as a ratio, and that paper is explicit
-that its observer model is only to be trusted inside one. Legibility also
-cannot reach one when more than one goal is present, by the same paper's
-statement, so a value near one is not a percentage of some attainable ideal.
+The ceiling $c$ is the trust region of \cite{dragan2013generating} expressed as
+a ratio, for the reasons given in Section~\ref{sec:related}.
 
 \section{The Bound}
 \label{sec:bound}
@@ -274,13 +322,17 @@ nothing rather than as a negative price.
 The bound is exactly reproducible and is not validated against people. It
 certifies a statement about a stated observer model under a stated budget, and
 says nothing about whether a person watching the robot would agree with that
-model. The founding formulation bounds its own user studies to inside a trust
-region and is explicit that it can only be trusted there, which is why every
-result here is reported at a ceiling and why no unbounded figure appears.
+model. Every result is reported at a ceiling for the reason
+\cite{dragan2013generating} gives, that the model can only be trusted inside
+one.
 
 The observer has no option to believe in neither goal. Its posterior sums to
-one over the declared goals however strange the motion becomes, which is a
-known direction of error that grows with the cost ratio.
+one over the declared goals however strange the motion becomes. This is not a
+hypothetical failure: \cite{dragan2013generating} reports that observers do
+form exactly that belief once motion departs far enough from expectation, and
+measures it. It is a known direction of error here, and it grows with the cost
+ratio, which is a further reason the tightest ceilings are the ones worth
+reading.
 
 The results are one lattice, one observer condition and one search budget over
 \suiteWorlds{} worlds. Nothing here is a trend.

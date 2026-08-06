@@ -673,11 +673,42 @@ The safety price gets half a page as a results subsection. The witness is a
 subsection of the bound rather than a section of its own, since it exists to
 make the interval two-sided rather than as a contribution in itself.
 
-Related work is not written. Every sentence that would attribute a finding to
-another paper is absent rather than approximate, because this project's rule
-is that such a sentence is checked against that paper's body with the date of
-the check recorded, and that pass has not happened. One citation is present
-and its bibliographic details are marked unverified in `references.bib`.
+## The literature pass, 6 August 2026
+
+Both founding papers were read in the body, not the abstract, and
+`paper/verification_log.md` records what was checked and what each check
+changed. Seven claims across the two, all seven supported, with the wording
+quoted in the log.
+
+What it settles, and each of these had been asserted somewhere in this project
+before it was checked:
+
+- The legibility functional is equation (9) of the HRI paper, averaging the
+  posterior under a weight favouring early motion and dividing by that
+  weight's integral. `f(t) = T - t` is that paper's own example.
+- Legibility cannot be driven to one with more than one goal, in the paper's
+  own words, so a value near one is not a proportion of anything attainable.
+- The cost bound is theirs. The HRI paper adds a regulariser immediately after
+  that sentence, to stop the robot departing too far from expectation, and the
+  RSS paper makes it a hard constraint and calls it a trust region.
+- "The legibility model can only be trusted inside this trust region" is a
+  direct quotation. Reporting only at stated ceilings is their requirement
+  rather than our caution.
+- Legibility carries motion towards obstacles. The HRI paper identifies it,
+  captions a figure "Legibility is not obstacle avoidance", and does not
+  measure it. That is the gap the safety-constrained bound fills.
+- Observers do form a belief that the robot is pursuing none of the declared
+  goals, once motion becomes strange enough, and the RSS follow-up study
+  measures it directly.
+
+That last one matters procedurally. It was carried into this project from the
+sibling repository's notes and was written into a draft here before it had
+been checked. It holds, but the order was wrong, and the log says so.
+
+**The survey is not done and the paper does not pretend otherwise.** Related
+work covers the founding formulation and makes no claim about subsequent work.
+That is a real gap in the paper rather than a stylistic choice, and filling it
+means reading more bodies rather than writing more sentences.
 
 **One dash survives and it needs a decision.** `references.bib` carries the
 page range `301--308`, which is the BibTeX convention and which `IEEEtran.bst`
