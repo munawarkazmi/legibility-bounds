@@ -1,182 +1,256 @@
 # legibility-bounds
 
-Two-sided bounds on how legible a robot trajectory can be under a path cost
-budget, in a 2D polygonal world with a finite goal set.
+**Certified two-sided bounds on how legible a robot trajectory can be, under a
+budget on how much path it may spend.**
 
-For a world, a cost ceiling and a stated observer, the instrument is meant to
-produce two numbers: a trajectory that achieves legibility `L_low`, and an
-argument that no trajectory inside the budget exceeds `L_high`. The gap
-between them is part of the result, because a bound whose gap is not stated
-says nothing about how much room is left.
+Legible motion lets someone watching a robot work out where it is going before
+it arrives. Existing methods *optimise* legibility and report the clarity they
+found. That is not the same as knowing what is achievable, and it cannot settle
+the question a scenario designer actually asks: **is this world hard, or did my
+planner just do badly in it?**
 
-## Why
+This answers that question. For a world, a cost budget and a stated observer,
+it returns a trajectory that achieves a legibility, and a bound that no
+trajectory within the budget can exceed. The optimum is somewhere between them,
+and the distance between them is reported rather than hidden.
 
-The sibling project [legible-motion-bench](https://github.com/munawarkazmi/legible-motion-bench)
-measures legible motion with an optimiser. Its own status document records
-the limit that this project exists to remove:
+![Certified intervals for every world in the suite](docs/img/intervals.png)
 
-> The optimiser is a local search. It cannot prove that no trajectory exists,
-> only that it did not find one, and the two are not the same claim.
+Every band above is a certified interval. The circle is a trajectory that
+exists; the diamond is a wall nothing can cross. The tick is the shortest path,
+for contrast.
 
-Because of that, its scenario suite could not carry the one property its
-specification asked for: that no trajectory inside a stated cost budget
-clears a legibility threshold in a given world. A local search cannot decide
-it. The legibility literature optimises with local trajectory methods and
-reports what the search found.
+---
 
-## Where it has got to
+## What you can say with it
 
-Every world in the sibling suite carries an upper bound at four cost
-ceilings, worlds with obstacles included. 32 pairs, and in all of them the
-bound sits above what a search reached. From `tools/suite_bounds.py`, written
-to `results/suite_bounds.json`:
+<!-- generated:example -->
+> No trajectory from the start to the true goal in `wall_choice`, spending at most 50 per cent more path than the shortest one, attains a legibility of **0.81 or above** under this observer.
+>
+> One attaining **0.8004** exists.
 
-    world                obstacles   worst gap   best gap   worst band
-    door_pair            yes            0.0270     0.0067         0.09
-    fan_middle           no             0.0567     0.0144         0.00
-    fan_outer            no             0.0282     0.0162         0.00
-    keep_out_shortcut    no             0.0198     0.0067         0.00
-    narrow_gap           yes            0.0462     0.0275         0.26
-    open_pair            no             0.0198     0.0067         0.00
-    pillar_aisle         yes            0.0184     0.0071         0.00
-    wall_choice          yes            0.0144     0.0065         0.12
+The shortest path there scores 0.5457, so the budget does buy clarity. The two ends are 0.0065 apart, so any threshold outside that band is decided: above it, unreachable; at or below the achieved value, reached.
+<!-- /generated:example -->
 
-The widest gap in the suite is now in a world with no obstacles at all.
+The first half of that is the part no search can give you. It is negative, and
+it quantifies over **every** trajectory rather than the ones somebody looked
+at. No amount of further searching overturns it, and a better optimiser would
+not weaken it.
 
-What that licenses, taking `wall_choice` at a 25 per cent cost budget: the
-bound is 0.6299, so no trajectory within that budget reaches legibility 0.63,
-whatever search anyone runs. The local optimiser reached 0.6084 there, so the
-statement is not vacuous either. The true optimum lies in an interval of width
-0.0215 and both of its ends are stated.
+---
 
-`band` is the share of a bound decided by cells too close to an obstacle for
-the straight-line argument, which are bounded more loosely. A high band share
-means a weak bound, and the column exists so that weakness is located rather
-than hidden.
+## How it works
 
-Both ends of each interval are constructed rather than searched for. The lower
-end is a **witness**: a trajectory threaded through the cells where the bound
-itself found belief high and reachable, joined by exact geodesics so it cannot
-walk through a wall, and scored by the vendored metric so what it claims is
-what it measures. Against the vendored optimiser at 500 evaluations it wins 12
-of the 32 pairs by up to 0.1485, and it is what brought the worst gap in the
-suite down from 0.1553 to 0.0681. Where the search still wins, the search's
-figure is used and the row says so.
+![The mechanism in one world](docs/img/mechanism.png)
+
+Shading is the observer's belief in the true goal. Two facts make the problem
+tractable, and neither is obvious from the definition of legibility:
+
+1. **The belief is a fixed field.** The distance travelled cancels out of the
+   observer's posterior, so belief depends only on *where the robot is*, not on
+   how it got there. The whole field can be computed once, before any
+   trajectory is considered.
+2. **The objective does not see duration.** The time weighting divides by its
+   own sum, so total duration cancels. The weighting is over normalised arc
+   length, and a bound never has to range over path durations.
+
+The bound then follows from **reachability**. A trajectory of length `L` that
+is a fraction `s` of the way along cannot be further than `sL` from the start,
+nor further than `(1-s)L` from the goal. That cuts out a lens, drawn dashed
+above. Taking the largest belief in each lens bounds every admissible
+trajectory at once.
+
+The hard part is obstacles. Two points a millimetre apart either side of a wall
+are a wall's length apart in the geodesic metric, so the belief cannot be
+bounded over a cell by the usual argument. Writing the belief as **odds against
+the true goal** removes the need: bounding it from above needs a lower bound on
+a *difference* of cost-to-go values, and the difference is available even when
+neither term is.
+
+### The lower end is built, not searched for
+
+A search is exactly what this project exists not to trust, so the lower end is
+constructed from the bound's own high-belief cells, threaded together by exact
+geodesics, and pulled back towards the shortest path until it fits the budget.
+It is then scored by the same metric as everything else, so what it claims is
+what it measures.
+
+<!-- generated:witness -->
+Against the vendored local search at 500 evaluations, the witness produces the better trajectory in **13 of 32** cases, by up to **0.1485**. Where the search wins, the search's value is used and the row records which produced it.
+<!-- /generated:witness -->
+
+---
+
+## Results
+
+<!-- generated:suite -->
+| world | obstacles | c | achieved | bound | widest gap | narrowest gap |
+| :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| `door_pair` | yes | 1.50 | 0.8507 | 0.8777 | **0.0270** | 0.0067 |
+| `fan_middle` | no | 1.25 | 0.4343 | 0.4909 | **0.0567** | 0.0144 |
+| `fan_outer` | no | 1.10 | 0.6410 | 0.6692 | **0.0282** | 0.0162 |
+| `keep_out_shortcut` | no | 1.05 | 0.7870 | 0.8068 | **0.0198** | 0.0067 |
+| `narrow_gap` | yes | 1.50 | 0.7584 | 0.8047 | **0.0462** | 0.0275 |
+| `open_pair` | no | 1.05 | 0.7870 | 0.8068 | **0.0198** | 0.0067 |
+| `pillar_aisle` | yes | 1.05 | 0.8022 | 0.8205 | **0.0184** | 0.0071 |
+| `wall_choice` | yes | 1.10 | 0.5787 | 0.5931 | **0.0144** | 0.0065 |
+
+All 32 world and ceiling pairs, 0 violations. Each row is the world at the ceiling where its interval is widest, with its narrowest gap over all 4 ceilings alongside. Lattice 0.0125, search budget 500.
+<!-- /generated:suite -->
+
+---
 
 ## What safety costs, certifiably
 
-A keep-out zone constrains the robot and not the watcher, so the same
-machinery bounds the safety-constrained problem: how legible a trajectory can
-be if it never enters a zone. Putting that bound beside an unconstrained
-trajectory that exists gives a certified lower bound on the price of the
-constraint. From `tools/safety_price.py`:
+Keep-out zones are regions a trajectory may enter and is penalised for
+entering. The usual way to measure what avoiding them costs is to run two
+searches and compare, **which cannot establish that the constraint costs
+anything**. A search that did worse under a constraint may simply have been a
+worse search.
 
-    world                ceiling   free ach   safe bound    price
-    keep_out_shortcut       1.25     0.8353       0.8225   0.0128
-    pillar_aisle            1.05     0.8022       0.7558   0.0464
+A keep-out zone constrains the robot but not the observer, so the same argument
+bounds the constrained problem. Put that bound beside an unconstrained
+trajectory that exists, and the difference is a certified lower bound on the
+price of the constraint: something is achievable, and nothing safe can match
+it.
 
-Something is achievable within the budget, and nothing respecting the zone can
-match it, so the constraint costs at least the difference. Comparing two
-searches cannot establish that: a search that did worse under a constraint may
-simply have been a worse search.
+<!-- generated:safety -->
+| world | c | achievable | safe bound | price of safety |
+| :--- | ---: | ---: | ---: | ---: |
+| `pillar_aisle` | 1.05 | 0.8022 | 0.7558 | **0.0464** |
+| `keep_out_shortcut` | 1.25 | 0.8353 | 0.8225 | **0.0128** |
+| `keep_out_shortcut` | 1.10 | 0.8079 | 0.8009 | **0.0070** |
 
-## What is not true yet
+3 of 8 pairs certify a positive price. The rest certify nothing and are reported as nothing.
+<!-- /generated:safety -->
 
-- **The certified price of safety exists only where it is positive.** Three
-  of eight world and ceiling pairs certify that respecting a keep-out zone
-  costs legibility; the other five certify nothing and are reported as
-  nothing.
-- **The witness is a construction, not an optimum.** It certifies what it
-  scores and nothing more; it does not claim to be the best trajectory, and in
-  `fan_middle` and at tight ceilings in `wall_choice` the vendored search
-  beats it.
-- The relaxation throws away every constraint linking one sample of a
-  trajectory to the next. Putting one of them back, by requiring the
-  trajectory to pass through an anchor, tightens the bound by at most 0.0068
-  anywhere in the suite and costs more than refining the lattice would.
-  `legibility_bounds/anchored.py` is kept as the evidence for that rather than
-  as a tool anything runs.
-- **The bound near obstacles rests on a precondition, checked cell by cell.**
-  Cells too close to an obstacle for the straight-line argument are bounded
-  through the geodesic distance from a cell point to the cell's centre, which
-  can only be bounded where the obstacle does not pass clean through the cell
-  and no second obstacle touches it. `cells_certified` decides that for each
-  cell by counting boundary crossings of the cell's circle; a cell that fails
-  falls back to a belief of one and is counted in `uncertified_cells`. No
-  claim is made that the precondition holds in general.
-- **The constant in that bound is loose.** The worst detour measured anywhere
-  is about 2.2 cell radii against a claimed 9.28. Closing it needs a real
-  bound on how far a convex boundary can wrap inside a disc.
-- One lattice, one observer, one search budget. Nothing here may be read as a
-  trend.
-- Nothing has been reported anywhere. The venue is IEEE Robotics and
-  Automation Letters, decided 6 August 2026 from the current calls, but no
-  paper exists and no format has been set up.
+In `keep_out_shortcut` the cheapest route is already safe, so the constraint
+costs nothing to a robot that does not try to be understood. It is only when
+the robot tries to communicate that it has to pay.
 
-## The objective is not defined here
+---
 
-Legibility, the observer, the cost ratio and the arrival tolerance are those
-of `legible-motion-bench`, which implements the formulation of Dragan, Lee
-and Srinivasa (HRI 2013). That repository is vendored as a git submodule
-under `vendor/` and pinned to a commit, and `legibility_bounds.vendored` is
-the only place that knows where it lives. This project bounds that objective.
-It does not redefine it.
+## Where the remaining width comes from
 
-Two consequences of that formulation are worth stating in the same breath as
-any number:
+Two candidates, told apart by measurement rather than argument.
 
-- Legibility cannot reach 1 when there is more than one goal, by the founding
-  paper's own statement. A value of 0.93 is not ninety-three per cent of the
-  way to perfect.
-- The cost ceiling is not an idea of ours. It is the trust region of Dragan
-  and Srinivasa expressed as a ratio, and it is cited as such.
+**Not the discarded coupling between samples.** The bound lets each sample sit
+anywhere its own lens allows, independently of the others. Restoring that
+coupling tightens the widest bound in the suite by less than a hundredth, and
+costs more than refining the lattice would.
 
-## Getting a working copy
+**Mostly the lattice.**
 
-The geometry comes in as a submodule, so a fresh clone needs it:
+![Gap against lattice spacing](docs/img/refinement.png)
+
+<!-- generated:refinement -->
+| world | 0.05 | 0.025 | 0.0125 | 0.00625 |
+| :--- | ---: | ---: | ---: | ---: |
+| `narrow_gap` | 0.0958 | 0.0634 | 0.0373 | 0.0331 |
+| `pillar_aisle` | 0.0134 | 0.0093 | 0.0071 | 0.0060 |
+| `wall_choice` | 0.0456 | 0.0216 | 0.0134 | 0.0096 |
+
+Refining from 0.05 to 0.00625 closes between 55 and 79 per cent of the gap, so the numbers above are conservative by roughly that margin.
+<!-- /generated:refinement -->
+
+**And what survives that is the obstacle constant.**
+
+<!-- generated:slack -->
+The argument gives `D <= (3 + 2pi) r`, about 9.28 cell radii. Sampling real point pairs in real cells beside obstacle corners finds a worst detour of 2.53, so the constant is loose by a factor of about 3.7. A bound must hold in the worst case and the worst case is rarely met, so this is not an error. It is the size of the prize: a sharper argument for those cells is the highest-leverage improvement outstanding.
+<!-- /generated:slack -->
+
+---
+
+## Reproducing everything
+
+The exact geometry comes from
+[legible-motion-bench](https://github.com/munawarkazmi/legible-motion-bench),
+vendored as a submodule and pinned to a commit, so a bound cannot drift from
+the benchmark it is bounding.
 
 ```bash
 git clone --recursive https://github.com/munawarkazmi/legibility-bounds.git
 ```
 
-If the clone was made without `--recursive`:
-
 ```bash
-git submodule update --init
+python -m venv .venv && .venv/Scripts/python.exe -m pip install -e ".[dev,figures]"
 ```
-
-Then, on Windows:
-
-```bash
-python -m venv .venv && .venv/Scripts/python.exe -m pip install -e ".[dev]"
-```
-
-Building the paper additionally needs `matplotlib` for its figure, and a TeX
-distribution:
-
-```bash
-.venv/Scripts/python.exe -m pip install -e ".[dev,figures]"
-```
-
-## Tests
 
 ```bash
 .venv/Scripts/python.exe -m pytest -q
 ```
 
-Sixty-two tests. Three are about the vendored geometry being the right one
-and behaving as the bounding argument assumes. Several try to make the bound
-fail, including against the one case where the exact optimum is known without
-searching: at a ceiling of exactly one in a world with no obstacles, the only
-admissible trajectory is the straight line, so the optimum is its legibility
-and no search is involved.
-
-To reproduce the table above, and the single-world probe it grew out of:
+Then any of the tools, each of which writes a record under `results/`:
 
 ```bash
 .venv/Scripts/python.exe tools/suite_bounds.py
 ```
 
-```bash
-.venv/Scripts/python.exe tools/open_pair_probe.py
+| tool | what it produces |
+| :--- | :--- |
+| `suite_bounds.py` | every world at every ceiling, both ends of each interval |
+| `safety_price.py` | the certified price of respecting a keep-out zone |
+| `refinement.py` | gap against lattice spacing |
+| `detour_slack.py` | how loose the obstacle constant really is |
+| `open_pair_probe.py` | the original kill-criterion probe, on the simplest world |
+| `build_paper_tables.py` | the paper's tables and every number quoted in its prose |
+| `build_paper_figures.py` | the paper's figure |
+| `build_readme.py` | every number in this file |
+
+<!-- generated:commit -->
+Pinned geometry: `a376ab2`.
+<!-- /generated:commit -->
+
+No number in this README is typed by hand. Everything between a
+`<!-- generated:... -->` marker and its closing tag is rewritten from
+`results/` by `tools/build_readme.py`, which also has a `--check` mode that
+fails if the file has gone stale.
+
+---
+
+## What is not true
+
+This project is careful about what it claims, and these are not footnotes.
+
+- **The observer model is not validated against people.** It is exactly
+  reproducible and it has never been shown to match what a human watching the
+  robot would infer. Every result is reported at a stated cost ceiling for
+  that reason: the founding paper says its model can only be trusted inside
+  one.
+- **The observer cannot believe in neither goal.** Its posterior sums to one
+  over the declared goals however strange the motion becomes. That is a known
+  direction of error and it grows with the cost ratio.
+- **One formulation.** Legibility is not one thing in this literature. What is
+  bounded here is the objective of Dragan, Lee and Srinivasa, and a bound on
+  that says nothing about another.
+- **A different kind of guarantee.** Learning-based work on legibility carries
+  convergence guarantees. Those are about an algorithm reaching what it
+  converges to; this is about what any trajectory could achieve.
+- **Obstacles must be convex polygons**, and the bound near them rests on a
+  precondition, checked per cell, that no obstacle passes clean through a cell
+  and no two obstacles meet the same one. A cell that fails it is bounded by
+  one, which always holds.
+- **One lattice, one observer condition, one search budget.** Nothing here is a
+  trend.
+
+---
+
+## Layout
+
 ```
+legibility_bounds/     the library
+  lattice.py             exact geodesic quantities over a lattice of a world
+  reachability.py        the bound
+  witness.py             the constructed lower end
+  anchored.py            a tightening that did not pay, kept as evidence
+  visibility.py          whole-lattice visibility, held to the exact predicate
+  vendored.py            the one place that knows where the geometry comes from
+tools/                 everything that writes a record or a figure
+tests/                 62 tests
+results/               committed records; every number anywhere comes from here
+paper/                 the RA-L draft, its verification log, and its build
+vendor/                legible-motion-bench, pinned
+```
+
+`STATUS.md` is the working log: what was decided, what was measured, and every
+defect found along the way, including the ones that looked like findings first.

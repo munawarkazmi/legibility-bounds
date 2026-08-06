@@ -716,6 +716,37 @@ That last one matters procedurally. It was carried into this project from the
 sibling repository's notes and was written into a draft here before it had
 been checked. It holds, but the order was wrong, and the log says so.
 
+## The README explains itself now, 6 August 2026
+
+Rewritten so a visitor understands the project before deciding whether to read
+any of it. Three figures under `docs/img/`, all generated:
+
+- **`intervals.png`**, the one that does the work. Every world's certified
+  interval as a range: a circle for a trajectory that exists, a diamond for a
+  wall nothing crosses, a tick for the shortest path. The whole result readable
+  in one glance, which no table achieves.
+- **`mechanism.png`**, the paper's figure rendered for the web.
+- **`refinement.png`**, gap against lattice spacing.
+
+Drawn as ranges rather than bars, because a bar would encode the achieved value
+as length from zero and what matters is the pair of endpoints and the distance
+between them. Marks are separated by shape as well as colour, so the figures
+survive being printed or read by someone who cannot separate the hues. White
+backgrounds on purpose: GitHub serves both light and dark themes, and a
+transparent background puts dark ink on a dark page.
+
+**No number in the README is typed by hand.** `tools/build_readme.py` rewrites
+every block between a `<!-- generated:name -->` marker and its close, from
+`results/`. It has a `--check` mode that fails if the file has gone stale.
+
+That tool exists because the rule was already broken once. When
+`safety_price.json` was regenerated this morning, three tables in the README
+and STATUS silently kept the old figures, and I only noticed because I happened
+to be editing nearby. Prose is still edited by hand; numbers no longer are.
+
+One em dash of my own got into the new prose and was caught by the check that
+exists for exactly that.
+
 ## Acting on outside feedback, 6 August 2026
 
 A colleague read the draft. Four of their points were worth taking, two were
