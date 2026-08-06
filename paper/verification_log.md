@@ -73,10 +73,65 @@ This claim was carried into this project from a sibling repository's notes and
 was repeated in a draft before it had been checked here. It is checked now and
 it holds, but the order was the wrong way round.
 
+## Miura and Zilberstein, UAI 2021
+
+**Bibliographic details, checked 6 August 2026.** "A Unifying Framework for
+Observer-Aware Planning and its Complexity", Shuwa Miura and Shlomo
+Zilberstein, Proceedings of the Thirty-Seventh Conference on Uncertainty in
+Artificial Intelligence, Proceedings of Machine Learning Research volume 161,
+pages 610 to 620, 2021. Confirmed from the PMLR record, which publishes its
+own BibTeX.
+
+**Body read 6 August 2026**, from the PMLR copy. This paper changed the
+framing of the whole section and of the introduction, which is the reason to
+run a survey rather than write from memory.
+
+- Observer-aware behaviours, legibility among them, are unified as MDPs in
+  which the property is a choice of reward over the observer's belief. The
+  paper's own summary of legibility cites Dragan and Srinivasa alongside
+  others, so this is the same notion rather than a different one.
+- The complexity is established rather than assumed. In the paper's words,
+  the problem is "PSPACE-complete (Theorem 1 and 2)" for a Bayesian observer
+  and "remains NP-hard even when restricted to stationary policies or
+  deterministic environments (Theorem 3)", which "confirms the intractability
+  of the problem".
+
+**What this changed.** The draft had said that the field optimises and that
+nobody decides, which reads as though computing the optimum had simply not
+been attempted. That is wrong and a reviewer in this area would know it. The
+optimum is intractable, and that is precisely why a two-sided bound is worth
+having. Both the introduction and the related work were rewritten around the
+hardness result rather than around an absence.
+
+It also bounds what this paper may claim. Optimality is computable in
+discretised stochastic formulations up to the discretisation, so the claim
+here is specifically about the continuous trajectory setting with exact
+cost-to-go and a stated path cost budget, and is written that way.
+
+## Lepers, Thomas and Buffet, AAMAS 2025
+
+**Bibliographic details, checked 6 August 2026.** "Observer-Aware
+Probabilistic Planning under Partial Observability", Salom{\'e} Lepers,
+Vincent Thomas and Olivier Buffet. The arXiv record 2502.10568, version 2 of
+20 November 2025, describes itself as the complete version of an AAMAS 2025
+extended abstract, and a paper of that title appears in the AAMAS 2025
+proceedings.
+
+**Body read 6 August 2026.** Cited only as a partially observable extension of
+the observer-aware line. No finding is attributed to it beyond that it extends
+observer-aware MDPs to partial observability, which its abstract and body both
+state. Its solution method computes approximately optimal policies for a
+discretised problem, which is consistent with the framing above.
+
 ## What has not been checked
 
-The related work covers the founding formulation and nothing else. No survey
-of subsequent legibility work has been done, and no claim is made in the paper
-about what that work does or does not establish beyond the two papers above.
-Any sentence positioning this work against a broader literature is therefore
-still to be written, and is not to be written from memory.
+The related work covers the founding formulation and the observer-aware
+planning line. It is not a survey of everything since 2013, and the paper says
+so in its own text rather than implying coverage it does not have.
+
+Specifically not read, and therefore not cited: work on legibility in
+multi-agent navigation, learning-based approaches, and the recent generative
+methods. A scoping review of motion intent communication was fetched and not
+used, because it covers signalling modalities such as projection and light
+rather than the motion objective bounded here, and citing it would have
+implied a survey of a literature this paper does not engage with.

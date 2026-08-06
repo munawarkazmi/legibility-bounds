@@ -61,8 +61,11 @@ over candidate goals, updates it from the motion so far under an assumption of
 efficiency, and legibility is that posterior's mass on the true goal averaged
 along the trajectory with early motion weighted more heavily.
 
-Work since has optimised this objective. Optimisation answers what a
-particular search found under a particular budget, which is a different
+Work since has optimised this objective, and with reason: computing the
+optimum is intractable in general, being PSPACE-complete in the stochastic
+sequential formulation and NP-hard even for deterministic environments
+\cite{miura2021unifying}. What a trajectory optimiser reports is therefore
+what a particular search found under a particular budget, which is a different
 statement from what is achievable. The distinction matters whenever the
 interesting claim is negative. A scenario designer who wants to assert that a
 world is genuinely hard, that no trajectory within a twenty five per cent cost
@@ -109,14 +112,29 @@ trust region. This is why every number reported here is reported at a stated
 ceiling, and why an unbounded optimum is treated as a diagnostic rather than
 as a result.
 
-Both papers optimise. They generate a trajectory and report the legibility it
-attains, which is the right thing to do when the question is how to move well.
-It does not answer whether a world admits a legible trajectory at all, because
-a search that returns nothing better has not shown that nothing better exists.
-That is the question this paper addresses, and the authors' own two
-observations are what make it worth addressing: the objective is unbounded in
-cost without a ceiling, so the interesting statements are all budgeted ones,
-and the model is only meaningful inside that budget.
+A separate line formalises observer-aware behaviour in stochastic sequential
+settings. Miura and Zilberstein \cite{miura2021unifying} unify legibility with
+explicability and predictability as observer-aware Markov decision processes,
+in which each property is a choice of reward over the observer's belief, and
+establish the complexity of the resulting problem: it is PSPACE-complete for a
+Bayesian observer, and remains NP-hard when restricted to stationary policies
+or to deterministic environments. Approximation and partially observable
+extensions follow, for instance \cite{lepers2025observer}.
+
+That hardness result is the reason a bound is worth having, and it shapes what
+this paper claims. Computing the optimum is intractable in general, so the
+question is not why nobody has computed it. What is available in the
+continuous trajectory setting is what a local optimiser found, and a search
+that returns nothing better has not shown that nothing better exists. The
+statement a scenario designer needs, that no trajectory within a stated budget
+can be read correctly in a given world, is therefore not obtainable from the
+methods above at all.
+
+This paper does not compute the optimum either. It brackets it. The setting is
+the continuous one of \cite{dragan2013legibility}, with exact cost-to-go
+rather than a discretised state space, and the two ends of the bracket are a
+trajectory that exists and a bound that no trajectory within the budget can
+pass.
 
 Two further findings in those papers bear directly on sections below.
 \cite{dragan2013legibility} observes that legibility is not obstacle
@@ -129,9 +147,9 @@ strange enough, and may come to believe the robot is pursuing none of them,
 a belief its follow-up study measures directly. The observer used here cannot
 represent that belief, and Section~\ref{sec:limitations} says so.
 
-No survey of subsequent legibility work is offered. This section covers the
-founding formulation, and no claim is made here about what later work does or
-does not establish.
+This section covers the founding formulation and the observer-aware planning
+line. It is not a survey of everything since, and no claim is made here about
+work outside those two.
 
 \section{Problem}
 \label{sec:problem}

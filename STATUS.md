@@ -705,10 +705,38 @@ That last one matters procedurally. It was carried into this project from the
 sibling repository's notes and was written into a draft here before it had
 been checked. It holds, but the order was wrong, and the log says so.
 
-**The survey is not done and the paper does not pretend otherwise.** Related
-work covers the founding formulation and makes no claim about subsequent work.
-That is a real gap in the paper rather than a stylistic choice, and filling it
-means reading more bodies rather than writing more sentences.
+## The survey changed the paper's claim, 6 August 2026
+
+Four papers read in the body, four in the log. The one that mattered is Miura
+and Zilberstein, UAI 2021, which unifies legibility with explicability and
+predictability as observer-aware MDPs and establishes the complexity of the
+result: PSPACE-complete for a Bayesian observer, and NP-hard even restricted
+to stationary policies or deterministic environments.
+
+The draft had argued that the field optimises and nobody decides, which reads
+as though computing the optimum had not been attempted. That is wrong, and a
+reviewer in this area would know it on sight. The optimum is intractable, and
+that is exactly why a two-sided bound is worth having. The introduction and
+the related work were rewritten around the hardness result rather than around
+an absence, and the paper is stronger for it: the contribution is no longer
+"nobody tried" but "the optimum is out of reach, so bracket it".
+
+It also narrows what may be claimed. Optimality is computable in discretised
+stochastic formulations, up to the discretisation, so the claim here is
+specifically about the continuous trajectory setting with exact cost-to-go and
+a stated path cost budget. The paper now says that.
+
+This is the second time today that a search for prior work changed a claim
+rather than decorating it, and it is the argument for doing the reading before
+the writing rather than after.
+
+**What is still not covered**, and the paper says so in its own text: work on
+legibility in multi-agent navigation, learning-based approaches, and recent
+generative methods. A scoping review of motion intent communication was
+fetched and deliberately not cited, since it covers signalling modalities such
+as projection and light rather than the motion objective bounded here, and
+citing it would have implied engagement with a literature this paper does not
+engage with.
 
 **One dash survives and it needs a decision.** `references.bib` carries the
 page range `301--308`, which is the BibTeX convention and which `IEEEtran.bst`
