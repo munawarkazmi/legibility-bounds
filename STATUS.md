@@ -97,19 +97,20 @@ search reached. Nothing here is a trend: it is one lattice, one observer and
 one search budget.
 
     world                obstacles   worst gap   best gap   worst band
-    door_pair            yes            0.0277     0.0067         0.18
+    door_pair            yes            0.0270     0.0067         0.09
     fan_middle           no             0.0567     0.0144         0.00
     fan_outer            no             0.0282     0.0162         0.00
     keep_out_shortcut    no             0.0198     0.0067         0.00
-    narrow_gap           yes            0.0681     0.0344         0.37
+    narrow_gap           yes            0.0462     0.0275         0.26
     open_pair            no             0.0198     0.0067         0.00
     pillar_aisle         yes            0.0184     0.0071         0.00
-    wall_choice          yes            0.0220     0.0068         0.34
+    wall_choice          yes            0.0144     0.0065         0.12
 
-Over the four worlds with obstacles the gap runs 0.0067 to 0.0681, and over
-the four without it runs 0.0067 to 0.0567. The `achieved` column is the better
-of the vendored search and a witness built from the bound, and which of the
-two produced it is recorded on every row.
+Over the four worlds with obstacles the gap runs 0.0065 to 0.0462, and over
+the four without it runs 0.0067 to 0.0567. The widest gap in the suite is now
+in a world with no obstacles at all. The `achieved` column is the better of
+the vendored search and a witness built from the bound, and which of the two
+produced it is recorded on every row; the witness won 13 of the 32.
 
 What this buys is the statement the sibling benchmark could not make about
 its own worlds. In `wall_choice` at a 25 per cent cost budget the bound is
@@ -293,8 +294,8 @@ deliberately too-coarse lattice and checks that it refuses to certify.
 Same tool, same three worlds, after the change:
 
     world           grid 0.05 to 0.00625      bound moved   band moved
-    wall_choice     0.6969 to 0.6220               0.0720       0.0647
-    narrow_gap      0.7905 to 0.7499               0.0406      -0.0362
+    wall_choice     0.6540 to 0.6180               0.0360       0.0777
+    narrow_gap      0.7855 to 0.7228               0.0627       0.0232
     pillar_aisle    0.8614 to 0.8540               0.0074       0.0000
 
 Two things changed together. The bounds are much lower: `wall_choice` at grid
@@ -362,9 +363,41 @@ Across `wall_choice`, `narrow_gap`, `pillar_aisle` and `door_pair` it measures
 Those same measurements say the constant is still loose. The worst detour
 observed anywhere is about 2.2 cell radii against a claimed 9.28. It is not
 tuned to that and must not be, since a bound fitted to samples is not a bound.
-Closing the rest needs a real bound on how far a convex boundary can wrap
-inside a disc, which is a geometry problem rather than a tidier version of
-this argument, and it is not scoped.
+
+## The constant was not what needed fixing, 6 August 2026
+
+Sharpening it turned out to be the wrong target. Almost no band cell wraps at
+all.
+
+Take a band cell the obstacle does not pass through, which is already checked.
+If it also holds no obstacle vertex, then the obstacle's boundary inside it
+lies within a single edge: two edges of a convex polygon meet at a vertex, so
+a cell crossed by two of them without their shared vertex would cross the
+cell's circle four times and be refused. A single straight boundary cuts the
+cell with a half plane, leaving a convex free part, so the segment from the
+centre to any free point of the cell is itself free and
+
+    D = |x - p| <= r
+
+exactly as for a cell nowhere near an obstacle. Corners are O(1) per obstacle
+while boundary cells are O(1/h) of them, so this covers all but a handful.
+
+    world           band share      bound at grid 0.0125
+    wall_choice     0.34 to 0.11    0.6299 to 0.6218
+    narrow_gap      0.37 to 0.26    0.7579 to 0.7271
+    pillar_aisle    0.00 to 0.00    0.8551 to 0.8551
+
+Across the suite the worst gap fell from 0.0681 to 0.0567, and the widest one
+is now in `fan_middle`, which has no obstacles at all. `narrow_gap` keeps a
+band share of 0.26 because its two obstacles put four corners either side of a
+gap the admissible corridor runs straight through, so its corner cells sit
+exactly where the trajectory has to go. Sharpening the constant would pay off
+there and almost nowhere else.
+
+Two tests hold the claim. One requires every cell still wrapping to have a
+corner within its own radius, and plain band cells to outnumber them. The
+other samples points inside plain band cells and checks the true geodesic to
+the centre never exceeds the straight line, which is what convexity asserts.
 
 ## Where the bound is weak, stated in its own column
 

@@ -58,11 +58,26 @@ from .vendored import (
     segment_segment_distance,
 )
 
-# The constant in the detour bound, applied to the cell radius.
+# The constant in the detour bound, applied to the cell radius. It is used
+# only for a cell that holds an obstacle corner.
 #
-# What has to be bounded is the geodesic distance from a point of the cell to
-# the lattice point at its centre, not between two arbitrary points of the
-# cell, and the centre being free is what makes the argument short:
+# Every other band cell needs no wrapping argument. If a cell holds no vertex
+# and the obstacle does not pass through it, the obstacle's boundary inside
+# the cell lies within a single edge, since two edges meet at a vertex and a
+# cell crossed by two of them without their shared vertex would cross the
+# cell's circle four times and be refused. A single straight boundary cuts the
+# cell with a half plane, leaving a convex free part, so the segment from the
+# centre to any free point of the cell is itself free and the detour is the
+# cell radius, exactly as for a cell nowhere near an obstacle.
+#
+# That is the whole of the improvement, and it applies to all but a handful of
+# band cells per obstacle: corners are O(1) per obstacle while boundary is
+# O(1/h) of them.
+#
+# For the corner cells that remain, what has to be bounded is the geodesic
+# distance from a point of the cell to the lattice point at its centre, not
+# between two arbitrary points of the cell, and the centre being free is what
+# makes the argument short:
 #
 #   from a point outside a convex body, the ray heading directly away from
 #   that body's nearest point never re-enters it. So the centre reaches the
@@ -214,6 +229,27 @@ def _crossings_with_circle(px, py, radius, a, b, tolerance):
         count += inside.astype(int)
         unsure |= near_end
     return count, unsure
+
+
+def _holds_a_corner(px, py, obstacles, radius: float, tolerance: float):
+    """Cells with an obstacle vertex inside them, and cells too close to call.
+
+    This is the whole of the corner-wrap question. A cell that no obstacle
+    passes through and that holds no vertex has its obstacle boundary inside a
+    single edge, because two edges of a convex polygon meet at a vertex and a
+    cell crossed by two of them without their shared vertex would have four
+    crossings of its circle and be refused already. A single straight boundary
+    means the obstacle cuts the cell with a half plane, so the free part is
+    convex, so no path from the centre needs to wrap at all.
+    """
+    holds = np.zeros(px.shape, dtype=bool)
+    unsure = np.zeros(px.shape, dtype=bool)
+    for polygon in obstacles:
+        for vertex in polygon.vertices:
+            distance = np.hypot(px - float(vertex[0]), py - float(vertex[1]))
+            holds |= distance <= radius
+            unsure |= np.abs(distance - radius) <= tolerance
+    return holds, unsure
 
 
 def cells_certified(px, py, obstacles, radius: float):
@@ -467,10 +503,12 @@ def build(
     def band_and_detour(against):
         """Cells near the given blockers, and the detour bound for each.
 
-        A clear cell is bounded by its own radius, since the segment from its
-        centre to any of its points misses everything. A band cell takes the
-        detour bound where its geometry allows it to be claimed, and nothing
-        otherwise.
+        Three outcomes rather than two. A cell away from everything, and a
+        cell whose obstacle boundary lies within one edge, are both bounded by
+        the cell radius: in the first the segment from the centre misses the
+        obstacle, and in the second the free part of the cell is convex, so it
+        misses it too. Only a cell holding an obstacle corner has to wrap, and
+        a cell an obstacle passes through cannot be bounded at all.
         """
         if not against:
             return (
@@ -479,8 +517,14 @@ def build(
             )
         band = _near_any_obstacle(mesh_x, mesh_y, against, radius) & usable
         allowed = cells_certified(mesh_x, mesh_y, against, radius)
+        corner, doubtful = _holds_a_corner(
+            mesh_x, mesh_y, against, radius, max(radius, 1.0) * 1e-9
+        )
+        wraps = band & (corner | doubtful)
         return band, np.where(
-            band, np.where(allowed, BAND_DETOUR_FACTOR * radius, np.inf), radius
+            band & ~allowed,
+            np.inf,
+            np.where(wraps, BAND_DETOUR_FACTOR * radius, radius),
         )
 
     # Two different detours, because they bound two different things. The

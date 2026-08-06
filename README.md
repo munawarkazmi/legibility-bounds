@@ -32,14 +32,16 @@ bound sits above what a search reached. From `tools/suite_bounds.py`, written
 to `results/suite_bounds.json`:
 
     world                obstacles   worst gap   best gap   worst band
-    door_pair            yes            0.0277     0.0067         0.18
+    door_pair            yes            0.0270     0.0067         0.09
     fan_middle           no             0.0567     0.0144         0.00
     fan_outer            no             0.0282     0.0162         0.00
     keep_out_shortcut    no             0.0198     0.0067         0.00
-    narrow_gap           yes            0.0681     0.0344         0.37
+    narrow_gap           yes            0.0462     0.0275         0.26
     open_pair            no             0.0198     0.0067         0.00
     pillar_aisle         yes            0.0184     0.0071         0.00
-    wall_choice          yes            0.0220     0.0068         0.34
+    wall_choice          yes            0.0144     0.0065         0.12
+
+The widest gap in the suite is now in a world with no obstacles at all.
 
 What that licenses, taking `wall_choice` at a 25 per cent cost budget: the
 bound is 0.6299, so no trajectory within that budget reaches legibility 0.63,

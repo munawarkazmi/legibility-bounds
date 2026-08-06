@@ -244,6 +244,76 @@ def test_a_sharp_vertex_defeats_the_global_width_test_but_not_this_one():
     assert lattice_module.cells_certified(fat_x, fat_y, [needle], radius)[0, 0]
 
 
+def test_only_cells_holding_a_corner_need_the_wrapping_bound(walled):
+    """The band is bounded by the cell radius except where a corner sits.
+
+    A cell that holds no vertex and that the obstacle does not pass through
+    has its obstacle boundary inside a single edge, so the free part of the
+    cell is convex and the segment from its centre to any free point of it is
+    free. Nothing has to wrap, and the detour is the cell radius.
+    """
+    scenario, _, built = walled
+    band = built.near_obstacle & built.usable
+    assert band.any()
+
+    corners = [v for ob in scenario.obstacles for v in ob.vertices]
+    wrapping = band & (built.detour > built.cell_radius) & np.isfinite(built.detour)
+    plain = band & (built.detour == built.cell_radius)
+
+    assert plain.any(), "most band cells should need no wrapping bound"
+    assert plain.sum() > wrapping.sum(), (
+        "cells holding a corner should be the rare case, not the common one"
+    )
+
+    # Every cell that does wrap has a corner within its own radius.
+    rows, cols = np.where(wrapping)
+    for row, col in zip(rows, cols):
+        point = (float(built.x[row, col]), float(built.y[row, col]))
+        nearest = min(math.hypot(point[0] - c[0], point[1] - c[1]) for c in corners)
+        assert nearest <= built.cell_radius + 1e-9
+
+    # And every plain band cell really does have a convex free part, which is
+    # what the claim rests on: its boundary lies within one edge.
+    rows, cols = np.where(plain)
+    rng = np.random.default_rng(5)
+    for index in rng.choice(len(rows), size=min(30, len(rows)), replace=False):
+        point = (float(built.x[rows[index], cols[index]]),
+                 float(built.y[rows[index], cols[index]]))
+        nearest = min(math.hypot(point[0] - c[0], point[1] - c[1]) for c in corners)
+        assert nearest > built.cell_radius
+
+
+def test_the_detour_is_the_cell_radius_where_the_free_part_is_convex(walled):
+    """Measured, not argued: sample plain band cells and check nothing wraps."""
+    scenario, _, built = walled
+    plain = np.argwhere(
+        built.near_obstacle & built.usable & (built.detour == built.cell_radius)
+    )
+    assert len(plain) > 0
+
+    rng = np.random.default_rng(23)
+    radius = built.cell_radius
+    checked = 0
+    for row, col in plain[rng.choice(len(plain), size=min(40, len(plain)), replace=False)]:
+        centre = (float(built.x[row, col]), float(built.y[row, col]))
+        for _ in range(15):
+            offsets = [float(v) for v in rng.uniform(-radius, radius, size=2)]
+            point = (centre[0] + offsets[0], centre[1] + offsets[1])
+            if math.hypot(offsets[0], offsets[1]) > radius:
+                continue
+            if any(ob.contains_interior(point) for ob in scenario.obstacles):
+                continue
+            measured = vendored.geodesic_cost(point, centre, scenario.obstacles)
+            straight = math.hypot(offsets[0], offsets[1])
+            assert measured <= straight + 1e-9, (
+                f"a plain band cell wrapped: {measured:.6f} against a straight "
+                f"{straight:.6f} between {point} and {centre}"
+            )
+            assert measured <= radius + 1e-9
+            checked += 1
+    assert checked > 100
+
+
 def test_a_cell_meeting_two_obstacles_is_not_certified():
     """The argument follows one boundary, so two obstacles is out of scope."""
     scenario = vendored.scenario("narrow_gap")

@@ -3,53 +3,53 @@
   "observer": "geodesic_beta1",
   "grid": 0.0125,
   "reused_from": null,
-  "reused_rows": 12,
+  "reused_rows": 13,
   "search_budget": 500,
   "waypoints": 3,
   "rows": [
     {
       "scenario": "door_pair",
       "ceiling": 1.05,
-      "achieved": 0.7811533847092507,
+      "achieved": 0.781931648688938,
       "search_achieved": 0.7694590063072045,
-      "witness_achieved": 0.7811533847092507,
+      "witness_achieved": 0.781931648688938,
       "witness_anchors": 5,
-      "witness_pullback": 0.6132467985153198,
-      "achieved_cost_ratio": 1.0499999987609272,
+      "witness_pullback": 0.6306029558181763,
+      "achieved_cost_ratio": 1.0499999903952904,
       "achieved_source": "witness, 5 anchors",
       "shortest_path_legibility": 0.7203999032131269,
-      "bound": 0.8088082346547285,
-      "gap": 0.027654849945477844,
-      "weight_from_band": 0.1391289319045973,
+      "bound": 0.8072408761963853,
+      "gap": 0.02530922750744724,
+      "weight_from_band": 0.09157160963244614,
       "band_cells": 1696,
       "uncertified_cells": 0,
       "unusable_cells": 47795,
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 10.558875699993223
+      "lattice_build_seconds": 10.76733719999902
     },
     {
       "scenario": "door_pair",
       "ceiling": 1.1,
-      "achieved": 0.7944575063118765,
+      "achieved": 0.7951160164735517,
       "search_achieved": 0.7866173630060305,
-      "witness_achieved": 0.7944575063118765,
+      "witness_achieved": 0.7951160164735517,
       "witness_anchors": 5,
-      "witness_pullback": 0.6210591793060303,
-      "achieved_cost_ratio": 1.0999999796207822,
+      "witness_pullback": 0.6400052905082703,
+      "achieved_cost_ratio": 1.0999999964747436,
       "achieved_source": "witness, 5 anchors",
       "shortest_path_legibility": 0.7203999032131269,
-      "bound": 0.8188067282714383,
-      "gap": 0.024349221959561795,
-      "weight_from_band": 0.18150197628458503,
+      "bound": 0.8169921518195183,
+      "gap": 0.021876135345966663,
+      "weight_from_band": 0.09072463768115943,
       "band_cells": 1696,
       "uncertified_cells": 0,
       "unusable_cells": 47795,
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 10.558875699993223
+      "lattice_build_seconds": 10.76733719999902
     },
     {
       "scenario": "door_pair",
@@ -62,16 +62,16 @@
       "achieved_cost_ratio": 1.2499999949496194,
       "achieved_source": "witness, 2 anchors",
       "shortest_path_legibility": 0.7203999032131269,
-      "bound": 0.857219086737748,
-      "gap": 0.006724986587547388,
-      "weight_from_band": 0.10386439022404917,
+      "bound": 0.8571921212261748,
+      "gap": 0.00669802107597417,
+      "weight_from_band": 0.08974176349687632,
       "band_cells": 1696,
       "uncertified_cells": 0,
       "unusable_cells": 47795,
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 10.558875699993223
+      "lattice_build_seconds": 10.76733719999902
     },
     {
       "scenario": "door_pair",
@@ -84,16 +84,16 @@
       "achieved_cost_ratio": 1.2635283545988185,
       "achieved_source": "witness, 3 anchors",
       "shortest_path_legibility": 0.7203999032131269,
-      "bound": 0.8777144584086596,
-      "gap": 0.02701030101819235,
-      "weight_from_band": 0.10099290780141841,
+      "bound": 0.8776879521124256,
+      "gap": 0.026983794721958332,
+      "weight_from_band": 0.08425531914893616,
       "band_cells": 1696,
       "uncertified_cells": 0,
       "unusable_cells": 47795,
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 10.558875699993223
+      "lattice_build_seconds": 10.76733719999902
     },
     {
       "scenario": "fan_middle",
@@ -115,7 +115,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.09146850000252016
+      "lattice_build_seconds": 0.08870069999829866
     },
     {
       "scenario": "fan_middle",
@@ -137,7 +137,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.09146850000252016
+      "lattice_build_seconds": 0.08870069999829866
     },
     {
       "scenario": "fan_middle",
@@ -159,7 +159,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.09146850000252016
+      "lattice_build_seconds": 0.08870069999829866
     },
     {
       "scenario": "fan_middle",
@@ -181,7 +181,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.09146850000252016
+      "lattice_build_seconds": 0.08870069999829866
     },
     {
       "scenario": "fan_outer",
@@ -203,7 +203,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.08384499998646788
+      "lattice_build_seconds": 0.09262260000105016
     },
     {
       "scenario": "fan_outer",
@@ -225,7 +225,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.08384499998646788
+      "lattice_build_seconds": 0.09262260000105016
     },
     {
       "scenario": "fan_outer",
@@ -247,7 +247,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.08384499998646788
+      "lattice_build_seconds": 0.09262260000105016
     },
     {
       "scenario": "fan_outer",
@@ -269,7 +269,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.08384499998646788
+      "lattice_build_seconds": 0.09262260000105016
     },
     {
       "scenario": "keep_out_shortcut",
@@ -291,7 +291,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.0649353000044357
+      "lattice_build_seconds": 0.0712898000201676
     },
     {
       "scenario": "keep_out_shortcut",
@@ -313,7 +313,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.0649353000044357
+      "lattice_build_seconds": 0.0712898000201676
     },
     {
       "scenario": "keep_out_shortcut",
@@ -335,7 +335,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.0649353000044357
+      "lattice_build_seconds": 0.0712898000201676
     },
     {
       "scenario": "keep_out_shortcut",
@@ -357,7 +357,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.0649353000044357
+      "lattice_build_seconds": 0.0712898000201676
     },
     {
       "scenario": "narrow_gap",
@@ -370,16 +370,16 @@
       "achieved_cost_ratio": 1.0499999926679044,
       "achieved_source": "witness, 3 anchors",
       "shortest_path_legibility": 0.6054837050002938,
-      "bound": 0.7005377129712542,
-      "gap": 0.034435131356684745,
-      "weight_from_band": 0.2883329280155642,
+      "bound": 0.6935843761135727,
+      "gap": 0.02748179449900323,
+      "weight_from_band": 0.26291950389105057,
       "band_cells": 2080,
       "uncertified_cells": 0,
       "unusable_cells": 133362,
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 5.051914799987571
+      "lattice_build_seconds": 5.792258800007403
     },
     {
       "scenario": "narrow_gap",
@@ -392,16 +392,16 @@
       "achieved_cost_ratio": 1.099999995205984,
       "achieved_source": "witness, 3 anchors",
       "shortest_path_legibility": 0.6054837050002938,
-      "bound": 0.7112582902331649,
-      "gap": 0.0348654092654852,
-      "weight_from_band": 0.3218942462409143,
+      "bound": 0.7045107646067647,
+      "gap": 0.028117883639084962,
+      "weight_from_band": 0.260583698607335,
       "band_cells": 2080,
       "uncertified_cells": 0,
       "unusable_cells": 133362,
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 5.051914799987571
+      "lattice_build_seconds": 5.792258800007403
     },
     {
       "scenario": "narrow_gap",
@@ -414,16 +414,16 @@
       "achieved_cost_ratio": 1.2497324538278913,
       "achieved_source": "searched",
       "shortest_path_legibility": 0.6054837050002938,
-      "bound": 0.7578600429871301,
-      "gap": 0.06810756231968762,
-      "weight_from_band": 0.37329904639451406,
+      "bound": 0.7270852765732022,
+      "gap": 0.037332795905759775,
+      "weight_from_band": 0.2554805528768884,
       "band_cells": 2080,
       "uncertified_cells": 0,
       "unusable_cells": 133362,
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 5.051914799987571
+      "lattice_build_seconds": 5.792258800007403
     },
     {
       "scenario": "narrow_gap",
@@ -436,16 +436,16 @@
       "achieved_cost_ratio": 1.253086566857713,
       "achieved_source": "witness, 2 anchors",
       "shortest_path_legibility": 0.6054837050002938,
-      "bound": 0.8048146063697623,
-      "gap": 0.04637829107156877,
-      "weight_from_band": 0.2404970431918557,
+      "bound": 0.8046805732754143,
+      "gap": 0.04624425797722076,
+      "weight_from_band": 0.2188936297627068,
       "band_cells": 2080,
       "uncertified_cells": 0,
       "unusable_cells": 133362,
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 5.051914799987571
+      "lattice_build_seconds": 5.792258800007403
     },
     {
       "scenario": "open_pair",
@@ -467,7 +467,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.06836779997684062
+      "lattice_build_seconds": 0.06914419998065569
     },
     {
       "scenario": "open_pair",
@@ -489,7 +489,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.06836779997684062
+      "lattice_build_seconds": 0.06914419998065569
     },
     {
       "scenario": "open_pair",
@@ -511,7 +511,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.06836779997684062
+      "lattice_build_seconds": 0.06914419998065569
     },
     {
       "scenario": "open_pair",
@@ -533,7 +533,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": false,
-      "lattice_build_seconds": 0.06836779997684062
+      "lattice_build_seconds": 0.06914419998065569
     },
     {
       "scenario": "pillar_aisle",
@@ -555,7 +555,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.5605247000057716
+      "lattice_build_seconds": 1.7288267999829259
     },
     {
       "scenario": "pillar_aisle",
@@ -577,7 +577,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.5605247000057716
+      "lattice_build_seconds": 1.7288267999829259
     },
     {
       "scenario": "pillar_aisle",
@@ -599,7 +599,7 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.5605247000057716
+      "lattice_build_seconds": 1.7288267999829259
     },
     {
       "scenario": "pillar_aisle",
@@ -621,73 +621,73 @@
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.5605247000057716
+      "lattice_build_seconds": 1.7288267999829259
     },
     {
       "scenario": "wall_choice",
       "ceiling": 1.05,
-      "achieved": 0.5654022154193223,
+      "achieved": 0.5690634160522934,
       "search_achieved": 0.5654022154193223,
-      "witness_achieved": 0.5601374425885336,
-      "witness_anchors": 2,
-      "witness_pullback": 0.6818503141403198,
-      "achieved_cost_ratio": 1.0491647910746396,
-      "achieved_source": "searched",
+      "witness_achieved": 0.5690634160522934,
+      "witness_anchors": 3,
+      "witness_pullback": 0.9188928008079529,
+      "achieved_cost_ratio": 1.0499999948925258,
+      "achieved_source": "witness, 3 anchors",
       "shortest_path_legibility": 0.5456775537280676,
-      "bound": 0.5873696844651213,
-      "gap": 0.021967469045798937,
-      "weight_from_band": 0.2080121511296753,
+      "bound": 0.5816902154350879,
+      "gap": 0.01262679938279454,
+      "weight_from_band": 0.1161951775204101,
       "band_cells": 1200,
       "uncertified_cells": 0,
       "unusable_cells": 41001,
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.4639702000131365
+      "lattice_build_seconds": 1.6345939000020735
     },
     {
       "scenario": "wall_choice",
       "ceiling": 1.1,
       "achieved": 0.5787459476782393,
       "search_achieved": 0.5787459476782393,
-      "witness_achieved": 0.5652098255612822,
-      "witness_anchors": 2,
-      "witness_pullback": 0.6959537267684937,
+      "witness_achieved": 0.5777349305905483,
+      "witness_anchors": 3,
+      "witness_pullback": 0.8947713971138,
       "achieved_cost_ratio": 1.0988527465784024,
       "achieved_source": "searched",
       "shortest_path_legibility": 0.5456775537280676,
-      "bound": 0.60004778607686,
-      "gap": 0.021301838398620765,
-      "weight_from_band": 0.26188981868898165,
+      "bound": 0.5931102459124253,
+      "gap": 0.014364298234186057,
+      "weight_from_band": 0.11506276150627603,
       "band_cells": 1200,
       "uncertified_cells": 0,
       "unusable_cells": 41001,
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.4639702000131365
+      "lattice_build_seconds": 1.6345939000020735
     },
     {
       "scenario": "wall_choice",
       "ceiling": 1.25,
       "achieved": 0.6083717329518393,
       "search_achieved": 0.6083717329518393,
-      "witness_achieved": 0.5786451116570621,
+      "witness_achieved": 0.5792617404674257,
       "witness_anchors": 2,
-      "witness_pullback": 0.9242863059043884,
+      "witness_pullback": 0.9384977221488953,
       "achieved_cost_ratio": 1.2481708382212053,
       "achieved_source": "searched",
       "shortest_path_legibility": 0.5456775537280676,
-      "bound": 0.6298643783579062,
-      "gap": 0.02149264540606688,
-      "weight_from_band": 0.3375619478560655,
+      "bound": 0.6217990669010257,
+      "gap": 0.013427333949186382,
+      "weight_from_band": 0.11021331609566905,
       "band_cells": 1200,
       "uncertified_cells": 0,
       "unusable_cells": 41001,
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.4639702000131365
+      "lattice_build_seconds": 1.6345939000020735
     },
     {
       "scenario": "wall_choice",
@@ -700,16 +700,16 @@
       "achieved_cost_ratio": 1.499999965486037,
       "achieved_source": "witness, 3 anchors",
       "shortest_path_legibility": 0.5456775537280676,
-      "bound": 0.8072260532013386,
-      "gap": 0.006835278077483298,
-      "weight_from_band": 0.15720155344177408,
+      "bound": 0.80693299149868,
+      "gap": 0.006542216374824772,
+      "weight_from_band": 0.09725896324646817,
       "band_cells": 1200,
       "uncertified_cells": 0,
       "unusable_cells": 41001,
       "detour_certified": true,
       "band_detour": 0.08205254102147512,
       "has_obstacles": true,
-      "lattice_build_seconds": 1.4639702000131365
+      "lattice_build_seconds": 1.6345939000020735
     }
   ],
   "violations": 0

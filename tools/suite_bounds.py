@@ -61,11 +61,20 @@ def _load_reusable(args, observer) -> dict:
         raise SystemExit(f"--reuse names no file: {path}")
     previous = json.loads(path.read_text(encoding="utf-8"))
 
+    if Path(args.output).resolve() == path.resolve():
+        raise SystemExit(
+            f"refusing to reuse {path.name} and overwrite it in the same run: "
+            f"the record would name itself as its own source, at a version "
+            f"that no longer exists. Write somewhere else, or drop --reuse."
+        )
+
     for field, mine in (
         ("geometry_commit", vendored.PINNED_COMMIT),
         ("observer", observer.name),
         ("search_budget", args.budget),
         ("waypoints", args.waypoints),
+        ("restarts", args.restarts),
+        ("sample_spacing", args.spacing),
     ):
         theirs = previous.get(field)
         if theirs != mine:
@@ -86,6 +95,13 @@ def main(argv=None) -> int:
     parser.add_argument("--grid", type=float, default=0.05)
     parser.add_argument("--budget", type=int, default=500)
     parser.add_argument("--waypoints", type=int, default=3)
+    # Exposed and recorded rather than hardcoded, because reuse is only sound
+    # when every input the search depends on is checked, and a setting that
+    # lives in the source is a setting no record can be checked against.
+    parser.add_argument("--restarts", type=int, default=3)
+    parser.add_argument(
+        "--spacing", type=float, default=vendored.metrics.DEFAULT_SAMPLE_SPACING
+    )
     parser.add_argument("--observer", default="geodesic")
     parser.add_argument(
         "--ceilings", default=",".join(str(c) for c in DEFAULT_CEILINGS)
@@ -139,16 +155,19 @@ def main(argv=None) -> int:
         build_seconds = time.perf_counter() - started
 
         shortest = ShortestPathPlanner().plan(scenario)
-        baseline = vendored.metrics.evaluate(scenario, observer, shortest.points)
+        baseline = vendored.metrics.evaluate(
+            scenario, observer, shortest.points, spacing=args.spacing
+        )
 
         for ceiling in ceilings:
             result = reachability_bound(
-                scenario, observer, ceiling, grid=args.grid, built=built
+                scenario, observer, ceiling, grid=args.grid, built=built,
+                spacing=args.spacing,
             )
             # The witness is built from the lattice, so unlike the search it
             # does depend on it and is never reused.
             found = witness_module.best_witness(
-                scenario, observer, ceiling, built
+                scenario, observer, ceiling, built, spacing=args.spacing
             )
 
             previous = reused.get((scenario.id, ceiling))
@@ -156,10 +175,13 @@ def main(argv=None) -> int:
                 plan = LegiblePlanner(
                     waypoints=args.waypoints,
                     budget=args.budget,
-                    restarts=3,
+                    restarts=args.restarts,
                     cost_budget=ceiling,
+                    spacing=args.spacing,
                 ).plan(scenario)
-                scored = vendored.metrics.evaluate(scenario, observer, plan.points)
+                scored = vendored.metrics.evaluate(
+                    scenario, observer, plan.points, spacing=args.spacing
+                )
                 achieved = max(scored.legibility, baseline.legibility)
                 achieved_ratio = scored.cost_ratio
                 source = "searched"
@@ -234,6 +256,8 @@ def main(argv=None) -> int:
         "reused_rows": sum(1 for r in rows if r["achieved_source"] != "searched"),
         "search_budget": args.budget,
         "waypoints": args.waypoints,
+        "restarts": args.restarts,
+        "sample_spacing": args.spacing,
         "rows": rows,
         "violations": len(broken),
     }
