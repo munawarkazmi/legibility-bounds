@@ -716,6 +716,39 @@ That last one matters procedurally. It was carried into this project from the
 sibling repository's notes and was written into a draft here before it had
 been checked. It holds, but the order was wrong, and the log says so.
 
+## The last of the literature, 6 August 2026
+
+Eight bodies read in total. The two the earlier draft admitted to ignoring
+both qualified a claim, which is why the admission was not good enough on its
+own.
+
+**Liu et al., arXiv 2024, learning-based.** It gives a convergence and
+completeness analysis for its multi-agent legibility algorithm. The paper had
+said nothing about guarantees existing elsewhere in this literature, which left
+"certified" reading as though nothing in legibility is guaranteed. False. A
+convergence result guarantees an algorithm reaches what it converges to; the
+bound here guarantees what any trajectory could achieve. Two different objects,
+and the paper now says which one it means.
+
+**Shi et al., arXiv 2025, generative.** It produces motion across a
+controllable range of intent expressiveness rather than one most legible
+trajectory, and scores it with a potential field of its own construction. The
+second half matters more: there is no single legibility in this literature, and
+a bound on one formulation says nothing about another. The paper now states
+that it bounds the objective of Dragan et al. and nothing else, a scoping the
+draft had left implicit.
+
+**Not read and therefore not cited:** PoLMDP and the wider sequential-decision
+legibility line, which is paywalled. It is described in a paper that was read,
+and a second-hand account is not a check, so it stays out.
+
+**Four of the eight papers changed a claim rather than supporting one.** The
+hardness result reframed the contribution, the safety paper narrowed it, the
+learning-based paper forced "certified" to be qualified, and the generative
+paper forced the objective to be scoped. Every one of those corrections made
+the paper narrower and more defensible, and not one of them could have come
+from reading abstracts.
+
 ## Read cold, 6 August 2026
 
 Read again as printed pages rather than as source, which is a different act

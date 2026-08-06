@@ -173,22 +173,67 @@ that the continuous setting still reaches for local optimisers, which is the
 right instrument for driving a robot and not one that can decide a negative
 statement about a world. No other finding is attributed to it.
 
+## Liu, Pan, Zeng, Ma and Doshi, arXiv 2024
+
+**Bibliographic details, checked 6 August 2026.** "Active Legibility in
+Multiagent Reinforcement Learning", arXiv:2410.20954v1, submitted 28 October
+2024. The arXiv record lists no journal reference, so it is cited as a
+preprint rather than as a published paper.
+
+**Body read 6 August 2026.** Cited for one thing, which it states in its own
+contributions and devotes a section to: it gives a convergence and
+completeness analysis for its multi-agent legibility algorithm.
+
+**What this changed.** The paper had said nothing about guarantees existing
+elsewhere in this literature, which left the word "certified" sounding like a
+claim that nothing in legibility is guaranteed. That is false. What is true is
+narrower and is now stated: a convergence result is a guarantee about an
+algorithm reaching what it converges to, and this paper's bound is a guarantee
+about what any trajectory could achieve. Two different objects, and the paper
+now says which one it means.
+
+The same paper refers to PoLMDP, an extension of legibility to sequential
+decision tasks under uncertainty. That work is behind a paywall and its body
+was not read, so no finding is attributed to it and it is not cited. A
+second-hand account of a paper is not a check of it.
+
+## Shi, Grislain, Sigaud and Chetouani, arXiv 2025
+
+**Bibliographic details, checked 6 August 2026.** "Controlling Intent
+Expressiveness in Robot Motion with Diffusion Models", arXiv:2510.12370v1,
+submitted 14 October 2025. No journal reference listed; cited as a preprint.
+
+**Body read 6 August 2026.** Cited for two things it states plainly: existing
+approaches usually produce a single most legible trajectory, whereas it
+generates motion across a controllable range of intent expressiveness; and it
+scores legibility with an Information Potential Field of its own construction
+rather than with the formulation bounded here.
+
+**What this changed.** The second point matters more than the first. There is
+no single legibility in this literature, and a bound on one formulation says
+nothing about another. The paper now states that it bounds the objective of
+Dragan et al. and nothing else, which is a scoping the draft had left implicit.
+
 ## What has not been checked
 
-Six papers have been read in the body: the two founding papers, the two
-observer-aware planning papers, and the two above. That covers the founding
-formulation, the line that establishes the problem's complexity, the state of
-continuous-setting planning, and the closest prior treatment of legibility
-beside safety.
+Eight papers have been read in the body: the two founding papers, two on
+observer-aware planning, one on legibility beside safety, one recent
+continuous-setting planner, one learning-based treatment and one generative
+one. That covers the founding formulation, the line that establishes the
+problem's complexity, the state of continuous-setting planning, the closest
+prior treatment of legibility beside safety, and the two families the earlier
+draft admitted to ignoring.
 
-Specifically not read, and therefore not cited: learning-based legibility,
-recent generative methods, and legibility in sequential decision tasks beyond
-the observer-aware line. A scoping review of motion intent communication was
-fetched and not used, because it covers signalling modalities such as
-projection and light rather than the motion objective bounded here, and citing
-it would have implied a survey of a literature this paper does not engage
-with.
+Specifically not read, and therefore not cited: PoLMDP and the wider
+sequential-decision legibility line, which is paywalled. A scoping review of
+motion intent communication was fetched and not used, because it covers
+signalling modalities such as projection and light rather than the motion
+objective bounded here, and citing it would have implied a survey of a
+literature this paper does not engage with.
 
-Two of the six changed a claim rather than supporting one. That is the
-argument for reading bodies rather than abstracts, and for doing it before the
-prose rather than after.
+Four of the eight changed a claim rather than supporting one: the hardness
+result reframed the contribution, the safety paper narrowed it, the
+learning-based paper forced the word "certified" to be qualified, and the
+generative paper forced the objective to be scoped. That is the argument for
+reading bodies rather than abstracts, and for doing it before the prose rather
+than after.

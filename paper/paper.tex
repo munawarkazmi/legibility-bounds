@@ -160,11 +160,24 @@ may come to believe the robot is pursuing none of them, a belief its follow-up
 study measures directly. The observer used here cannot represent that belief,
 and Section~\ref{sec:limitations} says so.
 
-This section covers the founding formulation, the observer-aware planning line,
-the state of continuous-setting planning, and the closest prior treatment of
-legibility beside safety. It is not a survey of everything since, and no claim
-is made here about learning-based or generative approaches, which are not
-engaged with.
+Two clarifications about what this paper does and does not claim, both prompted
+by more recent work.
+
+Guarantees are not absent from this literature. Learning-based treatments carry
+them: \cite{liu2024active} gives a convergence and completeness analysis for
+its multi-agent legibility algorithm. That is a guarantee about an algorithm
+reaching what it converges to, which is a different object from a bound on what
+any trajectory could achieve. The word certified is used here only in the
+second sense.
+
+Nor is there one legibility. Recent generative work produces motion across a
+controllable range of intent expressiveness rather than a single most legible
+trajectory, and scores it with a potential field of its own construction
+\cite{shi2025controlling}. This paper bounds the formulation of
+\cite{dragan2013legibility} and nothing else, and a bound on that objective
+says nothing about another.
+
+Beyond these, the section is not a survey of everything since 2013.
 
 \section{Problem}
 \label{sec:problem}
