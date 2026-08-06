@@ -705,6 +705,29 @@ That last one matters procedurally. It was carried into this project from the
 sibling repository's notes and was written into a draft here before it had
 been checked. It holds, but the order was wrong, and the log says so.
 
+## The certified statement, spelled out, 6 August 2026
+
+The paper's whole point was left implicit in a table: a reader had to work out
+for themselves what a row licensed. Section V-A now states it in words for one
+world, as a displayed quotation, and separates the three things that make it
+worth having. It is negative and quantifies over every trajectory, so no
+further searching can overturn it. It is not vacuous, since the two ends sit
+0.0065 apart and a threshold anywhere outside that band is decided. And it is
+conditional on the observer, the coefficient and the ceiling, which have to
+travel with it.
+
+Every figure in that subsection is a macro from the results, including the
+quotable threshold. That last one is computed rather than chosen: the bound
+says nothing exceeds it, so any strictly larger value may be stated as
+unreachable, and the tool rounds up to two places and then checks the result
+is strictly above the bound. A threshold equal to the bound would claim more
+than is proved.
+
+The worked example and the figure were on different ceilings, 1.25 against
+1.50, which would have put the same world's different numbers a page apart.
+They are both 1.50 now, which is also the tightest interval in the suite and
+the case where the witness beats the search by the largest margin.
+
 ## Sections III and IV rewritten, 6 August 2026
 
 Both described the objective and the bound in words without stating either,

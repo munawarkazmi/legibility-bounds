@@ -1,4 +1,4 @@
-"""Write the paper's tables and quoted numbers from the committed results.
+﻿"""Write the paper's tables and quoted numbers from the committed results.
 
     python tools/build_paper_tables.py
 
@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -220,7 +221,12 @@ def safety_table(record: dict) -> str:
     return "\n".join(lines)
 
 
-def facts(suite: dict, safety: dict) -> str:
+def facts(
+    suite: dict,
+    safety: dict,
+    example_scenario: str = "wall_choice",
+    example_ceiling: float = 1.5,
+) -> str:
     """Macros for the numbers that appear in prose rather than in a table."""
     rows = suite["rows"]
     worst = max(rows, key=lambda r: r["gap"])
@@ -253,6 +259,39 @@ def facts(suite: dict, safety: dict) -> str:
         "safetyPriced": str(len(priced)),
         "safetyLattice": f"{safety['grid']:g}",
     }
+    # One world spelled out in full, so the paper can state the certified
+    # property in words rather than leaving a reader to read it off a table.
+    example = next(
+        (
+            r for r in rows
+            if r["scenario"] == example_scenario
+            and abs(r["ceiling"] - example_ceiling) < 1e-9
+        ),
+        None,
+    )
+    if example is None:
+        raise RecordError(
+            f"the worked example asks for {example_scenario!r} at ceiling "
+            f"{example_ceiling!r}, which is not in the suite record"
+        )
+    # A threshold to quote in prose. The bound says no trajectory exceeds it,
+    # so any strictly larger value may be stated as unreachable. Rounding up
+    # to two places is for readability and is checked to stay strictly above,
+    # since a threshold equal to the bound would claim more than is proved.
+    threshold = math.ceil(example["bound"] * 100.0) / 100.0
+    if threshold <= example["bound"]:
+        threshold += 0.01
+    values.update({
+        "exampleWorld": _world(example["scenario"]),
+        "exampleCeiling": f"{example['ceiling']:.2f}",
+        "examplePercent": f"{round((example['ceiling'] - 1.0) * 100)}",
+        "exampleAchieved": _number(example["achieved"]),
+        "exampleBound": _number(example["bound"]),
+        "exampleGap": _number(example["gap"]),
+        "exampleThreshold": f"{threshold:.2f}",
+        "exampleBaseline": _number(example["shortest_path_legibility"]),
+    })
+
     if priced:
         largest = max(priced, key=lambda r: r["certified_price"])
         values["safetyLargestPrice"] = _number(largest["certified_price"])
@@ -269,6 +308,8 @@ def facts(suite: dict, safety: dict) -> str:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", default=str(DEFAULT_OUTPUT))
+    parser.add_argument("--example-scenario", default="wall_choice")
+    parser.add_argument("--example-ceiling", type=float, default=1.5)
     args = parser.parse_args(argv)
 
     suite = _load("suite_bounds.json")
@@ -290,7 +331,9 @@ def main(argv=None) -> int:
         "suite.tex": folded_suite_table(suite),
         "suite_full.tex": suite_table(suite),
         "safety.tex": safety_table(safety),
-        "facts.tex": facts(suite, safety),
+        "facts.tex": facts(
+            suite, safety, args.example_scenario, args.example_ceiling
+        ),
     }
     for name, text in written.items():
         (output / name).write_text(text, encoding="utf-8")

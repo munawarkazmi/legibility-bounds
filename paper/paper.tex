@@ -362,11 +362,46 @@ where the argument is loosest and is not where the widest interval sits.
 
 \input{generated/suite}
 
-What such a row licenses is a statement no search can make. Reading
-\suiteWorstGapWorld{} at its widest, the bound says that no trajectory within
-that cost budget attains a legibility above the value in the \emph{bnd}
-column, whatever method is used to look for one, while the \emph{ach} column
-exhibits a trajectory attaining its own value. The optimum lies between them.
+\subsection{What a row licenses}
+\label{sec:licenses}
+
+Take \exampleWorld{} at a cost ceiling of \exampleCeiling{}, the world drawn in
+Fig.~\ref{fig:mechanism}. The bound there is \exampleBound{} and a trajectory
+attaining \exampleAchieved{} is exhibited, the one drawn. In words, and this is
+the form a scenario designer needs:
+
+\begin{quote}
+No trajectory from $S$ to $A$ in this world, spending at most
+\examplePercent{}~per cent more path than the shortest one, attains a
+legibility of \exampleThreshold{} or above under this observer. One attaining
+\exampleAchieved{} exists.
+\end{quote}
+
+\noindent Three properties of that statement are worth separating.
+
+It is negative, and it is about every trajectory rather than about the ones
+someone looked at. No amount of further searching can overturn it, and a
+better optimiser would not weaken it. This is what a search cannot supply at
+any budget: a search that returns \exampleAchieved{} leaves open whether
+\exampleThreshold{} was merely missed.
+
+It is not vacuous. The two ends are \exampleGap{} apart, so the interval
+excludes essentially everything: the true optimum is pinned to a band narrow
+enough that a threshold anywhere outside it is decided. For contrast the
+shortest path in this world scores \exampleBaseline{}, so the budget does buy
+clarity here, and the question of how much is answered rather than bracketed
+by ignorance.
+
+It is conditional in ways that must travel with it. It holds for this observer,
+at this rationality coefficient, under this cost ceiling, and it says nothing
+about a person watching the robot. Section~\ref{sec:limitations} is not
+decoration; the statement above is only as good as the model it quantifies
+over.
+
+The same reading applies to every row of Table~\ref{tab:suite}, which is the
+point of reporting the suite rather than one world. A scenario suite whose
+worlds carry properties of this kind can assert that a world is hard, rather
+than that a particular planner found it so.
 
 \subsection{What safety costs}
 
