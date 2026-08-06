@@ -1,11 +1,11 @@
-% First draft. Every quantity comes from paper/generated/, written by
-% tools/build_paper_tables.py from the committed results. No number is typed
-% into this file by hand.
+% Every quantity comes from paper/generated/, written by
+% tools/build_paper_tables.py from the committed results, and the figure from
+% tools/build_paper_figures.py. No number is typed into this file by hand.
 %
-% Where the related work has to say what another paper found, the sentence is
-% marked TODO and left unwritten. This project's rule is that a finding
-% attributed to a paper is checked against that paper's body, with the date of
-% the check recorded, and that pass has not happened.
+% Every finding attributed to another paper has been checked against that
+% paper's body rather than its abstract, with the date of each check and what
+% it changed recorded in verification_log.md. Six papers have been through
+% that; nothing is cited that has not.
 \documentclass[journal]{IEEEtran}
 
 \usepackage{amsmath}
@@ -32,11 +32,12 @@
 \maketitle
 
 \begin{abstract}
-Legible motion is optimised, not decided. A trajectory optimiser reports the
-clarity it found, which does not establish that no clearer trajectory exists,
-so a question of the form ``can any trajectory within this budget be read
-correctly here'' has not been answerable. This paper gives an instrument that
-answers it for a bounded planar problem. Given a world of convex polygonal
+Legible motion is optimised rather than decided, and for good reason: the
+optimum is intractable. What an optimiser reports is the clarity it found,
+which does not establish that no clearer trajectory exists, so a question of
+the form ``can any trajectory within this budget be read correctly here'' has
+not been answerable. This paper answers it for a bounded planar problem without
+computing the optimum, by bracketing it instead. Given a world of convex polygonal
 obstacles, a finite goal set, a Boltzmann-rational observer and a ceiling on
 path cost, it returns a trajectory achieving a stated legibility together with
 a bound that no trajectory within the budget exceeds, and reports the gap
@@ -141,7 +142,9 @@ legibility into cost-based local planning for mobile robots in real time
 \cite{amirian2024legibot}, which is the right instrument for driving a robot
 and is not one that can decide a negative statement about a world.
 
-Two further findings bear directly on sections below.
+Two findings in the founding papers bear directly on sections below, and one
+line of subsequent work bounds what may be claimed from the first of them.
+
 \cite{dragan2013legibility} observes that legibility is not obstacle
 avoidance, and that a legible trajectory exaggerates away from competing goals
 even when that carries it closer to a wall. It identifies the phenomenon and
@@ -447,6 +450,11 @@ nothing rather than as a negative price.
 
 \input{generated/safety}
 
+The largest of the three arises in \safetyLargestWorld{} at ceiling
+\safetyLargestCeiling{}, where the cheapest route is not safe to begin with, so
+the constraint binds from the start rather than only once the robot tries to
+communicate.
+
 Worked in full, in the world built to ask this question. In \safetyWorld{} the
 zone sits exactly where a trajectory would deviate to signal the true goal, and
 the cheapest route to that goal does not enter it. At a ceiling of
@@ -476,11 +484,6 @@ difference between two searches, the same world would have appeared to cost
 \safetyFree{} minus \safetySafeAchieved{}, a larger number with nothing behind
 it.
 
-The largest price certified anywhere in the suite is \safetyLargestPrice{}, in
-\safetyLargestWorld{} at ceiling \safetyLargestCeiling{}, where the cheapest
-route is not safe to begin with and the constraint therefore binds from the
-start.
-
 \section{Limitations}
 \label{sec:limitations}
 
@@ -502,12 +505,35 @@ reading.
 The results are one lattice, one observer condition and one search budget over
 \suiteWorlds{} worlds. Nothing here is a trend.
 
-Finally, the relaxation of \eqref{eq:lens} discards every constraint linking
-one sample to the next. Restoring one of them, by requiring the trajectory to
-pass through an anchor, tightens the bound by at most a small fraction of the
-gaps reported above and costs more than refining the lattice would, so the
-remaining looseness is not mainly the discarded coupling. Where it does lie is
-not established.
+Finally, the relaxation of \eqref{eq:bound} discards every constraint linking
+one sample to the next, and it is natural to suppose that most of the width
+reported above lives there. It does not. Restoring one such constraint, by
+requiring every admissible trajectory to pass through some common point at a
+stated fraction of the way along and maximising over that point, tightens the
+widest bound in the suite by less than a hundredth and costs more than
+refining the lattice would. So the residual width is not mainly the discarded
+coupling between samples. Where it does lie is not established here.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+Legibility has been reported as a search outcome because its optimum is out of
+reach. This paper shows that the optimum does not have to be computed for the
+useful statements to be made. Bracketing it is enough, and the bracket is
+narrow: over \suiteWorlds{} published worlds at \suiteCeilings{} cost ceilings,
+every interval is two-sided, none is violated, and the widest is
+\suiteWorstGap{}.
+
+What that buys is a negative statement quantified over every trajectory rather
+than over the ones a planner returned, which is the form a scenario designer
+needs and the form a search cannot supply. The same argument, applied to a
+smaller feasible set, prices a safety constraint in the same certified terms.
+
+The obvious extensions are a second observer condition, non-convex or
+non-polygonal obstacles, and moving goals. The one that would change the
+standing of all of it is different: the objective bounded here is exactly
+reproducible and has never been validated against people, and no amount of
+tightening addresses that.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}

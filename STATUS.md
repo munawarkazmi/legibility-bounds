@@ -716,7 +716,34 @@ That last one matters procedurally. It was carried into this project from the
 sibling repository's notes and was written into a draft here before it had
 been checked. It holds, but the order was wrong, and the log says so.
 
-## The certified statement, spelled out, 6 August 2026
+## Read end to end, 6 August 2026
+
+The draft had been written in pieces over a day and never read as a whole.
+Doing that found six things, none of which any check would have caught, since
+all of them were correct sentences in the wrong relation to each other.
+
+- The header comment still said the literature pass had not happened. It had,
+  twice over.
+- The largest certified safety price was stated twice in one subsection, three
+  paragraphs apart, in nearly the same words.
+- The word "anchor" carried two meanings. In the witness subsection it is a
+  waypoint the constructed trajectory passes through; in the limitations it
+  was a constraint point in a tightened bound. Different ideas, same word, one
+  page apart. The limitations paragraph now describes the thing rather than
+  naming it.
+- "Two further findings bear directly on sections below" was followed by three
+  paragraphs, because a citation to subsequent work had been inserted between
+  them without adjusting the sentence that counted them.
+- The abstract still opened with "Legible motion is optimised, not decided",
+  which the introduction now immediately qualifies: it is optimised because
+  the optimum is intractable. A reader meeting the abstract and then the
+  introduction would have seen the paper correct itself in the first column.
+- **There was no conclusion.** The paper ended on its limitations and went
+  straight to the bibliography, which left it stopping on its weakest note and
+  never restating what the reader had been shown.
+
+The last one is the one that mattered. The other five are the kind of drift a
+document accumulates when it is edited in place and never read from the top.
 
 The paper's whole point was left implicit in a table: a reader had to work out
 for themselves what a row licensed. Section V-A now states it in words for one
