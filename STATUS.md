@@ -716,6 +716,28 @@ That last one matters procedurally. It was carried into this project from the
 sibling repository's notes and was written into a draft here before it had
 been checked. It holds, but the order was wrong, and the log says so.
 
+## Read cold again, 6 August 2026
+
+Nothing factually wrong this time. Two things about shape, which is what a
+third reading is for.
+
+**Related work had turned defensive.** Adding each earned qualification one at
+a time left seven short paragraphs in a row, four of them telling the reader
+what the paper does not claim. Every one was justified and the accumulation was
+not: a column and a half of pre-emptive concession reads as a paper apologising
+for itself. The two scoping points are now one paragraph, and the two
+meta-sentences introducing and closing them are gone.
+
+**Two sentences used a bare citation number as their subject**, rendering as
+"[1] observes that..." and "[3] reports that...". They now name the authors.
+A small thing, and the sort a reviewer registers as carelessness.
+
+The lesson from three readings: the first found stale and duplicated content,
+the second found a number that could not be looked up, and the third found
+nothing wrong at all and something wrong with the arrangement. Correctness,
+verifiability, then shape, in that order, and none of them visible to the
+build.
+
 ## The last of the literature, 6 August 2026
 
 Eight bodies read in total. The two the earlier draft admitted to ignoring

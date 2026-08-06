@@ -138,10 +138,10 @@ and is not one that can decide a negative statement about a world.
 Two findings in the founding papers bear directly on sections below, and one
 line of subsequent work bounds what may be claimed from the first of them.
 
-\cite{dragan2013legibility} observes that legibility is not obstacle
-avoidance, and that a legible trajectory exaggerates away from competing goals
-even when that carries it closer to a wall. It identifies the phenomenon and
-does not measure it.
+Dragan et al. \cite{dragan2013legibility} observe that legibility is not
+obstacle avoidance, and that a legible trajectory exaggerates away from
+competing goals even when that carries it closer to a wall. They identify the
+phenomenon and do not measure it.
 
 That is not to say the interaction goes unreported. Bastarache et al.
 \cite{bastarache2023legible} plan for legibility among moving agents and
@@ -154,30 +154,23 @@ to a moving agent, it is bounded over all admissible trajectories rather than
 measured on the ones a planner produced, and the two together yield a price
 that is certified rather than compared.
 
-Lastly, \cite{dragan2013generating} reports that observers may stop reasoning
-about the declared goals altogether once motion becomes strange enough, and
-may come to believe the robot is pursuing none of them, a belief its follow-up
-study measures directly. The observer used here cannot represent that belief,
-and Section~\ref{sec:limitations} says so.
+Lastly, the companion paper \cite{dragan2013generating} reports that observers
+may stop reasoning about the declared goals altogether once motion becomes
+strange enough, and may come to believe the robot is pursuing none of them, a
+belief its follow-up study measures directly. The observer used here cannot
+represent that belief, and Section~\ref{sec:limitations} says so.
 
-Two clarifications about what this paper does and does not claim, both prompted
-by more recent work.
-
-Guarantees are not absent from this literature. Learning-based treatments carry
-them: \cite{liu2024active} gives a convergence and completeness analysis for
-its multi-agent legibility algorithm. That is a guarantee about an algorithm
-reaching what it converges to, which is a different object from a bound on what
-any trajectory could achieve. The word certified is used here only in the
-second sense.
-
-Nor is there one legibility. Recent generative work produces motion across a
-controllable range of intent expressiveness rather than a single most legible
-trajectory, and scores it with a potential field of its own construction
-\cite{shi2025controlling}. This paper bounds the formulation of
-\cite{dragan2013legibility} and nothing else, and a bound on that objective
-says nothing about another.
-
-Beyond these, the section is not a survey of everything since 2013.
+Two scoping points follow from more recent work. Guarantees are not absent
+here: Liu et al. \cite{liu2024active} give a convergence and completeness
+analysis for their multi-agent legibility algorithm. That guarantees an
+algorithm reaches what it converges to, which is a different object from a
+bound on what any trajectory could achieve, and it is the second sense the word
+certified carries in this paper. Nor is there one legibility: recent generative
+work produces motion across a controllable range of intent expressiveness
+rather than a single most legible trajectory, scored by a potential field of
+its own construction \cite{shi2025controlling}. What is bounded here is the
+formulation of Dragan et al. and nothing else. Beyond these, the section is not
+a survey of everything since 2013.
 
 \section{Problem}
 \label{sec:problem}
@@ -506,9 +499,9 @@ one.
 
 The observer has no option to believe in neither goal. Its posterior sums to
 one over the declared goals however strange the motion becomes. This is not a
-hypothetical failure: \cite{dragan2013generating} reports that observers do
-form exactly that belief once motion departs far enough from expectation, and
-measures it. It is a known direction of error here, and it grows with the cost
+hypothetical failure: Dragan and Srinivasa \cite{dragan2013generating} report
+that observers do form exactly that belief once motion departs far enough from
+expectation, and measure it. It is a known direction of error here, and it grows with the cost
 ratio, so a result at a loose ceiling rests on the model further from where it
 was checked than one at a tight ceiling. Both are reported, and the ceiling is
 stated with every number for that reason.
