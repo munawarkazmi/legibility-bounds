@@ -221,6 +221,42 @@ def safety_table(record: dict) -> str:
     return "\n".join(lines)
 
 
+def refinement_table(record: dict) -> str:
+    """Gap against lattice spacing, which is where the residual width lives.
+
+    The achieved value does not depend on the lattice, so each column is the
+    same bound computed at a finer resolution against a fixed lower end. It
+    answers a question the paper would otherwise have to leave open.
+    """
+    rows = record["rows"]
+    grids = sorted({r["grid"] for r in rows}, reverse=True)
+    worlds = sorted({r["scenario"] for r in rows})
+    indexed = {(r["scenario"], r["grid"]): r for r in rows}
+
+    lines = [
+        BANNER,
+        r"\begin{table}[t]",
+        r"\centering",
+        r"\caption{Gap against lattice spacing, at cost ceiling "
+        + f"{record['ceiling']:.2f}"
+        + r". The achieved value does not depend on the lattice, so each row "
+          r"is the same interval measured at four resolutions. Most of the "
+          r"residual width is the lattice.}",
+        r"\label{tab:refinement}",
+        r"\begin{tabular}{l" + "r" * len(grids) + "}",
+        r"\toprule",
+        "world & " + " & ".join(f"${g:g}$" for g in grids) + r" \\",
+        r"\midrule",
+    ]
+    for world in worlds:
+        cells = [_world(world)]
+        for grid in grids:
+            cells.append(_number(indexed[(world, grid)]["gap"]))
+        lines.append(" & ".join(cells) + r" \\")
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}", ""]
+    return "\n".join(lines)
+
+
 def facts(
     suite: dict,
     safety: dict,
@@ -228,6 +264,8 @@ def facts(
     example_ceiling: float = 1.5,
     safety_scenario: str = "keep_out_shortcut",
     safety_ceiling: float = 1.25,
+    refinement: dict | None = None,
+    slack: dict | None = None,
 ) -> str:
     """Macros for the numbers that appear in prose rather than in a table."""
     rows = suite["rows"]
@@ -324,6 +362,34 @@ def facts(
         "safetyShortest": _number(safe_example["shortest_path_legibility"]),
     })
 
+    if refinement is not None:
+        grids = sorted({r["grid"] for r in refinement["rows"]}, reverse=True)
+        coarse, fine = grids[0], grids[-1]
+        closed = [
+            (
+                next(r for r in refinement["rows"]
+                     if r["scenario"] == w and r["grid"] == coarse)["gap"],
+                next(r for r in refinement["rows"]
+                     if r["scenario"] == w and r["grid"] == fine)["gap"],
+            )
+            for w in sorted({r["scenario"] for r in refinement["rows"]})
+        ]
+        shares = [(a - b) / a for a, b in closed if a > 0]
+        values.update({
+            "refineCoarse": f"{coarse:g}",
+            "refineFine": f"{fine:g}",
+            "refineWorlds": str(len(closed)),
+            "refineLeastClosed": f"{round(min(shares) * 100)}",
+            "refineMostClosed": f"{round(max(shares) * 100)}",
+        })
+
+    if slack is not None:
+        values.update({
+            "detourClaimed": f"{slack['claimed_in_cell_radii']:.2f}",
+            "detourMeasured": f"{slack['worst_measured_in_cell_radii']:.2f}",
+            "detourRatio": f"{slack['looseness_ratio']:.1f}",
+        })
+
     if priced:
         largest = max(priced, key=lambda r: r["certified_price"])
         values["safetyLargestPrice"] = _number(largest["certified_price"])
@@ -348,6 +414,8 @@ def main(argv=None) -> int:
 
     suite = _load("suite_bounds.json")
     safety = _load("safety_price.json")
+    refinement = _load("refinement.json")
+    slack = _load("detour_slack.json")
 
     if suite["violations"]:
         raise RecordError(
@@ -365,9 +433,10 @@ def main(argv=None) -> int:
         "suite.tex": folded_suite_table(suite),
         "suite_full.tex": suite_table(suite),
         "safety.tex": safety_table(safety),
+        "refinement.tex": refinement_table(refinement),
         "facts.tex": facts(
             suite, safety, args.example_scenario, args.example_ceiling,
-            args.safety_scenario, args.safety_ceiling,
+            args.safety_scenario, args.safety_ceiling, refinement, slack,
         ),
     }
     for name, text in written.items():

@@ -716,6 +716,54 @@ That last one matters procedurally. It was carried into this project from the
 sibling repository's notes and was written into a draft here before it had
 been checked. It holds, but the order was wrong, and the log says so.
 
+## Acting on outside feedback, 6 August 2026
+
+A colleague read the draft. Four of their points were worth taking, two were
+half right, two were wrong, and the two wrong ones were wrong for the same
+reason: they read a text extraction rather than the PDF, so Table I looked
+garbled and a section heading looked orphaned. Both render correctly and were
+checked before being dismissed.
+
+**Where the residual width lives is now measured rather than declined.** The
+draft said "not established here", which was honest and unsatisfying.
+`tools/refinement.py` now reports the gap at each lattice against a fixed
+achieved value, and the answer is the lattice: refining from 0.05 to 0.00625
+closes between 55 and 79 per cent of the gap across the three worlds tested.
+The paper carries that as its own table and says outright that the reported
+numbers are conservative by roughly that margin.
+
+**The loose constant is in the paper now.** `tools/detour_slack.py` samples
+real point pairs in real cells beside obstacle corners and measures a worst
+detour of 2.53 cell radii against a claimed 9.28, a factor of 3.7. Hiding a
+factor of four in the one place the argument is weakest was exactly the wrong
+thing for a paper that sells itself on saying what it does not prove.
+
+**The conclusion now situates the result.** What a benchmark can assert about
+itself changes: a suite can currently record that its own search found nothing
+better, and with a bound it can carry the property outright.
+
+**And one prose fix.** "The interval excludes essentially everything" was not
+a claim that could be defended. It now says which thresholds are decided and
+which are left open.
+
+Six pages, which is RA-L's limit without overlength charges.
+
+## Two ways to break a bibliography, 6 August 2026
+
+Both found in ten minutes, both taking every citation in the paper down at
+once, and neither obvious from the failure. A build that reports 47 undefined
+references does not look like a punctuation problem.
+
+- A percent sign inside an entry is an ordinary character, not a comment.
+  BibTeX has no comment syntax.
+- Text between entries is ignored only because it contains no at sign. Writing
+  one in a comment, as in a sentence mentioning a misc entry, starts an entry
+  and breaks the parse. This is what actually happened, and the first fix did
+  not address it.
+
+Recorded because the second is genuinely surprising and the log points at the
+line without explaining why.
+
 ## Read cold again, 6 August 2026
 
 Nothing factually wrong this time. Two things about shape, which is what a

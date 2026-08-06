@@ -1,0 +1,58 @@
+{
+  "geometry_commit": "a376ab28ce6cccc7a5af75fe64c06e60dd197db6",
+  "observer": "geodesic_beta1",
+  "grid": 0.05,
+  "claimed_in_cell_radii": 9.283185307179586,
+  "worst_measured_in_cell_radii": 2.533973965827561,
+  "looseness_ratio": 3.6634888252089146,
+  "rows": [
+    {
+      "scenario": "wall_choice",
+      "grid": 0.05,
+      "cell_radius": 0.03535533905932738,
+      "band_cells": 300,
+      "pairs_checked": 217,
+      "pairs_separated_by_the_obstacle": 11,
+      "worst_detour_in_cell_radii": 2.231716872114446,
+      "worst_separated_detour_in_cell_radii": 2.0615774660328228,
+      "claimed_in_cell_radii": 9.283185307179586,
+      "looseness_ratio": 4.159660852670889
+    },
+    {
+      "scenario": "narrow_gap",
+      "grid": 0.05,
+      "cell_radius": 0.03535533905932738,
+      "band_cells": 520,
+      "pairs_checked": 247,
+      "pairs_separated_by_the_obstacle": 8,
+      "worst_detour_in_cell_radii": 2.3693056246801683,
+      "worst_separated_detour_in_cell_radii": 2.3693056246801683,
+      "claimed_in_cell_radii": 9.283185307179586,
+      "looseness_ratio": 3.9181037728860835
+    },
+    {
+      "scenario": "pillar_aisle",
+      "grid": 0.05,
+      "cell_radius": 0.03535533905932738,
+      "band_cells": 160,
+      "pairs_checked": 231,
+      "pairs_separated_by_the_obstacle": 8,
+      "worst_detour_in_cell_radii": 2.533973965827561,
+      "worst_separated_detour_in_cell_radii": 2.533973965827561,
+      "claimed_in_cell_radii": 9.283185307179586,
+      "looseness_ratio": 3.6634888252089146
+    },
+    {
+      "scenario": "door_pair",
+      "grid": 0.05,
+      "cell_radius": 0.03535533905932738,
+      "band_cells": 424,
+      "pairs_checked": 301,
+      "pairs_separated_by_the_obstacle": 17,
+      "worst_detour_in_cell_radii": 2.1690547309696724,
+      "worst_separated_detour_in_cell_radii": 2.1690547309696724,
+      "claimed_in_cell_radii": 9.283185307179586,
+      "looseness_ratio": 4.279829906841287
+    }
+  ]
+}

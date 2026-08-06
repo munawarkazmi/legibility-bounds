@@ -407,12 +407,12 @@ better optimiser would not weaken it. This is what a search cannot supply at
 any budget: a search that returns \exampleAchieved{} leaves open whether
 \exampleThreshold{} was merely missed.
 
-It is not vacuous. The two ends are \exampleGap{} apart, so the interval
-excludes essentially everything: the true optimum is pinned to a band narrow
-enough that a threshold anywhere outside it is decided. For contrast the
-shortest path in this world scores \exampleBaseline{}, so the budget does buy
-clarity here, and the question of how much is answered rather than bracketed
-by ignorance.
+It is not vacuous. The two ends are \exampleGap{} apart, so any threshold
+outside that band is decided: above it, unreachable; at or below the achieved
+value, reached. Only a threshold falling inside the band is left open. For
+contrast the shortest path in this world scores \exampleBaseline{}, so the
+budget does buy clarity here, and the question of how much is answered rather
+than bracketed by ignorance.
 
 It is conditional in ways that must travel with it. It holds for this observer,
 at this rationality coefficient, under this cost ceiling, and it says nothing
@@ -509,14 +509,38 @@ stated with every number for that reason.
 The results are one lattice, one observer condition and one search budget over
 \suiteWorlds{} worlds. Nothing here is a trend.
 
-Finally, the relaxation of \eqref{eq:bound} discards every constraint linking
-one sample to the next, and it is natural to suppose that most of the width
-reported above lives there. It does not. Restoring one such constraint, by
-requiring every admissible trajectory to pass through some common point at a
-stated fraction of the way along and maximising over that point, tightens the
-widest bound in the suite by less than a hundredth and costs more than
-refining the lattice would. So the residual width is not mainly the discarded
-coupling between samples. Where it does lie is not established here.
+\subsection{Where the residual width lives}
+
+Two candidates account for the intervals reported above, and they can be told
+apart by measurement.
+
+The first is the relaxation of \eqref{eq:bound}, which discards every
+constraint linking one sample to the next. It is natural to suppose most of the
+width lives there. It does not: restoring one such constraint, by requiring
+every admissible trajectory to pass through a common point at a stated fraction
+of the way along and maximising over that point, tightens the widest bound in
+the suite by less than a hundredth, and costs more than refining the lattice
+would.
+
+The second is the lattice, and that is where most of it is.
+Table~\ref{tab:refinement} recomputes the same intervals at four resolutions
+against a fixed achieved value. Refining from \refineCoarse{} to
+\refineFine{} closes between \refineLeastClosed{} and \refineMostClosed{} per
+cent of the gap across the \refineWorlds{} worlds tested. The bound is
+therefore not converged at the resolution reported, and the numbers in
+Table~\ref{tab:suite} are conservative by roughly that margin.
+
+\input{generated/refinement}
+
+What remains after refining is concentrated in the worlds with obstacles, and
+the reason is the constant of Section~\ref{sec:bound}. The argument gives
+$D \le (3 + 2\pi)\,r \approx \detourClaimed{}\,r$, a worst case no
+configuration has been exhibited for. Sampling real point pairs in real cells
+beside obstacle corners finds a worst detour of \detourMeasured{}$\,r$, so the
+constant is loose by a factor of about \detourRatio{}. A bound must hold in the
+worst case and the worst case is rarely met, so this is not an error. It is the
+size of the prize: a sharper argument for those cells would tighten every
+obstacle world, and it is the highest-leverage improvement outstanding.
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -529,9 +553,16 @@ every interval is two-sided, none is violated, and the widest is
 \suiteWorstGap{}.
 
 What that buys is a negative statement quantified over every trajectory rather
-than over the ones a planner returned, which is the form a scenario designer
-needs and the form a search cannot supply. The same argument, applied to a
-smaller feasible set, prices a safety constraint in the same certified terms.
+than over the ones a planner returned, and that changes what a benchmark can
+assert about itself. A scenario suite can currently record that its own search
+found nothing better in a world; it cannot record that a world is hard. With a
+bound it can carry the property outright, machine-checked at the same standing
+as its geometry: no trajectory within this budget is read correctly here. A
+designer building such a world can then be told whether it does what it was
+built to do, rather than whether one planner struggled with it, and a planner
+evaluated on it can be scored against what was achievable rather than against
+whatever the baseline happened to reach. The same argument, applied to a
+smaller feasible set, prices a safety constraint in the same terms.
 
 The obvious extensions are a second observer condition, non-convex or
 non-polygonal obstacles, and moving goals. The one that would change the

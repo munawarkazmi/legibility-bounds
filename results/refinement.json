@@ -14,7 +14,9 @@
       "band_detour": 0.3282101640859005,
       "detour_certified": true,
       "band_cells": 300,
-      "build_seconds": 0.08688709998386912
+      "achieved": 0.6083717329518393,
+      "gap": 0.0456052984552312,
+      "build_seconds": 0.09526000000187196
     },
     {
       "scenario": "wall_choice",
@@ -27,7 +29,9 @@
       "band_detour": 0.16410508204295024,
       "detour_certified": true,
       "band_cells": 600,
-      "build_seconds": 0.4571468000067398
+      "achieved": 0.6083717329518393,
+      "gap": 0.02158764891348608,
+      "build_seconds": 0.4042888999974821
     },
     {
       "scenario": "wall_choice",
@@ -40,7 +44,9 @@
       "band_detour": 0.08205254102147512,
       "detour_certified": true,
       "band_cells": 1200,
-      "build_seconds": 1.83203289998346
+      "achieved": 0.6083717329518393,
+      "gap": 0.013427333949186382,
+      "build_seconds": 1.7368827000027522
     },
     {
       "scenario": "wall_choice",
@@ -53,7 +59,9 @@
       "band_detour": 0.04102627051073756,
       "detour_certified": true,
       "band_cells": 2400,
-      "build_seconds": 8.149346099991817
+      "achieved": 0.6083717329518393,
+      "gap": 0.00960214805169013,
+      "build_seconds": 7.596925999998348
     },
     {
       "scenario": "narrow_gap",
@@ -66,7 +74,9 @@
       "band_detour": 0.3282101640859005,
       "detour_certified": true,
       "band_cells": 520,
-      "build_seconds": 0.20647249999456108
+      "achieved": 0.6897524806674424,
+      "gap": 0.09575483072082536,
+      "build_seconds": 0.221301699988544
     },
     {
       "scenario": "narrow_gap",
@@ -79,7 +89,9 @@
       "band_detour": 0.16410508204295024,
       "detour_certified": true,
       "band_cells": 1040,
-      "build_seconds": 1.2312640999734867
+      "achieved": 0.6897524806674424,
+      "gap": 0.06335849781267067,
+      "build_seconds": 1.3354104000027291
     },
     {
       "scenario": "narrow_gap",
@@ -92,7 +104,9 @@
       "band_detour": 0.08205254102147512,
       "detour_certified": true,
       "band_cells": 2080,
-      "build_seconds": 5.322916400007671
+      "achieved": 0.6897524806674424,
+      "gap": 0.037332795905759775,
+      "build_seconds": 5.700678400025936
     },
     {
       "scenario": "narrow_gap",
@@ -105,7 +119,9 @@
       "band_detour": 0.04102627051073756,
       "detour_certified": true,
       "band_cells": 4160,
-      "build_seconds": 25.625184999982594
+      "achieved": 0.6897524806674424,
+      "gap": 0.0330630542642355,
+      "build_seconds": 27.337311999988742
     },
     {
       "scenario": "pillar_aisle",
@@ -118,7 +134,9 @@
       "band_detour": 0.3282101640859005,
       "detour_certified": true,
       "band_cells": 160,
-      "build_seconds": 0.07175020000431687
+      "achieved": 0.847965275903115,
+      "gap": 0.013424091369757751,
+      "build_seconds": 0.07539499999256805
     },
     {
       "scenario": "pillar_aisle",
@@ -131,7 +149,9 @@
       "band_detour": 0.16410508204295024,
       "detour_certified": true,
       "band_cells": 320,
-      "build_seconds": 0.3649345000158064
+      "achieved": 0.847965275903115,
+      "gap": 0.009277953828406238,
+      "build_seconds": 0.41376969998236746
     },
     {
       "scenario": "pillar_aisle",
@@ -144,7 +164,9 @@
       "band_detour": 0.08205254102147512,
       "detour_certified": true,
       "band_cells": 640,
-      "build_seconds": 1.5194075999897905
+      "achieved": 0.847965275903115,
+      "gap": 0.0071238136719724565,
+      "build_seconds": 1.693124399986118
     },
     {
       "scenario": "pillar_aisle",
@@ -157,7 +179,9 @@
       "band_detour": 0.04102627051073756,
       "detour_certified": true,
       "band_cells": 1280,
-      "build_seconds": 6.64549690001877
+      "achieved": 0.847965275903115,
+      "gap": 0.006023108809786737,
+      "build_seconds": 6.894803600007435
     }
   ]
 }

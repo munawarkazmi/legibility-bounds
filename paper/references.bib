@@ -1,3 +1,14 @@
+% The two preprint entries carry their identifier in the note field rather
+% than in eprint, because IEEEtran.bst ignores eprint on a misc entry and the
+% reference then prints with no way to find the paper.
+%
+% Two things about this file that are not LaTeX conventions. BibTeX has no
+% comment syntax: text is ignored only because it contains no at sign, so an
+% at sign written here starts an entry and breaks the parse. And a percent
+% inside an entry is an ordinary character, not a comment. Either mistake
+% takes every citation in the paper down with it, which is how both were
+% found.
+%
 % Bibliographic details for both entries were confirmed against public records
 % on 6 August 2026, and both bodies were read the same day. What was checked,
 % and what each check changed, is recorded in verification_log.md. Nothing is
@@ -54,9 +65,7 @@
                Doshi, Prashant},
   title     = {Active Legibility in Multiagent Reinforcement Learning},
   year      = {2024},
-  eprint    = {2410.20954},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.AI},
+  note      = {arXiv:2410.20954},
 }
 
 @misc{shi2025controlling,
@@ -65,9 +74,7 @@
   title     = {Controlling Intent Expressiveness in Robot Motion with
                Diffusion Models},
   year      = {2025},
-  eprint    = {2510.12370},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.RO},
+  note      = {arXiv:2510.12370},
 }
 
 @inproceedings{lepers2025observer,

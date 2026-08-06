@@ -37,6 +37,7 @@ from legibility_bounds import lattice as lattice_module  # noqa: E402
 from legibility_bounds import vendored  # noqa: E402
 from legibility_bounds.reachability import reachability_bound  # noqa: E402
 
+ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_GRIDS = (0.05, 0.025, 0.0125, 0.00625)
 DEFAULT_OUTPUT = Path(__file__).resolve().parents[1] / "results" / "refinement.json"
 
@@ -58,10 +59,22 @@ def main(argv=None) -> int:
     print(f"observer:  {observer.name}")
     print(f"ceiling:   {args.ceiling}\n")
 
+    # The achieved value does not depend on the lattice, so the gap at each
+    # lattice is the bound there minus a single number. That is what makes
+    # this a measurement of where the residual width lives rather than a
+    # study of the bound in isolation.
+    suite = json.loads(
+        (ROOT / "results" / "suite_bounds.json").read_text(encoding="utf-8")
+    )
+    achieved = {
+        (r["scenario"], r["ceiling"]): r["achieved"] for r in suite["rows"]
+    }
+
     rows = []
     for name in names:
         scenario = vendored.scenario(name)
-        print(name)
+        reached = achieved.get((name, args.ceiling))
+        print(f"{name} (achieved {reached:.4f})" if reached else name)
         for grid in grids:
             started = time.perf_counter()
             built = lattice_module.build(scenario, observer, grid)
@@ -80,23 +93,29 @@ def main(argv=None) -> int:
                 "band_detour": result.band_detour,
                 "detour_certified": result.detour_certified,
                 "band_cells": result.band_cells,
+                "achieved": reached,
+                "gap": None if reached is None else result.bound - reached,
                 "build_seconds": build_seconds,
             }
             rows.append(row)
+            gap = "" if reached is None else f"   gap {row['gap']:.4f}"
             print(
-                f"   grid {grid:<9} bound {result.bound:.4f}   "
+                f"   grid {grid:<9} bound {result.bound:.4f}{gap}   "
                 f"band {result.weight_from_band:.2f}   "
-                f"detour {result.band_detour:.4f}   "
                 f"cells {row['cells']:>8}   built in {build_seconds:>6.2f}s",
                 flush=True,
             )
 
-        first = [r for r in rows if r["scenario"] == scenario.id][0]
-        last = [r for r in rows if r["scenario"] == scenario.id][-1]
+        here = [r for r in rows if r["scenario"] == scenario.id]
+        first, last = here[0], here[-1]
+        closed = (
+            "" if last["gap"] is None
+            else f", closing {first['gap'] - last['gap']:.4f} of the gap and "
+                 f"leaving {last['gap']:.4f}"
+        )
         print(
-            f"   over that refinement the bound moved {first['bound'] - last['bound']:.4f} "
-            f"and the band share moved "
-            f"{first['weight_from_band'] - last['weight_from_band']:.4f}\n",
+            f"   over that refinement the bound moved "
+            f"{first['bound'] - last['bound']:.4f}{closed}\n",
             flush=True,
         )
 
