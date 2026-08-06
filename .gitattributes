@@ -1,0 +1,9 @@
+# The paper is built by GNU make inside WSL, reading this working copy
+# directly from the Windows filesystem. A Makefile checked out with CRLF line
+# endings breaks make, and the failure looks like a missing separator rather
+# than like a line ending problem, so it is pinned to LF here.
+#
+# This repository is edited on Windows and built on Linux at the same time,
+# which is exactly the case line ending conversion handles badly.
+Makefile text eol=lf
+*.sh text eol=lf
