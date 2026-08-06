@@ -161,6 +161,16 @@ The argument gives `D <= (3 + 2pi) r`, about 9.28 cell radii. Sampling real poin
 
 ---
 
+## Plain-language guide
+
+For a non-specialist reader there is a six-page guide,
+[docs/explainer/explainer.pdf](docs/explainer/explainer.pdf), which explains
+why searching can never answer the designer's question, how a bound over
+every trajectory is possible at all, the odds-against reformulation that
+rescues the argument beside obstacles, and what the certified price of
+safety means. Its source is committed alongside it and builds with
+`latexmk -pdf explainer.tex`.
+
 ## Reproducing everything
 
 The exact geometry comes from
