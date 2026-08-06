@@ -109,7 +109,9 @@ simply have been a worse search.
   bound on how far a convex boundary can wrap inside a disc.
 - One lattice, one observer, one search budget. Nothing here may be read as a
   trend.
-- No result has been reported anywhere, and no venue has been chosen.
+- Nothing has been reported anywhere. The venue is IEEE Robotics and
+  Automation Letters, decided 6 August 2026 from the current calls, but no
+  paper exists and no format has been set up.
 
 ## The objective is not defined here
 

@@ -553,6 +553,44 @@ dynamic program rather than a per-slice maximum. That is the obvious next
 piece, and it is also where a certified lower bound would come from, since
 any path the dynamic program returns is realisable. It is not built.
 
+## Target venue, decided 6 August 2026
+
+IEEE Robotics and Automation Letters. Terms read from the calls on 6 August
+2026 rather than assumed, because the handoff carried RA-L as a working guess
+and one of the two candidates turned out to be closed.
+
+- Rolling submission, no deadline. A final decision within six months of
+  submission, and about four months from submission to early access.
+- Six pages, with at most two more at an overlength charge.
+- Double-anonymous review, which matters for an author with no affiliation.
+- An accepted paper may be presented at a RAS conference within 270 days of
+  acceptance.
+
+**WAFR is closed and was the better fit for the algorithmic framing.** The
+17th symposium ran 15 to 17 June 2026 in Oulu, and its submission deadline was
+1 February 2026, extended from 15 January. Its site still looks live because
+camera-ready is due 17 August 2026. WAFR is biennial, so the next edition is
+most likely 2028 and no call exists for it. That removes it from the decision
+for about two years rather than making it a choice.
+
+**The ICRA 2027 transfer is not being chased.** ICRA 2027 is in Seoul, 24 to
+28 May 2027. An accepted RA-L paper can be transferred into it until 31
+December 2026, but that requires acceptance by then, which in turn requires
+clearing review with no substantive revision from a submission made now. A
+first-round accept is not the normal outcome and planning around one would
+mean writing to a deadline that probably does not pay out. The presentation
+route stays open later through IROS 2027 or ICRA 2028.
+
+Direct submission to ICRA 2027 by 15 September 2026, at eight pages, was the
+alternative and was declined. It buys a hard date in exchange for a venue that
+suits an instrument paper less well, and a rejection in January would cost
+four and a half months with nothing archival.
+
+Nothing about the format has been set up yet. The sibling project's LaTeX
+notes do not transfer: it vendors the ACM `acmart` class because its
+distribution does not ship it, and RA-L wants IEEE's, which is a different
+problem with different gotchas.
+
 ## Decisions taken
 
 - 6 August 2026. The exact geometry is imported from `legible-motion-bench`
