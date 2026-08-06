@@ -226,6 +226,8 @@ def facts(
     safety: dict,
     example_scenario: str = "wall_choice",
     example_ceiling: float = 1.5,
+    safety_scenario: str = "keep_out_shortcut",
+    safety_ceiling: float = 1.25,
 ) -> str:
     """Macros for the numbers that appear in prose rather than in a table."""
     rows = suite["rows"]
@@ -292,6 +294,36 @@ def facts(
         "exampleBaseline": _number(example["shortest_path_legibility"]),
     })
 
+    # And one keep-out world spelled out, for the same reason.
+    safe_example = next(
+        (
+            r for r in safety["rows"]
+            if r["scenario"] == safety_scenario
+            and abs(r["ceiling"] - safety_ceiling) < 1e-9
+        ),
+        None,
+    )
+    if safe_example is None:
+        raise RecordError(
+            f"the safety example asks for {safety_scenario!r} at ceiling "
+            f"{safety_ceiling!r}, which is not in the safety record"
+        )
+    if safe_example["certified_price"] is None:
+        raise RecordError(
+            f"{safety_scenario!r} at ceiling {safety_ceiling!r} certifies no "
+            f"price, so it cannot carry a worked example that claims one"
+        )
+    values.update({
+        "safetyWorld": _world(safe_example["scenario"]),
+        "safetyCeiling": f"{safe_example['ceiling']:.2f}",
+        "safetyPercent": f"{round((safe_example['ceiling'] - 1.0) * 100)}",
+        "safetyFree": _number(safe_example["free_achieved"]),
+        "safetySafeBound": _number(safe_example["safe_bound"]),
+        "safetySafeAchieved": _number(safe_example["safe_achieved"]),
+        "safetyPrice": _number(safe_example["certified_price"]),
+        "safetyShortest": _number(safe_example["shortest_path_legibility"]),
+    })
+
     if priced:
         largest = max(priced, key=lambda r: r["certified_price"])
         values["safetyLargestPrice"] = _number(largest["certified_price"])
@@ -310,6 +342,8 @@ def main(argv=None) -> int:
     parser.add_argument("--output", default=str(DEFAULT_OUTPUT))
     parser.add_argument("--example-scenario", default="wall_choice")
     parser.add_argument("--example-ceiling", type=float, default=1.5)
+    parser.add_argument("--safety-scenario", default="keep_out_shortcut")
+    parser.add_argument("--safety-ceiling", type=float, default=1.25)
     args = parser.parse_args(argv)
 
     suite = _load("suite_bounds.json")
@@ -332,7 +366,8 @@ def main(argv=None) -> int:
         "suite_full.tex": suite_table(suite),
         "safety.tex": safety_table(safety),
         "facts.tex": facts(
-            suite, safety, args.example_scenario, args.example_ceiling
+            suite, safety, args.example_scenario, args.example_ceiling,
+            args.safety_scenario, args.safety_ceiling,
         ),
     }
     for name, text in written.items():

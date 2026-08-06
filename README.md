@@ -72,8 +72,8 @@ trajectory that exists gives a certified lower bound on the price of the
 constraint. From `tools/safety_price.py`:
 
     world                ceiling   free ach   safe bound    price
-    keep_out_shortcut       1.25     0.8353       0.8235   0.0119
-    pillar_aisle            1.05     0.8022       0.7632   0.0389
+    keep_out_shortcut       1.25     0.8353       0.8225   0.0128
+    pillar_aisle            1.05     0.8022       0.7558   0.0464
 
 Something is achievable within the budget, and nothing respecting the zone can
 match it, so the constraint costs at least the difference. Comparing two

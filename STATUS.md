@@ -442,11 +442,11 @@ measure.
 `results/safety_price.json`. Two worlds in the suite carry keep-out zones.
 
     world                ceiling   free ach   safe ach   safe bound    price
-    keep_out_shortcut       1.05     0.7870     0.7509       0.7915     none
-    keep_out_shortcut       1.10     0.8079     0.7737       0.8013   0.0066
-    keep_out_shortcut       1.25     0.8353     0.7890       0.8235   0.0119
+    keep_out_shortcut       1.05     0.7870     0.7509       0.7911     none
+    keep_out_shortcut       1.10     0.8079     0.7737       0.8009   0.0070
+    keep_out_shortcut       1.25     0.8353     0.7890       0.8225   0.0128
     keep_out_shortcut       1.50     0.8594     0.8170       0.8661     none
-    pillar_aisle            1.05     0.8022     0.7274       0.7632   0.0389
+    pillar_aisle            1.05     0.8022     0.7274       0.7558   0.0464
     pillar_aisle            1.10     0.8208     0.7407       0.8370     none
     pillar_aisle            1.25     0.8456     0.8446       0.8572     none
     pillar_aisle            1.50     0.8682     0.8663       0.8772     none
@@ -458,9 +458,20 @@ within the budget can pass if it never enters one. Where the first exceeds the
 second, the difference is a certified lower bound on what the constraint
 costs: something is achievable and nothing safe can match it.
 
-Three of the eight pairs certify a positive price, the largest 0.0389 in
+Three of the eight pairs certify a positive price, the largest 0.0464 in
 `pillar_aisle` at ceiling 1.05. The rest certify nothing and say so rather
 than reporting a negative number as though it were a finding.
+
+`keep_out_shortcut` at ceiling 1.25 is the case worked in full in the paper,
+because that world was built to ask exactly this question. Its cheapest route
+scores 0.6968 and is already safe, so the constraint costs nothing to a robot
+that does not try to be understood. A trajectory scoring 0.8353 exists within
+the budget and crosses the zone, and nothing within the budget that stays out
+of it reaches 0.8225. So being understood there costs at least 0.0128.
+
+Reported the other way round, as the difference between two searches, the same
+world would have appeared to cost 0.8353 against 0.7890, a larger number with
+nothing behind it.
 
 This is the statement the sibling benchmark cannot make. Comparing two
 searches cannot show a constraint costs anything, because a search that did

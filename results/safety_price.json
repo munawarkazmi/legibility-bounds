@@ -8,71 +8,83 @@
     {
       "scenario": "keep_out_shortcut",
       "ceiling": 1.05,
+      "shortest_path_legibility": 0.6967558394953979,
+      "shortest_path_is_safe": true,
       "free_achieved": 0.7870064823328535,
       "free_enters_keep_out": true,
       "safe_achieved": 0.7509222620107469,
-      "safe_bound": 0.7914854232213393,
-      "safe_gap": 0.04056316121059245,
+      "safe_bound": 0.791114867178083,
+      "safe_gap": 0.04019260516733614,
       "certified_price": null,
       "weight_from_band": 0.0,
       "uncertified_cells": 0,
-      "lattice_build_seconds": 0.383601900015492
+      "lattice_build_seconds": 0.40943980001611635
     },
     {
       "scenario": "keep_out_shortcut",
       "ceiling": 1.1,
+      "shortest_path_legibility": 0.6967558394953979,
+      "shortest_path_is_safe": true,
       "free_achieved": 0.8078936633040493,
       "free_enters_keep_out": true,
       "safe_achieved": 0.7737005197445853,
-      "safe_bound": 0.8012923126362321,
-      "safe_gap": 0.027591792891646816,
-      "certified_price": 0.006601350667817196,
+      "safe_bound": 0.8008685704255386,
+      "safe_gap": 0.027168050680953293,
+      "certified_price": 0.007025092878510719,
       "weight_from_band": 0.0,
       "uncertified_cells": 0,
-      "lattice_build_seconds": 0.383601900015492
+      "lattice_build_seconds": 0.40943980001611635
     },
     {
       "scenario": "keep_out_shortcut",
       "ceiling": 1.25,
+      "shortest_path_legibility": 0.6967558394953979,
+      "shortest_path_is_safe": true,
       "free_achieved": 0.8353264189409506,
       "free_enters_keep_out": true,
       "safe_achieved": 0.7890465615817089,
-      "safe_bound": 0.8234531372699054,
-      "safe_gap": 0.034406575688196495,
-      "certified_price": 0.011873281671045177,
+      "safe_bound": 0.8225467946379144,
+      "safe_gap": 0.03350023305620542,
+      "certified_price": 0.012779624303036252,
       "weight_from_band": 0.0,
       "uncertified_cells": 0,
-      "lattice_build_seconds": 0.383601900015492
+      "lattice_build_seconds": 0.40943980001611635
     },
     {
       "scenario": "keep_out_shortcut",
       "ceiling": 1.5,
+      "shortest_path_legibility": 0.6967558394953979,
+      "shortest_path_is_safe": true,
       "free_achieved": 0.8594365374041942,
       "free_enters_keep_out": true,
       "safe_achieved": 0.8170131281754973,
-      "safe_bound": 0.8661067742342378,
-      "safe_gap": 0.04909364605874045,
+      "safe_bound": 0.866100273295704,
+      "safe_gap": 0.04908714512020673,
       "certified_price": null,
       "weight_from_band": 0.0,
       "uncertified_cells": 0,
-      "lattice_build_seconds": 0.383601900015492
+      "lattice_build_seconds": 0.40943980001611635
     },
     {
       "scenario": "pillar_aisle",
       "ceiling": 1.05,
+      "shortest_path_legibility": 0.7221701656776055,
+      "shortest_path_is_safe": false,
       "free_achieved": 0.802151053908661,
       "free_enters_keep_out": true,
       "safe_achieved": 0.7273907927799612,
-      "safe_bound": 0.7632402604902911,
-      "safe_gap": 0.03584946771032993,
-      "certified_price": 0.03891079341836989,
-      "weight_from_band": 0.23549979432332377,
+      "safe_bound": 0.7557824443884421,
+      "safe_gap": 0.028391651608480895,
+      "certified_price": 0.04636860952021893,
+      "weight_from_band": 0.2241053064582477,
       "uncertified_cells": 81,
-      "lattice_build_seconds": 1.4898040000116453
+      "lattice_build_seconds": 1.9269366999797057
     },
     {
       "scenario": "pillar_aisle",
       "ceiling": 1.1,
+      "shortest_path_legibility": 0.7221701656776055,
+      "shortest_path_is_safe": false,
       "free_achieved": 0.8207765785729908,
       "free_enters_keep_out": false,
       "safe_achieved": 0.7406605343567951,
@@ -81,11 +93,13 @@
       "certified_price": null,
       "weight_from_band": 0.0,
       "uncertified_cells": 81,
-      "lattice_build_seconds": 1.4898040000116453
+      "lattice_build_seconds": 1.9269366999797057
     },
     {
       "scenario": "pillar_aisle",
       "ceiling": 1.25,
+      "shortest_path_legibility": 0.7221701656776055,
+      "shortest_path_is_safe": false,
       "free_achieved": 0.8456088557920806,
       "free_enters_keep_out": false,
       "safe_achieved": 0.8446214798052818,
@@ -94,11 +108,13 @@
       "certified_price": null,
       "weight_from_band": 0.0,
       "uncertified_cells": 81,
-      "lattice_build_seconds": 1.4898040000116453
+      "lattice_build_seconds": 1.9269366999797057
     },
     {
       "scenario": "pillar_aisle",
       "ceiling": 1.5,
+      "shortest_path_legibility": 0.7221701656776055,
+      "shortest_path_is_safe": false,
       "free_achieved": 0.8681930371827574,
       "free_enters_keep_out": false,
       "safe_achieved": 0.8662752758851452,
@@ -107,7 +123,7 @@
       "certified_price": null,
       "weight_from_band": 0.0,
       "uncertified_cells": 81,
-      "lattice_build_seconds": 1.4898040000116453
+      "lattice_build_seconds": 1.9269366999797057
     }
   ],
   "violations": 0

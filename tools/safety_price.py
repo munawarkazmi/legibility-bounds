@@ -126,6 +126,11 @@ def main(argv=None) -> int:
             row = {
                 "scenario": scenario.id,
                 "ceiling": ceiling,
+                # Whether the cheapest route already respects the zone. Where
+                # it does, the constraint costs a robot nothing until it tries
+                # to communicate, and the price below is the price of trying.
+                "shortest_path_legibility": baseline.legibility,
+                "shortest_path_is_safe": baseline.safety.keep_out_entries == 0,
                 "free_achieved": free_achieved,
                 "free_enters_keep_out": free.safety.keep_out_entries > 0,
                 "safe_achieved": safe_achieved,

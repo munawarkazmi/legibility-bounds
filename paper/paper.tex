@@ -428,6 +428,40 @@ nothing rather than as a negative price.
 
 \input{generated/safety}
 
+Worked in full, in the world built to ask this question. In \safetyWorld{} the
+zone sits exactly where a trajectory would deviate to signal the true goal, and
+the cheapest route to that goal does not enter it. At a ceiling of
+\safetyCeiling{}:
+
+\begin{quote}
+The shortest route scores \safetyShortest{} and is already safe, so the
+constraint costs nothing to a robot that does not try to be understood. A
+trajectory scoring \safetyFree{} exists within the budget, and it crosses the
+zone. No trajectory within the same budget that stays out of the zone attains
+\safetySafeBound{}. So being understood here costs at least \safetyPrice{} of
+legibility once the zone is respected.
+\end{quote}
+
+\noindent The structure of that claim is what distinguishes it from a
+comparison of two planners. The first figure is a trajectory that exists, the
+third is a bound over all trajectories, and only their combination is a
+statement about the constraint rather than about a search. A safety-constrained
+search reached \safetySafeAchieved{} here, which is consistent with the bound
+and, on its own, would have established nothing: a search that does worse under
+a constraint may only have been a worse search.
+
+The price is a lower bound and not an estimate. The true cost of the constraint
+is at least \safetyPrice{} and may be more, since the safe optimum lies
+somewhere at or below \safetySafeBound{}. Reported the other way round, as a
+difference between two searches, the same world would have appeared to cost
+\safetyFree{} minus \safetySafeAchieved{}, a larger number with nothing behind
+it.
+
+The largest price certified anywhere in the suite is \safetyLargestPrice{}, in
+\safetyLargestWorld{} at ceiling \safetyLargestCeiling{}, where the cheapest
+route is not safe to begin with and the constraint therefore binds from the
+start.
+
 \section{Limitations}
 \label{sec:limitations}
 
