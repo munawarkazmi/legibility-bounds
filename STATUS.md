@@ -824,13 +824,44 @@ This is the second time today that a search for prior work changed a claim
 rather than decorating it, and it is the argument for doing the reading before
 the writing rather than after.
 
-**What is still not covered**, and the paper says so in its own text: work on
-legibility in multi-agent navigation, learning-based approaches, and recent
-generative methods. A scoping review of motion intent communication was
-fetched and deliberately not cited, since it covers signalling modalities such
-as projection and light rather than the motion objective bounded here, and
-citing it would have implied engagement with a literature this paper does not
-engage with.
+## The survey narrowed the safety claim too, 6 August 2026
+
+Two more bodies read, six in total, and the second of them corrected the other
+headline claim.
+
+**Bastarache, Nielsen and Smith, ICRA 2023.** They plan for legibility among
+moving agents and report minimum pairwise distance alongside it, plus minimum
+time-to-collision, which in their own words they use "as a proxy for legibility
+and safety". The draft had implied that safety goes unreported beside
+legibility, resting on the founding paper's observation that the interaction is
+identified and not measured. True of that paper, false of the literature, and a
+reviewer working on social navigation would have spotted it at once.
+
+The claim is now the narrower thing it actually is, and all three parts of it
+survive: the safety quantity here is satisfaction of a stated static constraint
+rather than proximity to a moving agent, it is bounded over all admissible
+trajectories rather than measured on the ones a planner produced, and the two
+together give a price that is certified rather than compared.
+
+That narrowing was recorded in the sibling repository's notes and has now been
+verified here independently rather than inherited, which is the second time
+today that order has mattered.
+
+**Amirian, Abrini and Chetouani, RO-MAN 2024.** Cited for one thing: legibility
+built into cost-based local motion planning for real-time use. It is evidence
+that the continuous setting still reaches for local optimisers, which is the
+right instrument for driving a robot and not one that can decide a negative
+statement about a world.
+
+**Two of the six papers changed a claim rather than supporting one.** That is
+the whole argument for reading bodies before writing prose rather than after.
+
+**What is still not covered**, and the paper says so in its own text:
+learning-based legibility, recent generative methods, and legibility in
+sequential decision tasks beyond the observer-aware line. A scoping review of
+motion intent communication was fetched and deliberately not cited, since it
+covers signalling modalities such as projection and light rather than the
+motion objective bounded here.
 
 **One dash survives and it needs a decision.** `references.bib` carries the
 page range `301--308`, which is the BibTeX convention and which `IEEEtran.bst`

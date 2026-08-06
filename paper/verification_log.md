@@ -123,15 +123,72 @@ observer-aware MDPs to partial observability, which its abstract and body both
 state. Its solution method computes approximately optimal policies for a
 discretised problem, which is consistent with the framing above.
 
+## Bastarache, Nielsen and Smith, ICRA 2023
+
+**Bibliographic details, checked 6 August 2026.** "On Legible and Predictable
+Robot Navigation in Multi-Agent Environments", Jean-Luc Bastarache,
+Christopher Nielsen and Stephen L. Smith, Proceedings of the IEEE
+International Conference on Robotics and Automation, London, 2023, pages 5508
+to 5514, DOI 10.1109/ICRA48891.2023.10160572. Confirmed against the authors'
+institutional copy and the IEEE record.
+
+**Body read 6 August 2026**, from the copy at
+`ece.uwaterloo.ca/~sl2smith/papers/2023ICRA-Legible_and_Predictable.pdf`. This
+one narrowed a claim, which is why it was sought out.
+
+- Legibility is planned for among moving agents, with interactions modelled as
+  dynamic goal regions rather than as static goal points.
+- Safety quantities are reported alongside legibility. The paper reports the
+  minimum distance to other agents, and in its own words, "As a proxy for
+  legibility and safety, we also report the minimum time-to-collision (TTC)."
+
+**What this changed.** The draft implied that safety goes unreported beside
+legibility, resting on the observation in the HRI paper that the interaction is
+identified and not measured. That was true of the founding paper and false of
+the literature, and a reviewer working on social navigation would have known
+it immediately.
+
+The claim is now stated as the narrower thing it is. What is new here is that
+the safety quantity is satisfaction of a stated static constraint rather than
+proximity to a moving agent, that it is bounded over all admissible
+trajectories rather than measured on the ones a planner produced, and that the
+two together give a price that is certified rather than compared. All three
+survive this paper; the unqualified version did not.
+
+This claim came into the project from a sibling repository's notes, which had
+recorded the same narrowing. It is verified here independently rather than
+inherited.
+
+## Amirian, Abrini and Chetouani, RO-MAN 2024
+
+**Bibliographic details, checked 6 August 2026.** "Legibot: Generating Legible
+Motions for Service Robots Using Cost-Based Local Planners", Javad Amirian,
+Mouad Abrini and Mohamed Chetouani, IEEE International Conference on Robot and
+Human Interactive Communication, Pasadena, 2024. Also arXiv:2404.05100.
+
+**Body read 6 August 2026.** Cited for one thing only, which the paper states
+plainly: legibility is incorporated into cost-based local motion planning so
+that a mobile robot can generate legible motion in real time. It is evidence
+that the continuous setting still reaches for local optimisers, which is the
+right instrument for driving a robot and not one that can decide a negative
+statement about a world. No other finding is attributed to it.
+
 ## What has not been checked
 
-The related work covers the founding formulation and the observer-aware
-planning line. It is not a survey of everything since 2013, and the paper says
-so in its own text rather than implying coverage it does not have.
+Six papers have been read in the body: the two founding papers, the two
+observer-aware planning papers, and the two above. That covers the founding
+formulation, the line that establishes the problem's complexity, the state of
+continuous-setting planning, and the closest prior treatment of legibility
+beside safety.
 
-Specifically not read, and therefore not cited: work on legibility in
-multi-agent navigation, learning-based approaches, and the recent generative
-methods. A scoping review of motion intent communication was fetched and not
-used, because it covers signalling modalities such as projection and light
-rather than the motion objective bounded here, and citing it would have
-implied a survey of a literature this paper does not engage with.
+Specifically not read, and therefore not cited: learning-based legibility,
+recent generative methods, and legibility in sequential decision tasks beyond
+the observer-aware line. A scoping review of motion intent communication was
+fetched and not used, because it covers signalling modalities such as
+projection and light rather than the motion objective bounded here, and citing
+it would have implied a survey of a literature this paper does not engage
+with.
+
+Two of the six changed a claim rather than supporting one. That is the
+argument for reading bodies rather than abstracts, and for doing it before the
+prose rather than after.

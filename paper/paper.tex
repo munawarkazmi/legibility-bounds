@@ -136,20 +136,39 @@ rather than a discretised state space, and the two ends of the bracket are a
 trajectory that exists and a bound that no trajectory within the budget can
 pass.
 
-Two further findings in those papers bear directly on sections below.
+In the continuous setting the tools remain local. Recent work incorporates
+legibility into cost-based local planning for mobile robots in real time
+\cite{amirian2024legibot}, which is the right instrument for driving a robot
+and is not one that can decide a negative statement about a world.
+
+Two further findings bear directly on sections below.
 \cite{dragan2013legibility} observes that legibility is not obstacle
 avoidance, and that a legible trajectory exaggerates away from competing goals
-even when that carries it closer to a wall. The phenomenon is identified there
-and not measured, which is what makes a bound on the safety-constrained
-problem worth having. And \cite{dragan2013generating} reports that observers
-may stop reasoning about the declared goals altogether once motion becomes
-strange enough, and may come to believe the robot is pursuing none of them,
-a belief its follow-up study measures directly. The observer used here cannot
-represent that belief, and Section~\ref{sec:limitations} says so.
+even when that carries it closer to a wall. It identifies the phenomenon and
+does not measure it.
 
-This section covers the founding formulation and the observer-aware planning
-line. It is not a survey of everything since, and no claim is made here about
-work outside those two.
+That is not to say the interaction goes unreported. Bastarache et al.
+\cite{bastarache2023legible} plan for legibility among moving agents and
+report minimum pairwise distance alongside it, together with minimum
+time-to-collision, which they use as a proxy for legibility and safety
+together. So the contribution here is not that safety appears beside
+legibility for the first time. It is narrower, and it is threefold: the safety
+quantity is satisfaction of a stated static constraint rather than proximity
+to a moving agent, it is bounded over all admissible trajectories rather than
+measured on the ones a planner produced, and the two together yield a price
+that is certified rather than compared.
+
+Lastly, \cite{dragan2013generating} reports that observers may stop reasoning
+about the declared goals altogether once motion becomes strange enough, and
+may come to believe the robot is pursuing none of them, a belief its follow-up
+study measures directly. The observer used here cannot represent that belief,
+and Section~\ref{sec:limitations} says so.
+
+This section covers the founding formulation, the observer-aware planning line,
+the state of continuous-setting planning, and the closest prior treatment of
+legibility beside safety. It is not a survey of everything since, and no claim
+is made here about learning-based or generative approaches, which are not
+engaged with.
 
 \section{Problem}
 \label{sec:problem}
