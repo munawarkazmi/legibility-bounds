@@ -9,6 +9,10 @@
 \usepackage{booktabs}
 \usepackage[hidelinks]{hyperref}
 
+% Every quantity quoted in prose is a macro written by
+% tools/build_paper_tables.py from the committed results.
+\input{generated/facts}
+
 \begin{document}
 
 \title{Certified Bounds on Achievable Legibility \\ under a Path Cost Budget}
@@ -71,8 +75,24 @@ joined by exact geodesics and scored by the same metric.
 \section{Results}
 \label{sec:results}
 
-Placeholder. The suite table and the certified price of safety go here, from
-\texttt{paper/generated/}, never typed.
+Placeholder prose, real numbers. Over \suiteWorlds{} worlds at
+\suiteCeilings{} cost ceilings, \suitePairs{} pairs in all, every bound holds:
+\suiteViolations{} violations. Table~\ref{tab:suite} gives both ends of each
+interval at lattice \suiteLattice{}. Gaps run from \suiteBestGap{} to
+\suiteWorstGap{}, the widest in \suiteWorstGapWorld{} at ceiling
+\suiteWorstGapCeiling{}, which has no obstacles at all.
+
+The lower end is constructed rather than searched for. Against a local search
+at \searchBudget{} evaluations the witness wins \witnessWins{} of the
+\suitePairs{} pairs, by up to \witnessBestMargin{}.
+
+Table~\ref{tab:safety} gives what a keep-out zone costs. Of \safetyPairs{}
+pairs, \safetyPriced{} certify a positive price, the largest
+\safetyLargestPrice{} in \safetyLargestWorld{} at ceiling
+\safetyLargestCeiling{}.
+
+\input{generated/suite}
+\input{generated/safety}
 
 \section{Limitations}
 \label{sec:limitations}

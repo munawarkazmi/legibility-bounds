@@ -613,10 +613,33 @@ noticing and caught it only by running `pdffonts`. As of 6 August 2026 the
 skeleton builds to one page with no undefined references and five fonts, all
 Type 1, embedded and subset.
 
-The document carries no number by hand. Every quantity is to come from
-`paper/generated/`, written by a tool from the committed results, so the paper
-cannot drift from the code. That tool does not exist yet and the sections are
-placeholders.
+The document carries no number by hand. `tools/build_paper_tables.py` writes
+everything under `paper/generated/` from the committed results: the suite
+table, the safety price table, and a file of macros for the quantities that
+appear in prose, so that a sentence quoting the worst gap writes
+`\suiteWorstGap` and cannot disagree with the record it came from. The
+Makefile rebuilds them whenever a results file is newer, so a paper cannot be
+built from a table older than the numbers it reports.
+
+Two refusals are built into that tool rather than left to care. It will not
+write anything if the records were produced against a different geometry from
+the one this repository is pinned to, because a paper built from a table
+describing another version of the world is wrong in a way proofreading cannot
+catch. And it will not write anything if the suite records any bound
+violation.
+
+As of 6 August 2026 the skeleton builds to two pages with no undefined
+references, seven fonts all Type 1 and embedded, and four font warnings. The
+warnings are all `OT1/ptm/m/scit`, the small caps italic that IEEEtran asks
+for and the Nimbus clone of Times does not carry. They are cosmetic and are
+recorded here so they are not rediscovered later.
+
+Two checks were wrong when first written and both would have been worse than
+having none. Searching the log for `undefined` also matches
+`Font shape ... undefined`, which is a benign substitution, so the check
+failed on a clean build; a check that cries wolf gets ignored and then misses
+the real thing. And counting `Font shape` counted 44 where only 4 were
+warnings, the rest being routine bold-extended substitution in Times.
 
 ## Decisions taken
 

@@ -1,0 +1,23 @@
+% Written by tools/build_paper_tables.py from the committed results.
+% Do not edit. Any change here is lost on the next build, and a number
+% typed by hand is a number that can disagree with the code.
+
+\begin{table}[t]
+\centering
+\caption{What respecting a keep-out zone certifiably costs. \emph{free} is a trajectory that exists within the budget and may cross a zone; \emph{safe bnd} is a bound no trajectory that avoids one can exceed. Where the first is larger, the difference is a certified lower bound on the price of the constraint.}
+\label{tab:safety}
+\begin{tabular}{lrrrr}
+\toprule
+world & $c$ & free & safe bnd & price \\
+\midrule
+\texttt{keep\_out\_shortcut} & 1.05 & 0.7870 & 0.7915 & \textemdash \\
+\texttt{keep\_out\_shortcut} & 1.10 & 0.8079 & 0.8013 & 0.0066 \\
+\texttt{keep\_out\_shortcut} & 1.25 & 0.8353 & 0.8235 & 0.0119 \\
+\texttt{keep\_out\_shortcut} & 1.50 & 0.8594 & 0.8661 & \textemdash \\
+\texttt{pillar\_aisle} & 1.05 & 0.8022 & 0.7632 & 0.0389 \\
+\texttt{pillar\_aisle} & 1.10 & 0.8208 & 0.8370 & \textemdash \\
+\texttt{pillar\_aisle} & 1.25 & 0.8456 & 0.8572 & \textemdash \\
+\texttt{pillar\_aisle} & 1.50 & 0.8682 & 0.8772 & \textemdash \\
+\bottomrule
+\end{tabular}
+\end{table}
