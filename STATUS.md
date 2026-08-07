@@ -716,6 +716,23 @@ That last one matters procedurally. It was carried into this project from the
 sibling repository's notes and was written into a draft here before it had
 been checked. It holds, but the order was wrong, and the log says so.
 
+## Two builds of the same paper, 6 August 2026
+
+RA-L is double-anonymous, so the submission build carries no author. A signed
+copy for circulation is a build option rather than an edit:
+
+    cd paper && make named        writes paper-named.pdf
+
+Nothing differs between them but the author block and the running head. It is
+done this way because a file that has to be edited by hand before submitting is
+a file that will eventually be submitted unedited, and a de-anonymisation is
+the kind of mistake that is caught by a desk reject rather than by a reviewer.
+
+The named build is checked rather than assumed: it contains "Munawar Kazmi" and
+zero occurrences of "Anonymous", and the anonymous build still contains the
+latter. `paper-named.*` is gitignored, since it is derived from the same source
+and is never the artefact of record.
+
 ## The README explains itself now, 6 August 2026
 
 Rewritten so a visitor understands the project before deciding whether to read

@@ -22,6 +22,9 @@ paper/*.out
 paper/*.run.xml
 paper/*.synctex.gz
 paper/paper.pdf
+# The signed circulation copy, built by `make named`. Derived from the same
+# source as the anonymous one and never the artefact of record.
+paper/paper-named.*
 # Raster previews of the figure, rendered to look at it during development.
 # The figure itself is committed; these are not.
 paper/generated/*.png

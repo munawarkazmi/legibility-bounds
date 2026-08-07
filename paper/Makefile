@@ -16,9 +16,18 @@ RESULTS = ../results/suite_bounds.json ../results/safety_price.json
 # binaries directly, so the build does not need a second environment.
 PYTHON = ../.venv/Scripts/python.exe
 
-.PHONY: all clean check tables
+.PHONY: all clean check tables named
 
 all: $(PAPER).pdf
+
+# A signed copy for circulation. Identical to the submission build except for
+# the author block, and written to its own name so the anonymous one is never
+# overwritten by it.
+named: $(GENERATED) $(FIGURES)
+	latexmk -pdf -halt-on-error -interaction=nonstopmode \
+	  -usepretex='\def\isnamed{1}' -jobname=$(PAPER)-named $(PAPER).tex
+	@echo '--- author block:'
+	@pdftotext -layout -f 1 -l 1 $(PAPER)-named.pdf - | sed -n '3,6p'
 
 # Regenerated whenever a results file is newer, so a paper cannot be built
 # from a table that is older than the numbers it claims to report.

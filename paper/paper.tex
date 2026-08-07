@@ -22,12 +22,24 @@
 
 \title{Certified Bounds on Achievable Legibility \\ under a Path Cost Budget}
 
-% Double-anonymous review. The author block is filled in for the final
-% version only.
-\author{Anonymous}
-
-\markboth{IEEE Robotics and Automation Letters. Preprint version.}%
-{Anonymous: Certified Bounds on Achievable Legibility}
+% RA-L is double-anonymous, so the submission build carries no author. A named
+% copy for circulation is a build option rather than an edit here, since a
+% file that has to be changed by hand before submitting is a file that will
+% eventually be submitted unchanged:
+%
+%     cd paper && make named        writes paper-named.pdf
+%
+% Nothing else differs between the two builds.
+\providecommand{\isnamed}{0}
+\ifnum\isnamed=1
+  \author{Munawar Kazmi}
+  \markboth{IEEE Robotics and Automation Letters. Preprint version.}%
+  {Kazmi: Certified Bounds on Achievable Legibility}
+\else
+  \author{Anonymous}
+  \markboth{IEEE Robotics and Automation Letters. Preprint version.}%
+  {Anonymous: Certified Bounds on Achievable Legibility}
+\fi
 
 \maketitle
 
