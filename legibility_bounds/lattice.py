@@ -29,13 +29,13 @@ precondition that can be checked:
     together than a cell, then a cell's free part is in one piece and meets
     at most one obstacle
 
-Under that precondition a path between two free points of a cell can be run
-inside the cell itself, going straight where it can and following the
-obstacle boundary where it cannot. Inside a disc of radius r that costs at
-most 2r of straight travel plus the boundary arc, and a convex arc inside a
-disc of radius r is no longer than its circumference, so
+Under that precondition the nearest point of the obstacle to the lattice
+point puts a whole free half plane through that lattice point, and a path
+from any free point of the cell to it can be run inside the cell: straight
+out of the obstacle's shadow, at most half way round the cell's circle, then
+straight in along the half plane's boundary. So
 
-    detour <= 2r + 2 pi r = 2 (1 + pi) r
+    detour <= 2r + pi r + r = (3 + pi) r
 
 The precondition is computed per scenario in `certifies_detour` and is
 reported rather than assumed. Where it fails, the detour is infinite and the
@@ -77,30 +77,49 @@ from .vendored import (
 # For the corner cells that remain, what has to be bounded is the geodesic
 # distance from a point of the cell to the lattice point at its centre, not
 # between two arbitrary points of the cell, and the centre being free is what
-# makes the argument short:
+# makes the argument short. Write K for the obstacle, p for the centre and r
+# for the cell radius.
 #
-#   from a point outside a convex body, the ray heading directly away from
-#   that body's nearest point never re-enters it. So the centre reaches the
-#   circle along such a ray in exactly r, and any other point of the cell
-#   reaches it in at most 2r, both staying inside the cell and outside the
-#   obstacle;
+# Let a be the nearest point of K to p, and w the unit vector from a to p. The
+# projection inequality for a closed convex set says every k in K satisfies
+# <k - a, p - a> <= 0, and therefore
 #
-#   and the free part of the circle is a single arc whenever the obstacle does
-#   not cross the cell, so the two arrival points are joined along it in at
-#   most its own length, 2 pi r.
+#     <k - p, w> = <k - a, w> - |p - a| <= -|p - a| < 0
 #
-#   so  D <= r + 2r + 2 pi r = (3 + 2 pi) r
+# So the whole closed half plane H = { y : <y - p, w> >= 0 } is free of the
+# obstacle, and p lies on its boundary line L. Everything below is that one
+# fact spent three ways:
 #
-# Two earlier versions were wrong. The first said 2(1 + pi) and was not a
-# bound at all, having counted one diameter of straight travel where the
+#   a point x of the cell lying in H reaches p along the segment xp, which
+#   stays in H because H is convex, so it is free and costs at most r;
+#
+#   a point x outside H leaves along the ray directly away from its own
+#   nearest point of K, which never re-enters K by the same inequality, and
+#   which leaves the cell within 2r because no chord beats the diameter. If
+#   that ray meets L first, the rest of the way to p runs along L and is free,
+#   for at most 2r + r;
+#
+#   and if the ray meets the circle first, it lands below L, where K meets the
+#   circle in a single arc whenever the obstacle does not cross the cell. One
+#   of the two directions along the circle therefore reaches an end of the
+#   diameter without crossing K, in at most pi r, and the segment from there
+#   to p runs along L and is free.
+#
+#   so  D <= 2r + pi r + r = (3 + pi) r
+#
+# Three earlier versions were wrong or loose. The first said 2(1 + pi) and was
+# not a bound at all, having counted one diameter of straight travel where the
 # construction needed two. The second said (4 + 2 pi) and was sound, but
 # bounded the distance between two arbitrary points of a cell, which is a
-# harder quantity than anything here needs.
+# harder quantity than anything here needs. The third said (3 + 2 pi), which
+# escaped to the circle and then allowed a full turn around it. The half plane
+# above is what makes a full turn unnecessary: it puts a free half circle in a
+# known place rather than a free ray, so half a turn always reaches L.
 #
 # `tests/test_lattice.py` samples real point pairs in real band cells,
 # targeting the corner cells where an obstacle can separate two points of one
 # cell at all, and reports the headroom rather than only passing.
-BAND_DETOUR_FACTOR = 3.0 + 2.0 * math.pi
+BAND_DETOUR_FACTOR = 3.0 + math.pi
 
 
 class LatticeError(ValueError):
