@@ -569,8 +569,14 @@ A measurement of slack says how much room there is in these worlds; it does not
 say how much of it a better argument could take. That is bounded from the other
 side, by exhibiting a configuration the constant must survive. Place a cell of
 unit radius with its lattice point free at the origin, and the obstacle
+% Stacked rather than set on one line: three coordinate pairs and two \quad
+% gaps overrun a two-column measure by eleven points, which reaches the margin
+% in print and is easy to miss on screen.
 \[
-  (-1.9001,\,-1.0448),\quad (0.8577,\,-0.5141),\quad (0.8763,\,0.4817),
+  \begin{aligned}
+    &(-1.9001,\,-1.0448),\quad (0.8577,\,-0.5141),\\
+    &(0.8763,\,0.4817),
+  \end{aligned}
 \]
 which is a single convex polygon that does not pass clean through the cell and
 so certifies the precondition of Section~\ref{sec:bound}. The point
