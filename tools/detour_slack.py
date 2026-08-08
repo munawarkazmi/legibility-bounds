@@ -4,21 +4,31 @@
 
 Cells near an obstacle are bounded through `D`, an upper bound on the geodesic
 distance from a point of the cell to its centre, and the argument gives
-`D <= (3 + 2 pi) r`. That is a worst case reached by a configuration nobody has
+`D <= (3 + pi) r`. That is a worst case reached by a configuration nobody has
 exhibited. This measures what the geometry actually does, by sampling real
-point pairs in real band cells and computing the true geodesic with the
-vendored implementation.
+points in real band cells and computing the true geodesic with the vendored
+implementation.
 
-The gap between the two is not a defect. A bound has to hold in the worst case
-and the worst case is rarely met. It is reported because it is the size of the
-prize: a sharper argument for the same cells would tighten every obstacle world
-in the suite by roughly the ratio recorded here, and nothing else on the list
-of remaining improvements is worth as much.
+Two quantities are measured, because they are not the same one and an earlier
+version of the constant was stated for the wrong one of them. To the centre is
+what the bound claims and what `belief_bound` and `reachable` rely on: the
+geodesic from a point of a cell to that cell's own lattice point. Between two
+points is the geodesic between two arbitrary points of the same cell, which is
+strictly harder and which nothing in the library needs. Only the first is
+compared against the constant. The second is recorded because it is easy to
+confuse with the first, and because it was once tested as though it were.
+
+The gap between claim and measurement is not a defect. A bound has to hold in
+the worst case and the worst case is rarely met. What the gap is worth is a
+separate question and is answered in `suite_bounds.json` rather than guessed at
+here: halving this constant closed 1.6 per cent of the suite's total interval
+width, because twenty of the thirty two pairs have no band weight at all and
+cannot move however tight it gets.
 
 Sampling deliberately targets cells beside obstacle corners. Under the
-precondition an obstacle is wider than a cell, so two points of one cell can
-only be separated by it where the segment between them clips a corner, and
-uniform sampling almost never lands there.
+precondition an obstacle is wider than a cell, so a point can only be separated
+from its own centre where the segment between them clips a corner, and uniform
+sampling almost never lands there.
 """
 
 from __future__ import annotations
@@ -62,36 +72,73 @@ def measure(scenario, observer, grid, cells, pairs, rng):
     chosen = band[np.argsort(to_corner)[:cells]]
 
     radius = built.cell_radius
-    worst = 0.0
-    worst_separated = 0.0
-    separated = 0
-    checked = 0
+    # The cell is the square of side `grid`. The cell radius is its half
+    # diagonal, so sampling offsets from the radius would cover a box 41 per
+    # cent wider than the cell in each direction and report a worst case at a
+    # corner no cell has. Results are still expressed in cell radii.
+    half = grid / 2.0
+    obstacles = scenario.obstacles
+
+    def free(q):
+        return not any(ob.contains_interior(q) for ob in obstacles)
+
+    worst_centre = 0.0
+    worst_centre_separated = 0.0
+    centre_separated = 0
+    points_checked = 0
+
+    worst_pair = 0.0
+    worst_pair_separated = 0.0
+    pair_separated = 0
+    pairs_checked = 0
+
     for row, col in chosen:
         cx = float(built.x[row, col])
         cy = float(built.y[row, col])
+        centre = (cx, cy)
+        if not free(centre):
+            continue
         for _ in range(pairs):
-            offsets = [float(v) for v in rng.uniform(-radius, radius, size=4)]
+            offsets = [float(v) for v in rng.uniform(-half, half, size=4)]
             a = (cx + offsets[0], cy + offsets[1])
             b = (cx + offsets[2], cy + offsets[3])
-            if any(ob.contains_interior(a) or ob.contains_interior(b)
-                   for ob in scenario.obstacles):
+            if not free(a):
                 continue
-            measured = vendored.geodesic_cost(a, b, scenario.obstacles)
-            checked += 1
-            worst = max(worst, measured / radius)
+
+            # What the constant actually claims.
+            to_centre = vendored.geodesic_cost(a, centre, obstacles)
+            points_checked += 1
+            worst_centre = max(worst_centre, to_centre / radius)
+            direct = math.hypot(a[0] - cx, a[1] - cy)
+            if to_centre > direct + 1e-9:
+                centre_separated += 1
+                worst_centre_separated = max(
+                    worst_centre_separated, to_centre / radius
+                )
+
+            # The harder quantity, recorded but not compared.
+            if not free(b):
+                continue
+            measured = vendored.geodesic_cost(a, b, obstacles)
+            pairs_checked += 1
+            worst_pair = max(worst_pair, measured / radius)
             straight = math.hypot(a[0] - b[0], a[1] - b[1])
             if measured > straight + 1e-9:
-                separated += 1
-                worst_separated = max(worst_separated, measured / radius)
+                pair_separated += 1
+                worst_pair_separated = max(worst_pair_separated, measured / radius)
     return {
         "scenario": scenario.id,
         "grid": grid,
         "cell_radius": radius,
         "band_cells": int((built.near_obstacle & built.usable).sum()),
-        "pairs_checked": checked,
-        "pairs_separated_by_the_obstacle": separated,
-        "worst_detour_in_cell_radii": worst,
-        "worst_separated_detour_in_cell_radii": worst_separated,
+        "points_checked": points_checked,
+        "points_separated_from_their_centre": centre_separated,
+        "worst_to_centre_in_cell_radii": worst_centre,
+        "worst_separated_to_centre_in_cell_radii": worst_centre_separated,
+        "pairs_checked": pairs_checked,
+        "pairs_separated_by_the_obstacle": pair_separated,
+        "worst_pair_in_cell_radii": worst_pair,
+        "worst_separated_pair_in_cell_radii": worst_pair_separated,
     }
 
 
@@ -112,8 +159,11 @@ def main(argv=None) -> int:
     claimed = lattice_module.BAND_DETOUR_FACTOR
 
     print(f"geometry: legible-motion-bench at {vendored.PINNED_COMMIT[:7]}")
-    print(f"claimed:  D <= {claimed:.4f} cell radii\n")
-    print(f"{'world':<20}{'worst':>8}{'separated':>11}{'pairs':>8}{'ratio':>8}")
+    print(f"claimed:  D <= {claimed:.4f} cell radii, point to its own centre\n")
+    print(
+        f"{'world':<20}{'to centre':>10}{'separated':>11}{'points':>8}"
+        f"{'ratio':>8}{'pair':>8}"
+    )
 
     rows = []
     for name in [n.strip() for n in args.scenarios.split(",") if n.strip()]:
@@ -124,23 +174,28 @@ def main(argv=None) -> int:
         if found is None:
             continue
         found["claimed_in_cell_radii"] = claimed
-        found["looseness_ratio"] = claimed / max(found["worst_detour_in_cell_radii"], 1e-9)
+        found["looseness_ratio"] = claimed / max(
+            found["worst_to_centre_in_cell_radii"], 1e-9
+        )
         rows.append(found)
         print(
-            f"{name:<20}{found['worst_detour_in_cell_radii']:>8.3f}"
-            f"{found['pairs_separated_by_the_obstacle']:>11}"
-            f"{found['pairs_checked']:>8}"
-            f"{found['looseness_ratio']:>8.2f}",
+            f"{name:<20}{found['worst_to_centre_in_cell_radii']:>10.3f}"
+            f"{found['points_separated_from_their_centre']:>11}"
+            f"{found['points_checked']:>8}"
+            f"{found['looseness_ratio']:>8.2f}"
+            f"{found['worst_pair_in_cell_radii']:>8.3f}",
             flush=True,
         )
 
-    worst = max(r["worst_detour_in_cell_radii"] for r in rows)
+    worst = max(r["worst_to_centre_in_cell_radii"] for r in rows)
+    worst_pair = max(r["worst_pair_in_cell_radii"] for r in rows)
     record = {
         "geometry_commit": vendored.PINNED_COMMIT,
         "observer": observer.name,
         "grid": args.grid,
         "claimed_in_cell_radii": claimed,
         "worst_measured_in_cell_radii": worst,
+        "worst_pair_in_cell_radii": worst_pair,
         "looseness_ratio": claimed / worst,
         "rows": rows,
     }
@@ -149,8 +204,12 @@ def main(argv=None) -> int:
     output.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
 
     print(
-        f"\nworst measured anywhere: {worst:.3f} cell radii against a claimed "
+        f"\nworst to its own centre: {worst:.3f} cell radii against a claimed "
         f"{claimed:.3f}, a factor of {claimed / worst:.2f}"
+    )
+    print(
+        f"worst between two points of one cell: {worst_pair:.3f} cell radii, "
+        f"which the constant does not claim and nothing here needs"
     )
     print(f"written to {output}")
     return 0

@@ -545,14 +545,24 @@ Table~\ref{tab:suite} are conservative by roughly that margin.
 \input{generated/refinement}
 
 What remains after refining is concentrated in the worlds with obstacles, and
-the reason is the constant of Section~\ref{sec:bound}. The argument gives
-$D \le (3 + 2\pi)\,r \approx \detourClaimed{}\,r$, a worst case no
-configuration has been exhibited for. Sampling real point pairs in real cells
-beside obstacle corners finds a worst detour of \detourMeasured{}$\,r$, so the
-constant is loose by a factor of about \detourRatio{}. A bound must hold in the
-worst case and the worst case is rarely met, so this is not an error. It is the
-size of the prize: a sharper argument for those cells would tighten every
-obstacle world, and it is the highest-leverage improvement outstanding.
+part of the reason is the constant of Section~\ref{sec:bound}. The argument
+gives $D \le (3 + \pi)\,r \approx \detourClaimed{}\,r$, a worst case no
+configuration has been exhibited for. Sampling real points in real cells beside
+obstacle corners, measured to each point's own lattice point, finds a worst
+detour of \detourMeasured{}$\,r$, so the constant is loose by a factor of about
+\detourRatio{}. A bound must hold in the worst case and the worst case is
+rarely met, so this is not an error.
+
+It is, however, worth less than it appears. Halving the constant from
+$(3 + 2\pi)$ to $(3 + \pi)$ closed 1.6 per cent of the suite's total interval
+width, because twenty of the thirty two pairs draw no weight from the band and
+cannot move however tight it becomes, while refinement closes 55 to 79 per
+cent. Measured to each point's own lattice point rather than between two
+arbitrary points of a cell, and over the cell rather than over a box of the
+cell's diagonal, no sampled point in any world tested here is separated from
+its lattice point at all, so the wrapping argument is never binding in this
+suite. Where the residual width in obstacle worlds actually lives is therefore
+not settled, and a sharper constant is not the answer to it.
 
 \section{Conclusion}
 \label{sec:conclusion}

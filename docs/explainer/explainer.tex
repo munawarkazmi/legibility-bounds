@@ -200,13 +200,17 @@ One suspected cause was ruled out by testing rather than argument: a deliberatel
 
 Most of the remaining width comes from the resolution of the grid the room is divided into. Refining that grid closes between 55 and 79 per cent of the gap, which means the published numbers are conservative by roughly that margin.
 
-What survives even that is a single constant in the obstacle argument. The proof guarantees a detour of no more than about 9.28 cell-widths near a corner; measuring actual point pairs beside actual corners finds the worst real detour is 2.53. So the constant is loose by a factor of about 3.7.
+What survives even that is a single constant in the obstacle argument. The proof guarantees a detour of no more than about 6.14 cell-widths near a corner; measuring actual points beside actual corners, each to its own grid point, finds the worst real detour is 0.99. So the constant is loose by a factor of about 6.2.
 
 \begin{quotebox}
-That is not an error, because a proof must hold in the worst case and the worst case is rarely met. The repository names it as the single highest-leverage improvement outstanding: a sharper argument for those cells is where the next gain lives.
+That is not an error, because a proof must hold in the worst case and the worst case is rarely met. What it is not is the prize this section used to call it.
 \end{quotebox}
 
-Publishing the location of your own weakest step, with a measurement of how weak it is, is unusual. It is also the reason the rest of the numbers can be taken at face value.
+An earlier version of this page said something stronger and less true, so it is worth setting out what changed. The constant used to be about 9.28, and a sharper argument brought it to 6.14. That was expected to matter and it did not. It closed 1.6 per cent of the total width, because most of the rooms draw nothing from the obstacle argument at all and cannot move however tight it becomes. Refining the grid, at 55 to 79 per cent, is worth some forty times as much.
+
+The looseness was also being measured in a way that flattered the constant. It compared two arbitrary points of a cell, which is a harder distance than the proof ever claims, and it drew those points from a box wider than the cell itself. Measured correctly, no sampled point in any room tested is cut off from its own grid point at all, and the detour argument never actually binds.
+
+Publishing the location of your own weakest step, with a measurement of how weak it is, is unusual. Publishing that the step you named as weakest was not the one that mattered, and that you had been measuring it against the wrong quantity, is the same discipline turned on itself. It is the reason the rest of the numbers can be taken at face value.
 
 \section{What is not true}
 

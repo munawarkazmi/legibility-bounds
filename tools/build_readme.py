@@ -174,15 +174,31 @@ def refinement_block(refine: dict) -> str:
 
 def slack_block(slack: dict) -> str:
     return (
-        f"The argument gives `D <= (3 + 2pi) r`, about "
-        f"{slack['claimed_in_cell_radii']:.2f} cell radii. Sampling real point "
-        f"pairs in real cells beside obstacle corners finds a worst detour of "
+        f"The argument gives `D <= (3 + pi) r`, about "
+        f"{slack['claimed_in_cell_radii']:.2f} cell radii. Sampling real points "
+        f"in real cells beside obstacle corners, and measuring to each point's "
+        f"own lattice point, which is the quantity the bound actually uses, "
+        f"finds a worst detour of "
         f"{slack['worst_measured_in_cell_radii']:.2f}, so the constant is "
         f"loose by a factor of about {slack['looseness_ratio']:.1f}. A bound "
         f"must hold in the worst case and the worst case is rarely met, so "
-        f"this is not an error. It is the size of the prize: a sharper "
-        f"argument for those cells is the highest-leverage improvement "
-        f"outstanding."
+        f"this is not an error.\n\n"
+        f"It is also not the prize it was once described as here. Halving this "
+        f"constant, from `(3 + 2pi)` to `(3 + pi)`, closed 1.6 per cent of the "
+        f"suite's total interval width: twenty of the thirty two pairs have no "
+        f"band weight at all and cannot move however tight it becomes. "
+        f"Refining the lattice, which closes 55 to 79 per cent, is worth "
+        f"roughly forty times as much. An earlier version of this file called a "
+        f"sharper constant the highest-leverage improvement outstanding, which "
+        f"the measurement does not support.\n\n"
+        f"Two further corrections went with it. The looseness used to be "
+        f"reported as a factor of 3.7, measured between two arbitrary points of "
+        f"a cell rather than from a point to its own centre. That is a harder "
+        f"quantity than the bound claims, and using it flattered the constant. "
+        f"The sampling also drew offsets from the cell radius, which is the "
+        f"half diagonal, and so covered a box wider than the cell. Corrected "
+        f"for both, no sampled point in any tested world is separated from its "
+        f"own lattice point at all, and the wrapping argument is never needed."
     )
 
 

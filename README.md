@@ -29,7 +29,7 @@ for contrast.
 >
 > One attaining **0.8004** exists.
 
-The shortest path there scores 0.5457, so the budget does buy clarity. The two ends are 0.0065 apart, so any threshold outside that band is decided: above it, unreachable; at or below the achieved value, reached.
+The shortest path there scores 0.5457, so the budget does buy clarity. The two ends are 0.0064 apart, so any threshold outside that band is decided: above it, unreachable; at or below the achieved value, reached.
 <!-- /generated:example -->
 
 The first half of that is the part no search can give you. It is negative, and
@@ -86,14 +86,14 @@ Against the vendored local search at 500 evaluations, the witness produces the b
 <!-- generated:suite -->
 | world | obstacles | c | achieved | bound | widest gap | narrowest gap |
 | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
-| `door_pair` | yes | 1.50 | 0.8507 | 0.8777 | **0.0270** | 0.0067 |
+| `door_pair` | yes | 1.50 | 0.8507 | 0.8776 | **0.0269** | 0.0066 |
 | `fan_middle` | no | 1.25 | 0.4343 | 0.4909 | **0.0567** | 0.0144 |
 | `fan_outer` | no | 1.10 | 0.6410 | 0.6692 | **0.0282** | 0.0162 |
 | `keep_out_shortcut` | no | 1.05 | 0.7870 | 0.8068 | **0.0198** | 0.0067 |
-| `narrow_gap` | yes | 1.50 | 0.7584 | 0.8047 | **0.0462** | 0.0275 |
+| `narrow_gap` | yes | 1.50 | 0.7584 | 0.8041 | **0.0456** | 0.0268 |
 | `open_pair` | no | 1.05 | 0.7870 | 0.8068 | **0.0198** | 0.0067 |
 | `pillar_aisle` | yes | 1.05 | 0.8022 | 0.8205 | **0.0184** | 0.0071 |
-| `wall_choice` | yes | 1.10 | 0.5787 | 0.5931 | **0.0144** | 0.0065 |
+| `wall_choice` | yes | 1.10 | 0.5787 | 0.5915 | **0.0128** | 0.0064 |
 
 All 32 world and ceiling pairs, 0 violations. Each row is the world at the ceiling where its interval is widest, with its narrowest gap over all 4 ceilings alongside. Lattice 0.0125, search budget 500.
 <!-- /generated:suite -->
@@ -156,7 +156,11 @@ Refining from 0.05 to 0.00625 closes between 55 and 79 per cent of the gap, so t
 **And what survives that is the obstacle constant.**
 
 <!-- generated:slack -->
-The argument gives `D <= (3 + 2pi) r`, about 9.28 cell radii. Sampling real point pairs in real cells beside obstacle corners finds a worst detour of 2.53, so the constant is loose by a factor of about 3.7. A bound must hold in the worst case and the worst case is rarely met, so this is not an error. It is the size of the prize: a sharper argument for those cells is the highest-leverage improvement outstanding.
+The argument gives `D <= (3 + pi) r`, about 6.14 cell radii. Sampling real points in real cells beside obstacle corners, and measuring to each point's own lattice point, which is the quantity the bound actually uses, finds a worst detour of 0.99, so the constant is loose by a factor of about 6.2. A bound must hold in the worst case and the worst case is rarely met, so this is not an error.
+
+It is also not the prize it was once described as here. Halving this constant, from `(3 + 2pi)` to `(3 + pi)`, closed 1.6 per cent of the suite's total interval width: twenty of the thirty two pairs have no band weight at all and cannot move however tight it becomes. Refining the lattice, which closes 55 to 79 per cent, is worth roughly forty times as much. An earlier version of this file called a sharper constant the highest-leverage improvement outstanding, which the measurement does not support.
+
+Two further corrections went with it. The looseness used to be reported as a factor of 3.7, measured between two arbitrary points of a cell rather than from a point to its own centre. That is a harder quantity than the bound claims, and using it flattered the constant. The sampling also drew offsets from the cell radius, which is the half diagonal, and so covered a box wider than the cell. Corrected for both, no sampled point in any tested world is separated from its own lattice point at all, and the wrapping argument is never needed.
 <!-- /generated:slack -->
 
 ---

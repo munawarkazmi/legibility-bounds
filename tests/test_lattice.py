@@ -100,23 +100,38 @@ def test_the_belief_bound_is_above_the_belief_and_is_a_probability(walled):
         assert (bound[band] < 1.0).any()
 
 
-@pytest.mark.parametrize(
-    "name", ["wall_choice", "narrow_gap", "pillar_aisle", "door_pair"]
-)
-def test_the_detour_bound_holds_against_real_geodesics(name):
+def _detours_to_centre(name):
     """The geometric claim the band bound rests on, checked rather than argued.
 
-    The claim is that two free points of the same cell are no further apart
-    geodesically than (4 + 2 pi) times the cell radius, given that no obstacle
-    is thinner than a cell and no two obstacles are closer together than one.
-    This samples point pairs inside real band cells and measures the true
-    geodesic with the vendored implementation.
+    The claim is that a free point of a cell is no further from that cell's own
+    lattice point, geodesically, than (3 + pi) times the cell radius, given that
+    no obstacle is thinner than a cell and no two obstacles are closer together
+    than one. That is the quantity `belief_bound` and `reachable` use, since
+    both read a value at the lattice point and relax it to cover the cell.
 
-    The first version of the constant was 24 per cent smaller, derived by
-    counting one diameter of straight travel where the construction needs two.
-    It passed on one world with a single seed, which is why this now runs over
-    four worlds and reports the headroom: a test that only says "passed" would
-    not have distinguished a sound constant from a lucky one.
+    The geodesic between two arbitrary points of a cell is a different and
+    harder quantity, and nothing in the library needs it. This measures it too,
+    and reports it, but does not assert the constant against it. An earlier
+    version of this test did assert it, which passed only because the constant
+    was loose enough to absorb the difference: it was checking a claim the
+    argument had stopped making.
+
+    The first version of the constant was 24 per cent smaller than the version
+    that replaced it, derived by counting one diameter of straight travel where
+    the construction needed two. It passed on one world with a single seed,
+    which is why this now runs over four worlds and reports the headroom: a
+    test that only says "passed" would not have distinguished a sound constant
+    from a lucky one.
+
+    This does not require that the obstacle separate anything in every world,
+    because it does not. Measured at this lattice, `wall_choice`, `narrow_gap`
+    and `pillar_aisle` produce no separated point at all in several thousand
+    samples each: their obstacles are wider than a cell everywhere, including
+    at the corners, so nothing can sit between a point and the centre of its
+    own cell, and the true detour there is simply the cell radius. Only
+    `door_pair` has a feature thin enough to separate. The non-trivial case is
+    therefore asserted separately, in the test below, rather than demanded here
+    of worlds whose geometry cannot supply it.
     """
     scenario = vendored.scenario(name)
     observer = vendored.Observer(condition="geodesic")
@@ -127,6 +142,7 @@ def test_the_detour_bound_holds_against_real_geodesics(name):
 
     rng = np.random.default_rng(19)
     radius = built.cell_radius
+    half = built.grid / 2.0
 
     # Cells beside an obstacle corner, and a random spread of the rest.
     #
@@ -148,45 +164,100 @@ def test_the_detour_bound_holds_against_real_geodesics(name):
     spread = band[rng.choice(len(band), size=min(20, len(band)), replace=False)]
     sampled = np.concatenate([beside_a_corner, spread])
 
+    def free(q):
+        return not any(ob.contains_interior(q) for ob in scenario.obstacles)
+
     checked = 0
     detoured = 0
     worst = 0.0
     worst_detoured = 0.0
+    worst_pair = 0.0
     for row, col in sampled:
         cx, cy = float(built.x[row, col]), float(built.y[row, col])
+        centre = (cx, cy)
+        if not free(centre):
+            continue
         for _ in range(20):
-            offsets = [float(v) for v in rng.uniform(-radius, radius, size=4)]
+            # Over the cell itself, which is the square of side `grid`, not the
+            # square of side twice the cell radius. The cell radius is the half
+            # diagonal, so drawing offsets from it samples a box 41 per cent
+            # wider than the cell in each direction. That is still sound, being
+            # a superset, but it puts the worst reported figure at the corner of
+            # a box no cell has, and that figure is what the looseness ratio in
+            # the README is computed from.
+            offsets = [float(v) for v in rng.uniform(-half, half, size=4)]
             a = (cx + offsets[0], cy + offsets[1])
             b = (cx + offsets[2], cy + offsets[3])
-            if any(ob.contains_interior(a) or ob.contains_interior(b)
-                   for ob in scenario.obstacles):
+            if not free(a):
                 continue
-            measured = vendored.geodesic_cost(a, b, scenario.obstacles)
+            measured = vendored.geodesic_cost(a, centre, scenario.obstacles)
             worst = max(worst, measured / radius)
             assert measured <= built.band_detour + 1e-9, (
-                f"{name}: geodesic {measured:.4f} between {a} and {b} exceeds "
-                f"the claimed detour bound {built.band_detour:.4f}"
+                f"{name}: geodesic {measured:.4f} from {a} to its own lattice "
+                f"point {centre} exceeds the claimed detour bound "
+                f"{built.band_detour:.4f}"
             )
             checked += 1
-            # A pair whose straight line is already free tells us nothing
-            # about a bound that exists for pairs the obstacle separates.
-            straight = math.hypot(a[0] - b[0], a[1] - b[1])
-            if measured > straight + 1e-9:
+            # A point whose straight line to the centre is already free tells
+            # us nothing about a bound that exists for the ones it is not.
+            direct = math.hypot(a[0] - cx, a[1] - cy)
+            if measured > direct + 1e-9:
                 detoured += 1
                 worst_detoured = max(worst_detoured, measured / radius)
+            if free(b):
+                worst_pair = max(
+                    worst_pair,
+                    vendored.geodesic_cost(a, b, scenario.obstacles) / radius,
+                )
 
-    assert checked > 100, f"{name}: only {checked} pairs were actually testable"
-    assert detoured > 0, (
-        f"{name}: not one sampled pair was separated by the obstacle, so this "
-        f"test never exercised the case the bound exists for"
-    )
+    assert checked > 100, f"{name}: only {checked} points were actually testable"
     # Recorded so a future change to the constant can be judged against what
     # the geometry actually does rather than against whether the test passed.
+    # The pair figure is reported and deliberately not asserted: see above.
     print(
-        f"\n{name}: worst detour {worst:.3f} cell radii overall and "
-        f"{worst_detoured:.3f} among the {detoured} pairs the obstacle "
+        f"\n{name}: worst detour to centre {worst:.3f} cell radii overall and "
+        f"{worst_detoured:.3f} among the {detoured} points the obstacle "
         f"separated, against a claimed {lattice_module.BAND_DETOUR_FACTOR:.3f}, "
-        f"over {checked} pairs"
+        f"over {checked} points. Worst between two points of one cell "
+        f"{worst_pair:.3f}, not claimed."
+    )
+    return {"checked": checked, "detoured": detoured, "worst": worst}
+
+
+@pytest.mark.parametrize(
+    "name", ["wall_choice", "narrow_gap", "pillar_aisle", "door_pair"]
+)
+def test_the_detour_bound_holds_against_real_geodesics(name):
+    """No sampled point of any cell exceeds the constant, in four worlds."""
+    _detours_to_centre(name)
+
+
+def test_the_detour_bound_is_exercised_where_an_obstacle_can_separate():
+    """The bound's non-trivial case, kept under test rather than assumed.
+
+    Three of the four worlds above cannot separate a point from the centre of
+    its own cell, so a bound that only ever ran on them would be checked
+    against nothing: the straight segment is free and the detour is the cell
+    radius, whatever constant is written down.
+
+    `door_pair` can, because one of its features is thin enough near a corner
+    for a point of a cell to sit beyond it. This pins that, so a future change
+    to the geometry, the lattice or the cell selection that quietly stops
+    exercising the wrapping case fails here instead of passing everywhere.
+
+    Worth stating plainly, because it bears on how much the constant is worth:
+    even here the detour stays under one cell radius. Points do go round the
+    obstacle rather than through it, but they are close enough to their own
+    lattice point that the way round is still shorter than the radius. So at
+    this lattice no world in the suite needs the wrapping argument at all, and
+    the constant is slack of roughly six times over rather than the four the
+    pair measurement used to suggest. That is a reason to doubt the constant is
+    the place to spend effort, not a reason to weaken this test.
+    """
+    found = _detours_to_centre("door_pair")
+    assert found["detoured"] > 0, (
+        "door_pair no longer separates any sampled point from its own centre, "
+        "so the wrapping case is now untested in every world"
     )
 
 
