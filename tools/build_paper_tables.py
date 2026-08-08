@@ -266,6 +266,7 @@ def facts(
     safety_ceiling: float = 1.25,
     refinement: dict | None = None,
     slack: dict | None = None,
+    lower: dict | None = None,
 ) -> str:
     """Macros for the numbers that appear in prose rather than in a table."""
     rows = suite["rows"]
@@ -390,6 +391,19 @@ def facts(
             "detourRatio": f"{slack['looseness_ratio']:.1f}",
         })
 
+    if lower is not None:
+        if not lower["cell_certifies_the_precondition"]:
+            raise RecordError(
+                "detour_lower_bound.json records a configuration whose cell "
+                "does not certify the precondition. Such a configuration "
+                "bounds nothing, and no paper is built from it."
+            )
+        values.update({
+            "detourLowerBound": f"{lower['geodesic_in_cell_radii']:.2f}",
+            "detourRecoverable": f"{lower['recoverable_ratio']:.2f}",
+            "detourLowerWidth": f"{lower['obstacle_minimum_width']:.2f}",
+        })
+
     if priced:
         largest = max(priced, key=lambda r: r["certified_price"])
         values["safetyLargestPrice"] = _number(largest["certified_price"])
@@ -416,6 +430,7 @@ def main(argv=None) -> int:
     safety = _load("safety_price.json")
     refinement = _load("refinement.json")
     slack = _load("detour_slack.json")
+    lower = _load("detour_lower_bound.json")
 
     if suite["violations"]:
         raise RecordError(
@@ -437,6 +452,7 @@ def main(argv=None) -> int:
         "facts.tex": facts(
             suite, safety, args.example_scenario, args.example_ceiling,
             args.safety_scenario, args.safety_ceiling, refinement, slack,
+            lower,
         ),
     }
     for name, text in written.items():

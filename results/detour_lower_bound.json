@@ -1,0 +1,36 @@
+{
+  "geometry_commit": "a376ab28ce6cccc7a5af75fe64c06e60dd197db6",
+  "cell_radius": 1.0,
+  "lattice_point": [
+    0.0,
+    0.0
+  ],
+  "point": [
+    -0.6055,
+    -0.7958
+  ],
+  "obstacle": [
+    [
+      -1.9001,
+      -1.0448
+    ],
+    [
+      0.8577,
+      -0.5141
+    ],
+    [
+      0.8763,
+      0.4817
+    ]
+  ],
+  "cell_certifies_the_precondition": true,
+  "lattice_point_is_free": true,
+  "point_is_free": true,
+  "point_is_within_the_cell": true,
+  "distance_from_the_lattice_point": 0.999963944349995,
+  "obstacle_minimum_width": 0.8636434597659778,
+  "obstacle_is_thinner_than_the_cell": true,
+  "geodesic_in_cell_radii": 3.4860121601287224,
+  "claimed_in_cell_radii": 6.141592653589793,
+  "recoverable_ratio": 1.7617817642274123
+}

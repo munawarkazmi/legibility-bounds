@@ -553,16 +553,46 @@ detour of \detourMeasured{}$\,r$, so the constant is loose by a factor of about
 \detourRatio{}. A bound must hold in the worst case and the worst case is
 rarely met, so this is not an error.
 
-It is, however, worth less than it appears. Halving the constant from
-$(3 + 2\pi)$ to $(3 + \pi)$ closed 1.6 per cent of the suite's total interval
-width, because twenty of the thirty two pairs draw no weight from the band and
-cannot move however tight it becomes, while refinement closes 55 to 79 per
-cent. Measured to each point's own lattice point rather than between two
-arbitrary points of a cell, and over the cell rather than over a box of the
-cell's diagonal, no sampled point in any world tested here is separated from
-its lattice point at all, so the wrapping argument is never binding in this
-suite. Where the residual width in obstacle worlds actually lives is therefore
-not settled, and a sharper constant is not the answer to it.
+It is, however, worth less than it appears, for two separate reasons.
+
+The first is that the constant barely moves the intervals. Halving it from
+$(3 + 2\pi)$ to $(3 + \pi)$ closed 1.6 per cent of the suite's total width,
+because twenty of the thirty two pairs draw no weight from the band and cannot
+move however tight it becomes, while refinement closes 55 to 79 per cent.
+Measured to each point's own lattice point rather than between two arbitrary
+points of a cell, and over the cell rather than over a box of the cell's
+diagonal, no sampled point in any world tested here is separated from its
+lattice point at all, so the wrapping argument is never binding in this suite.
+
+The second is that most of the remaining looseness is not available to anyone.
+A measurement of slack says how much room there is in these worlds; it does not
+say how much of it a better argument could take. That is bounded from the other
+side, by exhibiting a configuration the constant must survive. Place a cell of
+unit radius with its lattice point free at the origin, and the obstacle
+\[
+  (-1.9001,\,-1.0448),\quad (0.8577,\,-0.5141),\quad (0.8763,\,0.4817),
+\]
+which is a single convex polygon that does not pass clean through the cell and
+so certifies the precondition of Section~\ref{sec:bound}. The point
+$(-0.6055,\,-0.7958)$ lies in the cell and outside the obstacle, and its exact
+geodesic distance to the lattice point is \detourLowerBound{} cell radii. No
+constant below that can hold. The whole of the improvement available to any
+sharper argument is therefore a factor of \detourRecoverable{}, and the
+remaining looseness against \detourMeasured{} is a property of the scenarios
+rather than of the proof.
+
+Two things about that configuration are worth stating, because both are easy to
+read past. Its obstacle has minimum width \detourLowerWidth{} cell radii and is
+thinner than the cell, so it would fail the global width test discussed in
+Section~\ref{sec:bound} and passes the per-cell test that replaced it. It
+bounds the constant that is actually in force rather than the one an earlier
+version assumed. And it is close to the boundary of admissibility: the
+supremum is approached as the obstacle nears the lattice point and is not
+attained, so \detourLowerBound{} is a lower bound on the sharp constant and not
+the sharp constant itself, which is not determined here.
+
+Where the residual width in obstacle worlds lives is therefore still open, and
+a sharper constant is not the answer to it.
 
 \section{Conclusion}
 \label{sec:conclusion}

@@ -261,6 +261,60 @@ def test_the_detour_bound_is_exercised_where_an_obstacle_can_separate():
     )
 
 
+def test_no_constant_below_the_exhibited_configuration_can_hold():
+    """The lower bound the paper's limitations section rests on.
+
+    Slack measured against the suite says how much room there is in these
+    worlds. It does not say how much of it a sharper argument could take, and
+    the two are very different: most of the measured looseness is a property of
+    the scenarios rather than of the proof. What bounds the argument is a
+    configuration the constant has to survive, and this is one.
+
+    It is deliberately not a world from the suite. The obstacle is thinner than
+    a cell, so it would fail the global width test that `cells_certified`
+    replaced, and it passes the per-cell test that is actually in force. That is
+    the point: it bounds the constant being used rather than the one an earlier
+    version of the argument assumed.
+
+    `tools/detour_lower_bound.py` writes the same numbers to results. This is
+    here so that a change to the certification rule, the geometry, or the
+    constant cannot quietly invalidate a published claim without a test saying
+    so.
+    """
+    radius = 1.0
+    lattice_point = (0.0, 0.0)
+    point = (-0.6055, -0.7958)
+    obstacle = vendored.ConvexPolygon(
+        id="lower_bound",
+        vertices=((-1.9001, -1.0448), (0.8577, -0.5141), (0.8763, 0.4817)),
+    )
+
+    px, py = np.array([[lattice_point[0]]]), np.array([[lattice_point[1]]])
+    assert lattice_module.cells_certified(px, py, [obstacle], radius)[0, 0], (
+        "the exhibited configuration no longer certifies the precondition, so "
+        "it bounds nothing and the paper's limitations section is wrong"
+    )
+    assert not obstacle.contains_interior(lattice_point)
+    assert not obstacle.contains_interior(point)
+    assert math.hypot(*point) <= radius + 1e-9, "the point must lie in the cell"
+
+    measured = vendored.geodesic_cost(point, lattice_point, [obstacle]) / radius
+    assert measured > 3.4, (
+        f"the exhibited configuration now reaches only {measured:.4f} cell "
+        f"radii, so the stated lower bound no longer holds"
+    )
+    assert measured < lattice_module.BAND_DETOUR_FACTOR, (
+        f"the geodesic {measured:.4f} exceeds the claimed bound "
+        f"{lattice_module.BAND_DETOUR_FACTOR:.4f}. That is a violation of the "
+        f"bound itself, not a lower bound on it"
+    )
+    assert lattice_module.minimum_width(obstacle) < 2.0 * radius, (
+        "this configuration is supposed to be one the withdrawn global width "
+        "test would have excluded; if it is no longer thinner than a cell it "
+        "no longer makes that point"
+    )
+
+
 def test_a_lattice_too_coarse_for_its_obstacles_refuses_to_certify(walled):
     """A cell an obstacle passes clean through must say so rather than claim it."""
     scenario, observer, fine = walled
