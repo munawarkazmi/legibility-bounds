@@ -172,7 +172,13 @@ def refinement_block(refine: dict) -> str:
     )
 
 
-def slack_block(slack: dict) -> str:
+def slack_block(slack: dict, lower: dict) -> str:
+    if not lower["cell_certifies_the_precondition"]:
+        raise SystemExit(
+            "detour_lower_bound.json records a configuration whose cell does "
+            "not certify the precondition. It bounds nothing, and no README "
+            "is built from it."
+        )
     return (
         f"The argument gives `D <= (3 + pi) r`, about "
         f"{slack['claimed_in_cell_radii']:.2f} cell radii. Sampling real points "
@@ -199,6 +205,32 @@ def slack_block(slack: dict) -> str:
         f"half diagonal, and so covered a box wider than the cell. Corrected "
         f"for both, no sampled point in any tested world is separated from its "
         f"own lattice point at all, and the wrapping argument is never needed."
+        f"\n\n"
+        f"Most of that looseness is not available to anyone, which is a "
+        f"different claim and needs a different kind of evidence. Slack "
+        f"measured against these worlds says how much room there is here. It "
+        f"does not say how much a sharper argument could take. That is bounded "
+        f"by exhibiting a configuration the constant has to survive: a unit "
+        f"cell with a free lattice point at the origin, one convex obstacle, "
+        f"and a point of the cell whose exact geodesic distance to its own "
+        f"lattice point is "
+        f"{lower['geodesic_in_cell_radii']:.2f} cell radii. No constant below "
+        f"that can hold, so everything available to any future argument is a "
+        f"factor of {lower['recoverable_ratio']:.2f}, and the rest of the gap "
+        f"belongs to the scenarios rather than to the proof.\n\n"
+        f"That obstacle is "
+        f"{lower['obstacle_minimum_width']:.2f} cell radii wide at its "
+        f"narrowest, so it is thinner than a cell and would have been excluded "
+        f"by the global minimum-width test that `cells_certified` replaced. It "
+        f"passes the per-cell test that is actually in force, which is why it "
+        f"bounds the constant in use rather than the one the withdrawn test "
+        f"assumed. Built by `tools/detour_lower_bound.py`, which decides "
+        f"admissibility with `lattice.cells_certified` and measures with the "
+        f"vendored geodesic rather than reimplementing either.\n\n"
+        f"One thing this does not settle. The supremum is approached as the "
+        f"obstacle nears the lattice point and is not attained, so "
+        f"{lower['geodesic_in_cell_radii']:.2f} is a lower bound on the sharp "
+        f"constant and not the sharp constant. What that value is remains open."
     )
 
 
@@ -228,13 +260,14 @@ def main(argv=None) -> int:
     safety = _load("safety_price.json")
     refine = _load("refinement.json")
     slack = _load("detour_slack.json")
+    lower = _load("detour_lower_bound.json")
 
     blocks = {
         "suite": suite_block(suite),
         "safety": safety_block(safety),
         "example": example_block(suite, "wall_choice", 1.5),
         "refinement": refinement_block(refine),
-        "slack": slack_block(slack),
+        "slack": slack_block(slack, lower),
         "witness": witness_block(suite),
         "commit": f"Pinned geometry: `{vendored.PINNED_COMMIT[:7]}`.",
     }

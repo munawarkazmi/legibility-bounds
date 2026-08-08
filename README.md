@@ -161,6 +161,12 @@ The argument gives `D <= (3 + pi) r`, about 6.14 cell radii. Sampling real point
 It is also not the prize it was once described as here. Halving this constant, from `(3 + 2pi)` to `(3 + pi)`, closed 1.6 per cent of the suite's total interval width: twenty of the thirty two pairs have no band weight at all and cannot move however tight it becomes. Refining the lattice, which closes 55 to 79 per cent, is worth roughly forty times as much. An earlier version of this file called a sharper constant the highest-leverage improvement outstanding, which the measurement does not support.
 
 Two further corrections went with it. The looseness used to be reported as a factor of 3.7, measured between two arbitrary points of a cell rather than from a point to its own centre. That is a harder quantity than the bound claims, and using it flattered the constant. The sampling also drew offsets from the cell radius, which is the half diagonal, and so covered a box wider than the cell. Corrected for both, no sampled point in any tested world is separated from its own lattice point at all, and the wrapping argument is never needed.
+
+Most of that looseness is not available to anyone, which is a different claim and needs a different kind of evidence. Slack measured against these worlds says how much room there is here. It does not say how much a sharper argument could take. That is bounded by exhibiting a configuration the constant has to survive: a unit cell with a free lattice point at the origin, one convex obstacle, and a point of the cell whose exact geodesic distance to its own lattice point is 3.49 cell radii. No constant below that can hold, so everything available to any future argument is a factor of 1.76, and the rest of the gap belongs to the scenarios rather than to the proof.
+
+That obstacle is 0.86 cell radii wide at its narrowest, so it is thinner than a cell and would have been excluded by the global minimum-width test that `cells_certified` replaced. It passes the per-cell test that is actually in force, which is why it bounds the constant in use rather than the one the withdrawn test assumed. Built by `tools/detour_lower_bound.py`, which decides admissibility with `lattice.cells_certified` and measures with the vendored geodesic rather than reimplementing either.
+
+One thing this does not settle. The supremum is approached as the obstacle nears the lattice point and is not attained, so 3.49 is a lower bound on the sharp constant and not the sharp constant. What that value is remains open.
 <!-- /generated:slack -->
 
 ---
@@ -206,6 +212,7 @@ Then any of the tools, each of which writes a record under `results/`:
 | `safety_price.py` | the certified price of respecting a keep-out zone |
 | `refinement.py` | gap against lattice spacing |
 | `detour_slack.py` | how loose the obstacle constant really is |
+| `detour_lower_bound.py` | how much of that looseness any argument could take |
 | `open_pair_probe.py` | the original kill-criterion probe, on the simplest world |
 | `build_paper_tables.py` | the paper's tables and every number quoted in its prose |
 | `build_paper_figures.py` | the paper's figure |
