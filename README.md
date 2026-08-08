@@ -217,6 +217,7 @@ Then any of the tools, each of which writes a record under `results/`:
 | `build_paper_tables.py` | the paper's tables and every number quoted in its prose |
 | `build_paper_figures.py` | the paper's figure |
 | `build_readme.py` | every number in this file |
+| `build_explainer.py` | every number in the plain-language guide |
 
 <!-- generated:commit -->
 Pinned geometry: `a376ab2`.

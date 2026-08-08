@@ -1,14 +1,22 @@
 % Public explainer for legibility-bounds, written for a non-specialist
-% reader. Every number is taken from the committed records in results/,
-% via the generated blocks in the README; the figures are the ones in
-% docs/img/, produced by the repository's own tools.
+% reader. The figures are the ones in docs/img/, produced by the
+% repository's own tools.
 %
 % Build from this directory:  latexmk -pdf explainer.tex
 %
-% When the suite is re-run, the numbers in "The results", "What safety
-% costs" and "Where the remaining width lives" must be re-checked against
-% README.md, whose generated blocks come from results/. They are prose
-% here, so nothing enforces them.
+% Every passage that quotes a number sits between a pair of markers reading
+% "generated:<block>" and "/generated:<block>", each on its own comment line,
+% and is written by tools/build_explainer.py from the records in results/.
+% Do not edit inside a marker; the next run overwrites it. Prose outside the
+% markers is written by hand and is never touched.
+%
+% This used to say that the numbers here had to be re-checked against the
+% README by hand, because nothing enforced them. Nothing did, and they went
+% stale: this file was still quoting a narrowest gap of 0.0065 after the
+% results had moved to 0.0064, and since the site's drift checker asks
+% whether a number is still findable in this repository rather than whether
+% it is still true, that one stale sentence held a stale claim on the site
+% green. Run tools/build_explainer.py --check to fail instead of drifting.
 \documentclass[11pt,a4paper]{article}
 
 \usepackage[margin=2.4cm,top=2.2cm,bottom=2.2cm]{geometry}
@@ -110,12 +118,14 @@ That second number is a different kind of statement from anything a search produ
 
 Here is a real one, from the committed results:
 
+% generated:example
 \begin{quotebox}
 \textit{No trajectory from the start to the true goal in the} \code{wall\_choice} \textit{room, spending at most 50 per cent more distance than the shortest route, attains a legibility of \textbf{0.81 or above} under this observer.}\\[4pt]
 \textit{One attaining \textbf{0.8004} exists.}
 \end{quotebox}
 
 The shortest route in that room scores 0.5457, so the extra distance genuinely buys clarity. And the two ends sit 0.0064 apart, which means any target outside that narrow band is now settled: above it, provably unreachable; at or below the achieved value, definitely reached.
+% /generated:example
 
 \section{How you prove something about every possible route}
 
@@ -151,7 +161,9 @@ The upper limit is only half an interval. The lower end needs an actual trajecto
 
 The obvious approach is to run a search. This project deliberately does not, because a search is exactly the thing it exists not to rely on. Instead the trajectory is \emph{constructed}: it is threaded through the high-belief cells that the bound itself identified, joined up with exact shortest connections, and then pulled back towards the direct route until it fits inside the distance budget. It is then scored by the same measurement as everything else, so what it claims is what it measures.
 
+% generated:witness
 This turns out to work better than searching, too. Against the reference local search, the constructed trajectory is the better of the two in \textbf{13 of 32} cases, by as much as 0.1485. Where the search wins, the search's number is used and the record says which produced it.
+% /generated:witness
 
 \section{The results}
 
@@ -161,7 +173,9 @@ This turns out to work better than searching, too. Against the reference local s
 \caption{\small Every band is a certified interval. The circle is a trajectory that exists, the diamond is a level nothing can exceed, and the tick marks the shortest route for contrast. The best possible value lies inside every band.}
 \end{figure}
 
+% generated:range
 Eight rooms, four distance budgets each, so 32 combinations in total. \textbf{Every one holds, with no violations.} The intervals range from 0.0064 apart at the tightest to 0.0567 at the widest.
+% /generated:range
 
 Look at how far the circles sit from the ticks: in most rooms, spending a little extra distance buys a great deal of clarity. And look at how far apart the rooms are from one another. That spread is the thing that was previously invisible. Some of these rooms are simply harder than others, and now that can be stated rather than suspected.
 
@@ -175,6 +189,7 @@ That comparison establishes nothing. If the restricted run scores worse, it may 
 
 The bound settles it, because a keep-out region restricts the robot but not the person watching, so the same argument applies to the restricted problem. Put that limit next to an unrestricted trajectory that demonstrably exists, and if the achievable value is higher than the restricted ceiling, the gap between them is a \textbf{certified minimum price} of the safety constraint. Something is achievable; nothing safe can match it.
 
+% generated:safety
 \begin{center}
 \small
 \begin{tabular}{lrrrr}
@@ -189,6 +204,7 @@ room & budget & achievable & safe ceiling & certified price \\
 \end{center}
 
 Three of the eight cases certify a positive price. The other five certify nothing, and are reported as nothing rather than as zero.
+% /generated:safety
 
 One detail is worth drawing out. In \code{keep\_out\_shortcut} the cheapest route is already safe, so the restriction costs a robot nothing at all, as long as that robot is not trying to be understood. The price only appears once the robot wants to communicate. Being both safe and clear is harder than being either.
 
@@ -198,8 +214,11 @@ The intervals are not tight, and rather than leave that as a caveat, the project
 
 One suspected cause was ruled out by testing rather than argument: a deliberately discarded piece of the reasoning turns out to be worth less than a hundredth of a point, and recovering it would cost more than the alternative.
 
+% generated:refinement
 Most of the remaining width comes from the resolution of the grid the room is divided into. Refining that grid closes between 55 and 79 per cent of the gap, which means the published numbers are conservative by roughly that margin.
+% /generated:refinement
 
+% generated:slack
 What survives even that is a single constant in the obstacle argument. The proof guarantees a detour of no more than about 6.14 cell-widths near a corner; measuring actual points beside actual corners, each to its own grid point, finds the worst real detour is 0.99. So the constant is loose by a factor of about 6.2.
 
 \begin{quotebox}
@@ -209,9 +228,11 @@ That is not an error, because a proof must hold in the worst case and the worst 
 An earlier version of this page said something stronger and less true, so it is worth setting out what changed. The constant used to be about 9.28, and a sharper argument brought it to 6.14. That was expected to matter and it did not. It closed 1.6 per cent of the total width, because most of the rooms draw nothing from the obstacle argument at all and cannot move however tight it becomes. Refining the grid, at 55 to 79 per cent, is worth some forty times as much.
 
 The looseness was also being measured in a way that flattered the constant. It compared two arbitrary points of a cell, which is a harder distance than the proof ever claims, and it drew those points from a box wider than the cell itself. Measured correctly, no sampled point in any room tested is cut off from its own grid point at all, and the detour argument never actually binds.
+% /generated:slack
 
 \section{How much of that gap could anyone close?}
 
+% generated:recoverable
 The figure of 6.2 answers a narrower question than it appears to. It says how much slack there is in \emph{these} rooms. It says nothing about how much of that slack a better proof could ever take back, and those are different questions with different answers.
 
 Answering the second one means putting the measuring tape away and building a room on purpose. Place a single obstacle beside a grid point, arranged as awkwardly as the rules still allow, and ask how far a nearby point genuinely is from that grid point once you are forced to walk around the obstacle rather than through it. The answer is 3.49 cell-widths. That room is legal, so no proof is allowed to promise anything smaller than 3.49, however clever it is.
@@ -220,11 +241,12 @@ Answering the second one means putting the measuring tape away and building a ro
 So the gap splits in two. A sharper argument could bring the guarantee from 6.14 down to about 3.49, a factor of 1.76, and there it stops. The rest is not slack in the proof at all.
 \end{quotebox}
 
-What is left over is the distance between the rooms in this suite and the nastiest room the rules permit. No amount of cleverness recovers it, because there is nothing there to recover: the proof has to survive the nasty room, and these rooms simply are not it. That is worth separating out, because "the guarantee is six times larger than anything we measured" sounds like six times of waiting improvement, and only a fraction of it is.
+What is left over is the distance between the rooms in this suite and the nastiest room the rules permit. No amount of cleverness recovers it, because there is nothing there to recover: the proof has to survive the nasty room, and these rooms simply are not it. That is worth separating out, because "the guarantee is 6.2 times larger than anything we measured" sounds like 6.2 times of improvement waiting to be collected, and only a fraction of it is.
 
-The obstacle in that awkward room is narrower than a single cell. That sounds like cheating and is the opposite. An earlier version of the rules required every obstacle to be wider than a cell, and that requirement was withdrawn, because width is a property of a whole shape and a long thin triangle can be broad overall while its tip is thinner than a cell and slips straight through one. The rule in force is checked cell by cell instead. The awkward room obeys the rule that is actually in force, which is exactly why it constrains the constant actually in use.
+The obstacle in that awkward room is 0.86 cell-widths across at its narrowest, so it is narrower than a single cell. That sounds like cheating and is the opposite. An earlier version of the rules required every obstacle to be wider than a cell, and that requirement was withdrawn, because width is a property of a whole shape and a long thin triangle can be broad overall while its tip is thinner than a cell and slips straight through one. The rule in force is checked cell by cell instead. The awkward room obeys the rule that is actually in force, which is exactly why it constrains the constant actually in use.
 
 One thing this does not settle. 3.49 is the worst room anyone has built, not a proof that no worse room exists. The true answer lies somewhere between 3.49 and 6.14, and finding it is an open question rather than a finished one.
+% /generated:recoverable
 
 Publishing the location of your own weakest step, with a measurement of how weak it is, is unusual. Publishing that the step you named as weakest was not the one that mattered, that you had been measuring it against the wrong quantity, and that most of what remains was never available to begin with, is the same discipline turned on itself. It is the reason the rest of the numbers can be taken at face value.
 
