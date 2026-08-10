@@ -22,9 +22,19 @@ paper/*.out
 paper/*.run.xml
 paper/*.synctex.gz
 paper/paper.pdf
-# The signed circulation copy, built by `make named`. Derived from the same
-# source as the anonymous one and never the artefact of record.
+# The signed circulation copy, built by `make named`. Its intermediates stay
+# ignored; the PDF itself is committed. This comment used to say it was never
+# the artefact of record, and that stopped being true: it is the file deposited
+# on Zenodo as v2 and the one the site serves, which makes it the artefact of
+# record in every sense a reader cares about.
+#
+# Committing a build output means it can go stale in the tree, which is exactly
+# what happened to docs/explainer/explainer.pdf. It is worth doing anyway only
+# because the site's drift checker now compares what it serves against this
+# file byte for byte, and compares this file's commit date against paper.tex,
+# so a copy that falls behind its source is caught instead of served.
 paper/paper-named.*
+!paper/paper-named.pdf
 # Raster previews of the figure, rendered to look at it during development.
 # The figure itself is committed; these are not.
 paper/generated/*.png
